@@ -14,7 +14,7 @@ export default function RootLayout({
   const { i18n } = useTranslation();
   return (
     <html lang={i18n.language}>
-      <body>
+      <body style={{fontSize :'16px', fontFamily: 'inherit', background: '#000'}}>
         <ReduxProvider>
           <HeaderSite />
           {children}

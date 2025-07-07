@@ -1,119 +1,242 @@
-import React from 'react'
+import React from "react";
+import { useTranslation } from "react-i18next";
 
 const FooterSite = () => {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-[#1a1a1a] text-neutral-100 pt-10 pb-4 px-4 text-base">
       <div className="max-w-[90rem] mx-auto">
         {/* Top: Contact, Address, CTA */}
         <div className="flex flex-col md:flex-row md:justify-between items-center mb-8 gap-4">
           <button className="border border-neutral-700 rounded px-4 py-2 flex items-center gap-2 hover:bg-neutral-800">
-            <span>📧</span> Contact us
+            <span>📧</span> {t("contact_us")}
           </button>
-          <span className="text-neutral-400 text-sm text-center">USA, 800 Boylston Street, Suite 2475, Boston, MA 02199</span>
+          <span className="text-neutral-400 text-sm text-center">
+            {t("address")}
+          </span>
           <div className="flex flex-col items-center gap-2">
-            <button className="bg-[#00b087] text-white font-bold px-6 py-2 rounded hover:bg-[#009e76] transition">Get started with Semrush!</button>
-            <a href="#" className="text-neutral-400 text-sm underline hover:text-white">or see our plans & pricing</a>
+            <button className="bg-[#00b087] text-white font-bold px-6 py-2 rounded hover:bg-[#009e76] transition">
+              {t("get_start")}
+            </button>
+            <a
+              href="#"
+              className="text-neutral-400 text-sm underline hover:text-white"
+            >
+              {t("see_plans")}
+            </a>
           </div>
         </div>
+
         {/* Middle: Menu columns */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 border-b border-neutral-800 pb-8">
-          {/* SEMRUSH */}
+          {/* Semrush */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">Semrush</div>
+            <div className="font-bold text-lg mb-2 uppercase">
+              {t("semrush")}
+            </div>
             <ul className="space-y-1 text-sm text-neutral-400">
-              <li><a href="#" className="hover:text-white transition">Features</a></li>
-              <li><a href="#" className="hover:text-white transition">Pricing</a></li>
-              <li><a href="#" className="hover:text-white transition">Free Trial</a></li>
-              <li><a href="#" className="hover:text-white transition">Success Stories</a></li>
-              <li><a href="#" className="hover:text-white transition">Stats and Facts</a></li>
-              <li><a href="#" className="hover:text-white transition">Insights</a></li>
-              <li><a href="#" className="hover:text-white transition">News</a></li>
-              <li><a href="#" className="hover:text-white transition">Affiliate Program</a></li>
+              <li>
+                <a href="#">{t("features")}</a>
+              </li>
+              <li>
+                <a href="#">{t("pricing")}</a>
+              </li>
+              <li>
+                <a href="#">{t("free_trial")}</a>
+              </li>
+              <li>
+                <a href="#">{t("success_stories")}</a>
+              </li>
+              <li>
+                <a href="#">{t("stats_and_facts")}</a>
+              </li>
+              <li>
+                <a href="#">{t("insights")}</a>
+              </li>
+              <li>
+                <a href="#">{t("news")}</a>
+              </li>
+              <li>
+                <a href="#">{t("affiliate_program")}</a>
+              </li>
             </ul>
           </div>
-          {/* COMMUNITY & FREE TOOLS */}
+
+          {/* Community & Free Tools */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">Community</div>
+            <div className="font-bold text-lg mb-2 uppercase">
+              {t("community")}
+            </div>
             <ul className="space-y-1 text-sm text-neutral-400">
-              <li><a href="#" className="hover:text-white transition">Semrush Blog</a></li>
-              <li><a href="#" className="hover:text-white transition">Webinars</a></li>
+              <li>
+                <a href="#">{t("blog")}</a>
+              </li>
+              <li>
+                <a href="#">{t("webinars")}</a>
+              </li>
             </ul>
-            <div className="font-bold text-lg mt-4 mb-2 uppercase">Free Tools</div>
+            <div className="font-bold text-lg mt-4 mb-2 uppercase">
+              {t("free_tools")}
+            </div>
             <ul className="space-y-1 text-sm text-neutral-400">
-              <li><a href="#" className="hover:text-white transition">Top Websites</a></li>
-              <li><a href="#" className="hover:text-white transition">SEO Tools</a></li>
-              <li><a href="#" className="hover:text-white transition">SEOquake</a></li>
-              <li><a href="#" className="hover:text-white transition">Sensor</a></li>
+              <li>
+                <a href="#">{t("top_websites")}</a>
+              </li>
+              <li>
+                <a href="#">{t("seo_tools")}</a>
+              </li>
+              <li>
+                <a href="#">{t("seoquake")}</a>
+              </li>
+              <li>
+                <a href="#">{t("sensor")}</a>
+              </li>
             </ul>
           </div>
-          {/* MORE TOOLS */}
+
+          {/* More Tools */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">More Tools</div>
+            <div className="font-bold text-lg mb-2 uppercase">
+              {t("more_tools")}
+            </div>
             <ul className="space-y-1 text-sm text-neutral-400">
-              <li><a href="#" className="hover:text-white transition">Enterprise SEO</a></li>
-              <li><a href="#" className="hover:text-white transition">Enterprise Crawler</a></li>
-              <li><a href="#" className="hover:text-white transition">Insights24</a></li>
-              <li><a href="#" className="hover:text-white transition">Mfour</a></li>
-              <li><a href="#" className="hover:text-white transition">Prowly</a></li>
-              <li><a href="#" className="hover:text-white transition">App Center</a></li>
-              <li><a href="#" className="hover:text-white transition">Agency Partners</a></li>
-              <li><a href="#" className="hover:text-white transition">SplitSignal</a></li>
+              <li>
+                <a href="#">{t("enterprise_seo")}</a>
+              </li>
+              <li>
+                <a href="#">{t("enterprise_crawler")}</a>
+              </li>
+              <li>
+                <a href="#">{t("insights24")}</a>
+              </li>
+              <li>
+                <a href="#">{t("mfour")}</a>
+              </li>
+              <li>
+                <a href="#">{t("prowly")}</a>
+              </li>
+              <li>
+                <a href="#">{t("app_center")}</a>
+              </li>
+              <li>
+                <a href="#">{t("agency_partners")}</a>
+              </li>
+              <li>
+                <a href="#">{t("splitsignal")}</a>
+              </li>
             </ul>
           </div>
-          {/* COMPANY */}
+
+          {/* Company */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">Company</div>
+            <div className="font-bold text-lg mb-2 uppercase">
+              {t("company")}
+            </div>
             <ul className="space-y-1 text-sm text-neutral-400">
-              <li><a href="#" className="hover:text-white transition">About Us</a></li>
-              <li><a href="#" className="hover:text-white transition">Newsroom</a></li>
-              <li><a href="#" className="hover:text-white transition">Careers</a></li>
-              <li><a href="#" className="hover:text-white transition">Partners</a></li>
-              <li><a href="#" className="hover:text-white transition">Legal Info</a></li>
-              <li><a href="#" className="hover:text-white transition">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition">Cookie Settings</a></li>
-              <li><a href="#" className="hover:text-white transition">Do not sell my personal info</a></li>
-              <li><a href="#" className="hover:text-white transition">Security Info</a></li>
-              <li><a href="#" className="hover:text-white transition">For Investors</a></li>
-              <li><a href="#" className="hover:text-white transition">Semrush Select</a></li>
-              <li><a href="#" className="hover:text-white transition">Global Issues Index</a></li>
-              <li><a href="#" className="hover:text-white transition">Contact Us</a></li>
+              <li>
+                <a href="#">{t("about_us")}</a>
+              </li>
+              <li>
+                <a href="#">{t("newsroom")}</a>
+              </li>
+              <li>
+                <a href="#">{t("careers")}</a>
+              </li>
+              <li>
+                <a href="#">{t("partners")}</a>
+              </li>
+              <li>
+                <a href="#">{t("legal_info")}</a>
+              </li>
+              <li>
+                <a href="#">{t("privacy_policy")}</a>
+              </li>
+              <li>
+                <a href="#">{t("cookie_settings")}</a>
+              </li>
+              <li>
+                <a href="#">{t("do_not_sell")}</a>
+              </li>
+              <li>
+                <a href="#">{t("security_info")}</a>
+              </li>
+              <li>
+                <a href="#">{t("investors")}</a>
+              </li>
+              <li>
+                <a href="#">{t("semrush_select")}</a>
+              </li>
+              <li>
+                <a href="#">{t("global_issues")}</a>
+              </li>
+              <li>
+                <a href="#">{t("contact_us")}</a>
+              </li>
             </ul>
           </div>
-          {/* FOLLOW US & LANGUAGE */}
+
+          {/* Follow Us & Language */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">Follow Us</div>
+            <div className="font-bold text-lg mb-2 uppercase">
+              {t("follow_us")}
+            </div>
             <ul className="space-y-1 text-sm text-neutral-400">
-              <li><a href="#" className="hover:text-white transition">X (Twitter)</a></li>
-              <li><a href="#" className="hover:text-white transition">Facebook</a></li>
-              <li><a href="#" className="hover:text-white transition">LinkedIn</a></li>
-              <li><a href="#" className="hover:text-white transition">Instagram</a></li>
-              <li><a href="#" className="hover:text-white transition">YouTube</a></li>
-              <li><a href="#" className="hover:text-white transition">Pinterest</a></li>
+              <li>
+                <a href="#">X (Twitter)</a>
+              </li>
+              <li>
+                <a href="#">Facebook</a>
+              </li>
+              <li>
+                <a href="#">LinkedIn</a>
+              </li>
+              <li>
+                <a href="#">Instagram</a>
+              </li>
+              <li>
+                <a href="#">YouTube</a>
+              </li>
+              <li>
+                <a href="#">Pinterest</a>
+              </li>
             </ul>
-            <div className="font-bold text-lg mt-4 mb-2 uppercase">Language</div>
+            <div className="font-bold text-lg mt-4 mb-2 uppercase">
+              {t("language")}
+            </div>
             <div className="text-sm text-neutral-400">English ▼</div>
           </div>
-          {/* HELP */}
+
+          {/* Help */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">Help</div>
+            <div className="font-bold text-lg mb-2 uppercase">{t("help")}</div>
             <ul className="space-y-1 text-sm text-neutral-400">
-              <li><a href="#" className="hover:text-white transition">Knowledge Base</a></li>
-              <li><a href="#" className="hover:text-white transition">Academy</a></li>
-              <li><a href="#" className="hover:text-white transition">Semrush API</a></li>
+              <li>
+                <a href="#">{t("knowledge_base")}</a>
+              </li>
+              <li>
+                <a href="#">{t("academy")}</a>
+              </li>
+              <li>
+                <a href="#">{t("semrush_api")}</a>
+              </li>
             </ul>
           </div>
         </div>
-        {/* Bottom: Logo & copyright */}
+
+        {/* Bottom: Logo & Copyright */}
         <div className="flex flex-col md:flex-row justify-between items-center mt-8 gap-4">
           <div className="flex items-center gap-2">
             <img src="/logo.svg" alt="SEMRUSH Logo" className="h-6" />
             <span className="font-bold text-lg">SEMRUSH</span>
           </div>
-          <div className="text-sm text-neutral-500">© 2008 - 2025 Semrush. All rights reserved.</div>
+          <div className="text-sm text-neutral-500">
+            © 2008 - 2025 Semrush. {t("all_rights_reserved")}
+          </div>
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default FooterSite
+export default FooterSite;

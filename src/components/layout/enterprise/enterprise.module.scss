@@ -1,0 +1,68 @@
+.enterprise {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+  background-image: url("/enterprise-bg.jpg");
+  margin-top: -80px;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .container {
+    width: 1000px;
+    height: 290px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    .item {
+      flex: 1;
+      height: 100%;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      .title {
+        font-size: 48px;
+        color: #fff;
+        padding-left: 32px;
+        font-weight: 600;
+      }
+      .btn {
+        padding-left: 32px;
+        Button {
+          padding: 28px 32px;
+          font-weight: 600;
+          font-size: 20px;
+          border: none;
+        }
+      }
+    }
+    .item2 {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.6);
+      border: solid 1px #fff;
+      border-radius: 20px;
+      height: 100%;
+      z-index: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+      .title2 {
+        display: flex;
+        color: #fff;
+        align-items: center;
+        font-size: 22px;
+        gap: 20px;
+        .icon {
+          color: plum;
+          font-size: 32px;
+        }
+      }
+    }
+  }
+}

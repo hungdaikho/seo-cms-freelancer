@@ -5,15 +5,15 @@ import bn from './bn.json';
 
 const resources = {
   en: { translation: en },
-  bn: { translation: bn },
+  ph: { translation: bn },
 };
 
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'bn', 
-    fallbackLng: 'bn',
+    lng: 'ph', 
+    fallbackLng: 'ph',
     interpolation: {
       escapeValue: false, 
     },

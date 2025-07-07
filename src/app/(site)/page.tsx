@@ -1,10 +1,15 @@
 "use client";
-import { useTranslation } from 'react-i18next';
+
+import Enterprise from "@/components/layout/enterprise/enterprise";
+import HeroSite from "@/components/layout/hero/hero.site";
+import Quote from "@/components/layout/quote/quote";
+
 export default function Page() {
-  const { t } = useTranslation();
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <h1>{t('welcome')}</h1>
-    </div>
+    <>
+      <HeroSite />
+      <Enterprise />
+      <Quote />
+    </>
   );
 }
