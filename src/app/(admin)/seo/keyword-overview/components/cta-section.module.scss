@@ -1,0 +1,186 @@
+.ctaSection {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 48px;
+  margin-top: 48px;
+
+  .ctaContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+
+    .ctaContent {
+      h2 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 32px;
+      }
+
+      .demoForm {
+        background: white;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        .formHeader {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+
+          .keywordTips {
+            .tipsLabel {
+              font-size: 12px;
+              color: #6b7280;
+              text-decoration: underline;
+            }
+          }
+
+          .examples {
+            font-size: 14px;
+            color: #6b7280;
+
+            span {
+              margin-right: 8px;
+            }
+
+            a {
+              color: #3b82f6;
+              text-decoration: none;
+              margin-right: 8px;
+
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+
+        .formFields {
+          .keywordInput {
+            height: 48px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            margin-bottom: 16px;
+            font-size: 16px;
+
+            &:hover,
+            &:focus {
+              border-color: #3b82f6;
+            }
+          }
+
+          .formRow {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 12px;
+            align-items: end;
+            position: relative;
+
+            .domainInput {
+              height: 48px;
+              border-radius: 8px;
+              border: 1px solid #d1d5db;
+              background: #f8f9ff;
+
+              &:hover,
+              &:focus {
+                border-color: #3b82f6;
+              }
+            }
+
+            .aiFeature {
+              position: absolute;
+              bottom: -20px;
+              left: 0;
+              font-size: 11px;
+              color: #8b5cf6;
+              background: #f3e8ff;
+              padding: 2px 6px;
+              border-radius: 4px;
+            }
+
+            .countrySelect,
+            .locationSelect {
+              height: 48px;
+              min-width: 120px;
+
+              .ant-select-selector {
+                height: 48px !important;
+                border-radius: 8px;
+                border: 1px solid #d1d5db;
+
+                .ant-select-selection-item {
+                  line-height: 46px;
+                }
+              }
+            }
+
+            .searchButton {
+              height: 48px;
+              padding: 0 32px;
+              background: #10b981;
+              border: none;
+              border-radius: 8px;
+              font-weight: 600;
+
+              &:hover {
+                background: #059669;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .ctaSection {
+    padding: 32px 24px;
+
+    .ctaContent {
+      .demoForm {
+        padding: 24px;
+
+        .formFields .formRow {
+          grid-template-columns: 1fr;
+          gap: 16px;
+
+          .aiFeature {
+            position: static;
+            margin-top: 4px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .ctaSection {
+    padding: 24px 16px;
+
+    .ctaContent {
+      h2 {
+        font-size: 24px;
+      }
+
+      .demoForm {
+        padding: 16px;
+
+        .formHeader {
+          flex-direction: column;
+          gap: 12px;
+          align-items: flex-start;
+
+          .examples {
+            text-align: center;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

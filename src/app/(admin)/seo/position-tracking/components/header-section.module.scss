@@ -1,0 +1,154 @@
+.headerSection {
+  background: #f8fafc;
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+
+    .breadcrumbItem {
+      color: #64748b;
+
+      &:last-child {
+        color: #1e293b;
+        font-weight: 500;
+      }
+    }
+
+    .separator {
+      margin: 0 8px;
+      color: #cbd5e1;
+    }
+  }
+
+  .headerContent {
+    .titleSection {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+
+      .pageTitle {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+      }
+
+      .feedbackBtn {
+        color: #3b82f6;
+        padding: 0;
+        height: auto;
+        font-size: 14px;
+
+        &:hover {
+          color: #2563eb;
+        }
+
+        .anticon {
+          margin-right: 4px;
+        }
+      }
+    }
+
+    .controlsRow {
+      .searchInput {
+        height: 40px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+
+        .searchIcon {
+          color: #9ca3af;
+        }
+
+        &:focus-within {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+      }
+
+      .dateSelect {
+        width: 100%;
+        height: 40px;
+
+        .ant-select-selector {
+          height: 40px !important;
+          border-radius: 6px;
+          border: 1px solid #d1d5db;
+
+          .ant-select-selection-item {
+            line-height: 38px;
+            color: #374151;
+          }
+        }
+
+        &.ant-select-focused .ant-select-selector {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+      }
+
+      .dateDisplay {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        color: #6b7280;
+        font-size: 14px;
+        padding: 0 12px;
+      }
+
+      .createBtn {
+        height: 40px;
+        border-radius: 6px;
+        font-weight: 500;
+        width: 100%;
+
+        .anticon {
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .headerSection {
+    .headerContent {
+      .titleSection {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+
+        .pageTitle {
+          font-size: 24px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .headerSection {
+    padding: 16px;
+
+    .headerContent {
+      .titleSection {
+        .pageTitle {
+          font-size: 22px;
+        }
+      }
+
+      .controlsRow {
+        .dateDisplay {
+          justify-content: center;
+          background: #f1f5f9;
+          border-radius: 6px;
+          border: 1px solid #e2e8f0;
+        }
+      }
+    }
+  }
+}

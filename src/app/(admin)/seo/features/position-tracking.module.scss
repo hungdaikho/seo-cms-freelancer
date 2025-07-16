@@ -1,0 +1,168 @@
+.positionCard {
+  margin: 16px 24px;
+  border-radius: 8px;
+
+  :global(.ant-card-body) {
+    padding: 20px;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.headerLeft {
+  .cardTitle {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+
+    .infoIcon {
+      color: #bbb;
+      font-size: 14px;
+      margin-left: 4px;
+    }
+  }
+
+  .locationSelector {
+    font-size: 13px;
+    color: #666;
+  }
+}
+
+.headerRight {
+  text-align: right;
+  font-size: 12px;
+  color: #999;
+
+  .updateTime,
+  .dateRange {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  :global(.ant-select) {
+    margin-left: 8px;
+
+    .ant-select-selector {
+      border: none;
+      box-shadow: none;
+      font-size: 12px;
+    }
+  }
+}
+
+.visibilitySection {
+  display: flex;
+  gap: 24px;
+}
+
+.visibilityScore {
+  flex-shrink: 0;
+  text-align: center;
+
+  .visibilityLabel {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  .scoreValue {
+    font-size: 32px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.keywordStats {
+  flex: 1;
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.statSection {
+  .sectionTitle {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 4px;
+  }
+
+  .sectionValue {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+  }
+
+  .changes {
+    font-size: 11px;
+    margin-bottom: 8px;
+
+    .new,
+    .lost {
+      display: block;
+      color: #999;
+    }
+  }
+
+  :global(.ant-progress) {
+    .ant-progress-bg {
+      height: 4px !important;
+    }
+  }
+}
+
+.topKeywords {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.topKeywordsHeader {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.keywordTable {
+  .tableHeader {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    padding: 8px 0;
+    font-size: 12px;
+    color: #999;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .tableRow {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    padding: 8px 0;
+    font-size: 13px;
+
+    .keyword {
+      color: #1890ff;
+    }
+  }
+}
+
+.cardFooter {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}

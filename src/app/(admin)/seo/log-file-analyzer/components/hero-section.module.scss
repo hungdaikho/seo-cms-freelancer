@@ -1,0 +1,154 @@
+.heroSection {
+  padding: 80px 0;
+  background-color: #f8f9fa;
+  text-align: center;
+
+  .heroContent {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+
+    .heroTitle {
+      font-size: 48px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+      line-height: 1.2;
+
+      @media (max-width: 768px) {
+        font-size: 36px;
+      }
+    }
+
+    .heroSubtitle {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 50px;
+      line-height: 1.6;
+
+      @media (max-width: 768px) {
+        font-size: 16px;
+        br {
+          display: none;
+        }
+      }
+    }
+
+    .uploadArea {
+      background: white;
+      border: 2px dashed #d9d9d9;
+      border-radius: 12px;
+      padding: 60px 40px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover,
+      &.dragOver {
+        border-color: #00b96b;
+        background: #f6ffed;
+      }
+
+      @media (max-width: 768px) {
+        padding: 40px 20px;
+      }
+
+      .uploadIcon {
+        width: 60px;
+        height: 60px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+
+        svg {
+          width: 24px;
+          height: 24px;
+          color: #999;
+        }
+      }
+
+      .uploadText {
+        font-size: 18px;
+        color: #999;
+        margin-bottom: 16px;
+
+        @media (max-width: 768px) {
+          font-size: 16px;
+        }
+      }
+
+      .uploadOr {
+        font-size: 16px;
+        color: #999;
+        margin-bottom: 20px;
+      }
+
+      .browseButton {
+        height: 44px;
+        padding: 0 32px;
+        background: #00b96b;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #009a5a;
+          transform: translateY(-1px);
+        }
+
+        .anticon {
+          margin-right: 8px;
+        }
+      }
+    }
+
+    .fileInfo {
+      margin-bottom: 40px;
+
+      .fileInfoText {
+        font-size: 14px;
+        color: #666;
+
+        .accessLink {
+          color: #1890ff;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    .disclaimer {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: left;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+      @media (max-width: 768px) {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .disclaimerText {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 16px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,430 @@
+.strategyStepsSection {
+  margin-bottom: 48px;
+
+  .sectionHeader {
+    text-align: center;
+    margin-bottom: 48px;
+
+    h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0 0 16px 0;
+    }
+
+    p {
+      font-size: 16px;
+      color: #6b7280;
+      margin: 0;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+  }
+
+  .stepsGrid {
+    margin-bottom: 64px;
+
+    .stepCard {
+      height: 100%;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      .ant-card-body {
+        padding: 32px 24px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .stepHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+
+        .stepIcon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 20px;
+        }
+
+        .stepNumber {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: #f3f4f6;
+          color: #374151;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          font-weight: 600;
+        }
+      }
+
+      .stepContent {
+        flex: 1;
+
+        h3 {
+          font-size: 20px;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0 0 12px 0;
+        }
+
+        .stepDescription {
+          font-size: 14px;
+          color: #6b7280;
+          line-height: 1.6;
+          margin: 0 0 20px 0;
+        }
+
+        .featureList {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+
+          li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 8px;
+            line-height: 1.4;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .checkIcon {
+              color: #10b981;
+              font-size: 16px;
+              flex-shrink: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .sectionDivider {
+    margin: 64px 0;
+    border-color: #e5e7eb;
+  }
+
+  .demoSection {
+    .demoHeader {
+      text-align: center;
+      margin-bottom: 32px;
+
+      h3 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 8px 0;
+      }
+
+      p {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+      }
+    }
+
+    .demoCard {
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .ant-card-body {
+        padding: 32px;
+      }
+
+      .demoStats {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #f3f4f6;
+
+        .statItem {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .statIcon {
+            width: 40px;
+            height: 40px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 18px;
+          }
+
+          .progressContainer {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .statContent {
+            .statValue {
+              font-size: 20px;
+              font-weight: 700;
+              color: #1f2937;
+              line-height: 1;
+            }
+
+            .statLabel {
+              font-size: 12px;
+              color: #6b7280;
+              margin-top: 2px;
+            }
+          }
+        }
+      }
+
+      .demoTable {
+        margin-bottom: 24px;
+
+        .tableHeader {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+          gap: 16px;
+          padding: 12px 16px;
+          background: #f9fafb;
+          border-radius: 8px 8px 0 0;
+          border-bottom: 1px solid #e5e7eb;
+
+          .headerCell {
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+        }
+
+        .tableRow {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+          gap: 16px;
+          padding: 16px;
+          border-bottom: 1px solid #f3f4f6;
+          align-items: center;
+
+          &:last-child {
+            border-bottom: none;
+            border-radius: 0 0 8px 8px;
+          }
+
+          &:hover {
+            background: #f9fafb;
+          }
+
+          .tableCell {
+            font-size: 14px;
+
+            .keyword {
+              color: #1f2937;
+              font-weight: 500;
+            }
+
+            .difficultyBadge {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .ant-progress {
+                flex: 1;
+                max-width: 60px;
+              }
+
+              span {
+                font-size: 12px;
+                font-weight: 600;
+                color: #374151;
+              }
+            }
+
+            .volume {
+              color: #1f2937;
+              font-weight: 500;
+            }
+
+            .intent {
+              color: #6b7280;
+              font-size: 13px;
+            }
+
+            .priority {
+              font-weight: 600;
+              font-size: 13px;
+            }
+
+            .status {
+              display: inline-block;
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 12px;
+              font-weight: 500;
+              text-align: center;
+              min-width: 70px;
+            }
+          }
+        }
+      }
+
+      .demoActions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        padding-top: 24px;
+        border-top: 1px solid #f3f4f6;
+
+        .ant-btn {
+          height: 44px;
+          padding: 0 24px;
+          font-weight: 500;
+          border-radius: 8px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .strategyStepsSection {
+    .demoSection {
+      .demoCard {
+        .demoStats {
+          .statItem {
+            flex-direction: column;
+            text-align: center;
+            gap: 8px;
+
+            .statContent .statValue {
+              font-size: 18px;
+            }
+          }
+        }
+
+        .demoTable {
+          .tableHeader,
+          .tableRow {
+            grid-template-columns: 1fr;
+            gap: 8px;
+            padding: 12px;
+          }
+
+          .tableHeader .headerCell,
+          .tableRow .tableCell {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+
+            &:before {
+              content: attr(data-label);
+              font-weight: 600;
+              color: #6b7280;
+              font-size: 12px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .strategyStepsSection {
+    .sectionHeader {
+      margin-bottom: 32px;
+
+      h2 {
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 14px;
+      }
+    }
+
+    .stepsGrid {
+      margin-bottom: 48px;
+
+      .stepCard {
+        .ant-card-body {
+          padding: 24px 20px;
+        }
+
+        .stepHeader {
+          .stepIcon {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+          }
+
+          .stepNumber {
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+          }
+        }
+
+        .stepContent {
+          h3 {
+            font-size: 18px;
+          }
+
+          .stepDescription {
+            font-size: 13px;
+          }
+
+          .featureList li {
+            font-size: 13px;
+          }
+        }
+      }
+    }
+
+    .demoSection {
+      .demoHeader {
+        h3 {
+          font-size: 20px;
+        }
+      }
+
+      .demoCard {
+        .ant-card-body {
+          padding: 20px;
+        }
+
+        .demoActions {
+          flex-direction: column;
+
+          .ant-btn {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

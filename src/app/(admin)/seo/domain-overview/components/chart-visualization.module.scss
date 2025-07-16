@@ -1,0 +1,222 @@
+.chartVisualization {
+  width: 100%;
+
+  .comparisonChart,
+  .growthChart,
+  .countriesChart {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .chartHeader {
+    margin-bottom: 16px;
+
+    .legendItems {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .legendItem {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #374151;
+
+        .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+        }
+      }
+
+      .addCompetitor {
+        color: #6b7280;
+        font-size: 12px;
+        cursor: pointer;
+
+        &:hover {
+          color: #374151;
+        }
+      }
+    }
+  }
+
+  .chartArea {
+    position: relative;
+
+    .chartSvg {
+      width: 100%;
+      height: 120px;
+      margin-bottom: 12px;
+    }
+
+    .chartLines {
+      margin-bottom: 16px;
+    }
+  }
+
+  .metrics {
+    margin: 16px 0;
+
+    .metricBars {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .metricBar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 20px;
+
+        .barFill {
+          height: 6px;
+          border-radius: 3px;
+          position: relative;
+        }
+
+        .arrow {
+          font-size: 12px;
+          font-weight: bold;
+
+          &:contains("↑") {
+            color: #10b981;
+          }
+
+          &:contains("↓") {
+            color: #ef4444;
+          }
+        }
+      }
+    }
+  }
+
+  .chartTags {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+
+    .ant-tag {
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 2px 8px;
+    }
+  }
+
+  .domainInfo {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+
+    .domainItem {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #374151;
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+    }
+  }
+
+  .timeLabels {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+
+    .timeItem {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #374151;
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+    }
+  }
+
+  .tableHeader {
+    display: grid;
+    grid-template-columns: 40px 120px 80px 1fr;
+    gap: 12px;
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+    margin-bottom: 12px;
+    padding: 0 8px;
+  }
+
+  .countryRows {
+    margin-bottom: 16px;
+
+    .countryRow {
+      display: grid;
+      grid-template-columns: 40px 120px 80px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+
+      .countryFlag {
+        font-size: 16px;
+        text-align: center;
+      }
+
+      .trafficBar {
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 3px;
+        position: relative;
+
+        .barFill {
+          height: 100%;
+          border-radius: 3px;
+        }
+      }
+    }
+  }
+
+  .chartLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 8px;
+  }
+
+  .monthLabel {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    font-size: 12px;
+    color: #374151;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 768px) {
+  .chartVisualization {
+    .tableHeader,
+    .countryRow {
+      grid-template-columns: 30px 100px 60px 1fr;
+      gap: 8px;
+    }
+
+    .legendItems {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}

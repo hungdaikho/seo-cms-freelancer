@@ -1,0 +1,49 @@
+.ctaSection {
+  margin: 40px 0;
+
+  .ctaCard {
+    background: white;
+    padding: 60px 40px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    .title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 32px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.4;
+    }
+
+    .ctaButton {
+      height: 50px;
+      padding: 0 32px;
+      background: #10b981;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+
+      &:hover {
+        background: #059669;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .ctaSection {
+    .ctaCard {
+      padding: 40px 24px;
+
+      .title {
+        font-size: 24px;
+        margin-bottom: 24px;
+      }
+    }
+  }
+}

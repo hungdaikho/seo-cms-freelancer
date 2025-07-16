@@ -1,0 +1,205 @@
+.searchSection {
+  background: white;
+  border-radius: 12px;
+  padding: 48px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+
+  .header {
+    margin-bottom: 32px;
+
+    .badge {
+      display: inline-block;
+      background: #f3f4f6;
+      color: #6b7280;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    p {
+      font-size: 16px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 16px;
+
+      &.subDescription {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .searchForm {
+    max-width: 800px;
+    margin: 0 auto;
+
+    .searchRow {
+      margin-bottom: 16px;
+
+      .keywordInput {
+        .inputHeader {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+          font-size: 14px;
+
+          .keywordTips {
+            .tipsLabel {
+              color: #6b7280;
+              text-decoration: underline;
+              font-size: 12px;
+            }
+          }
+
+          .examples {
+            color: #6b7280;
+
+            span {
+              margin-right: 8px;
+            }
+
+            a {
+              color: #3b82f6;
+              text-decoration: none;
+              margin-right: 8px;
+
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+
+        .keywordField {
+          height: 48px;
+          border-radius: 8px;
+          border: 1px solid #d1d5db;
+          font-size: 16px;
+
+          &:hover,
+          &:focus {
+            border-color: #3b82f6;
+          }
+
+          .ant-input {
+            border: none;
+            box-shadow: none;
+          }
+        }
+      }
+    }
+
+    .formRow {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: end;
+
+      .domainInput {
+        position: relative;
+
+        .domainField {
+          height: 48px;
+          border-radius: 8px;
+          border: 1px solid #d1d5db;
+          background: #f8f9ff;
+
+          &:hover,
+          &:focus {
+            border-color: #3b82f6;
+          }
+        }
+
+        .aiFeature {
+          position: absolute;
+          bottom: -20px;
+          left: 0;
+          font-size: 11px;
+          color: #8b5cf6;
+          background: #f3e8ff;
+          padding: 2px 6px;
+          border-radius: 4px;
+        }
+      }
+
+      .countrySelect {
+        height: 48px;
+        min-width: 120px;
+
+        .ant-select-selector {
+          height: 48px !important;
+          border-radius: 8px;
+          border: 1px solid #d1d5db;
+
+          .ant-select-selection-item {
+            line-height: 46px;
+          }
+        }
+      }
+
+      .searchButton {
+        height: 48px;
+        padding: 0 32px;
+        background: #10b981;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+
+        &:hover {
+          background: #059669;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .searchSection {
+    padding: 32px 24px;
+
+    .searchForm .formRow {
+      grid-template-columns: 1fr;
+      gap: 16px;
+
+      .domainInput .aiFeature {
+        position: static;
+        margin-top: 4px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .searchSection {
+    padding: 24px 16px;
+
+    .header h1 {
+      font-size: 24px;
+    }
+
+    .searchForm {
+      .searchRow .keywordInput .inputHeader {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+
+        .examples {
+          text-align: center;
+          width: 100%;
+        }
+      }
+    }
+  }
+}

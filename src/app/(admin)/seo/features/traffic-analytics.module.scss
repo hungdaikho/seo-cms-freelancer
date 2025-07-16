@@ -1,0 +1,150 @@
+.analyticsContainer {
+  margin: 16px 24px;
+}
+
+.leftSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.trafficCard,
+.backlinksCard {
+  border-radius: 8px;
+
+  :global(.ant-card-body) {
+    padding: 20px;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .tabs {
+    :global(.ant-tabs) {
+      .ant-tabs-nav {
+        margin-bottom: 0;
+      }
+
+      .ant-tabs-tab {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+    }
+  }
+
+  .scope {
+    font-size: 13px;
+    color: #666;
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+
+  .emptyIcon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .emptyTitle {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #666;
+  }
+
+  .emptyText {
+    font-size: 14px;
+    color: #999;
+  }
+}
+
+.backlinksContent {
+  .chartSection {
+    margin-bottom: 24px;
+
+    .chartHeader {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .chart {
+      height: 120px;
+      border: 1px solid #f0f0f0;
+      border-radius: 4px;
+      padding: 8px;
+
+      .svgChart {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+  .domainsBreakdown {
+    .breakdownHeader {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .breakdownList {
+      .breakdownItem {
+        display: grid;
+        grid-template-columns: 60px 1fr 40px 40px;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 0;
+        font-size: 13px;
+        border-bottom: 1px solid #f8f8f8;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .progressBar {
+          height: 6px;
+          background: #f0f0f0;
+          border-radius: 3px;
+          overflow: hidden;
+
+          .progressFill {
+            height: 100%;
+            background: #1890ff;
+            transition: width 0.3s ease;
+          }
+        }
+
+        .count {
+          color: #1890ff;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+.cardFooter {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}

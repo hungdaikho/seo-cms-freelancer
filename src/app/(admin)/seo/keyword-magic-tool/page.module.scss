@@ -1,0 +1,18 @@
+.keywordMagicToolPage {
+  min-height: 100vh;
+  background: #f8fafc;
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .keywordMagicToolPage {
+    .container {
+      padding: 16px;
+    }
+  }
+}

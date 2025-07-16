@@ -1,0 +1,211 @@
+.editorDemo {
+  padding: 100px 0;
+  background-color: #fff;
+
+  .editorInterface {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e0e0e0;
+
+      .toolbarGroup {
+        display: flex;
+        gap: 8px;
+
+        .toolBtn {
+          width: 32px;
+          height: 32px;
+          border: 1px solid #d9d9d9;
+          background: white;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          font-size: 14px;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: #f0f0f0;
+            border-color: #40a9ff;
+          }
+        }
+      }
+    }
+
+    .editorContent {
+      padding: 30px;
+      min-height: 300px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        sans-serif;
+      line-height: 1.7;
+
+      .editorText {
+        font-size: 16px;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+        line-height: 1.7;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .highlight {
+          background: rgba(24, 144, 255, 0.15);
+          padding: 2px 4px;
+          border-radius: 3px;
+          color: #1890ff;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .navigation {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      pointer-events: none;
+
+      .navBtn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: all;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: white;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+  }
+
+  .sidePanel {
+    .keywordSection {
+      margin-bottom: 40px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .sectionTitle {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 12px;
+      }
+
+      .sectionDescription {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+
+      .keywordTags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .keywordTag {
+          border-radius: 6px;
+          padding: 4px 12px;
+          font-size: 13px;
+          border: none;
+
+          &.ant-tag {
+            margin: 0;
+          }
+        }
+      }
+    }
+
+    .quickTip {
+      padding: 20px;
+      background: #f6ffed;
+      border: 1px solid #b7eb8f;
+      border-radius: 8px;
+      margin-top: 40px;
+
+      .tipText {
+        font-size: 14px;
+        color: #52c41a;
+        margin: 0;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  @media (max-width: 992px) {
+    .sidePanel {
+      margin-top: 40px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 60px 0;
+
+    .editorInterface {
+      .toolbar {
+        padding: 8px 16px;
+
+        .toolbarGroup {
+          gap: 4px;
+
+          .toolBtn {
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+          }
+        }
+      }
+
+      .editorContent {
+        padding: 20px;
+
+        .editorText {
+          font-size: 15px;
+        }
+      }
+
+      .navigation {
+        padding: 0 16px;
+
+        .navBtn {
+          width: 36px;
+          height: 36px;
+
+          svg {
+            width: 14px;
+            height: 14px;
+          }
+        }
+      }
+    }
+  }
+}

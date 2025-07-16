@@ -1,0 +1,371 @@
+.ctaSection {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 80px 0 0 0;
+  margin-top: 80px;
+
+  .ctaContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 80px 24px;
+
+    .ctaContent {
+      h2 {
+        font-size: 42px;
+        font-weight: 700;
+        color: white;
+        margin: 0 0 24px 0;
+        line-height: 1.2;
+      }
+
+      .ctaDescription {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.6;
+        margin: 0 0 32px 0;
+      }
+
+      .benefitsList {
+        margin-bottom: 40px;
+
+        .benefitItem {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 16px;
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.95);
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .checkIcon {
+            color: #10b981;
+            font-size: 20px;
+            flex-shrink: 0;
+          }
+        }
+      }
+
+      .ctaActions {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+
+        .primaryBtn {
+          background: #10b981;
+          border-color: #10b981;
+          height: 48px;
+          padding: 0 32px;
+          font-size: 16px;
+          font-weight: 600;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          &:hover {
+            background: #059669;
+            border-color: #059669;
+            transform: translateY(-2px);
+          }
+
+          .anticon {
+            font-size: 14px;
+          }
+        }
+
+        .secondaryBtn {
+          background: transparent;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          color: white;
+          height: 48px;
+          padding: 0 32px;
+          font-size: 16px;
+          font-weight: 500;
+          border-radius: 8px;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+            transform: translateY(-2px);
+          }
+        }
+      }
+
+      .trustSignals {
+        .trustText {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.7);
+          line-height: 1.4;
+        }
+      }
+    }
+
+    .featuresGrid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .featureCard {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.15);
+          transform: translateX(8px);
+        }
+
+        .ant-card-body {
+          padding: 24px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .featureIcon {
+          width: 48px;
+          height: 48px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 20px;
+          flex-shrink: 0;
+        }
+
+        .featureContent {
+          flex: 1;
+
+          h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            margin: 0 0 4px 0;
+          }
+
+          p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+  }
+
+  .bottomBanner {
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 32px 0;
+
+    .bannerContent {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+
+      .bannerText {
+        flex: 1;
+
+        h3 {
+          font-size: 20px;
+          font-weight: 600;
+          color: white;
+          margin: 0 0 4px 0;
+        }
+
+        p {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.8);
+          margin: 0;
+        }
+      }
+
+      .bannerActions {
+        display: flex;
+        gap: 16px;
+        flex-shrink: 0;
+
+        .ant-btn {
+          height: 40px;
+          padding: 0 24px;
+          font-weight: 500;
+          border-radius: 6px;
+
+          &.ant-btn-primary {
+            &.ant-btn-background-ghost {
+              border-color: rgba(255, 255, 255, 0.5);
+              color: white;
+
+              &:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: white;
+                color: white;
+              }
+            }
+          }
+
+          &.ant-btn-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0 16px;
+
+            &:hover {
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .ctaSection {
+    padding: 60px 0 0 0;
+
+    .ctaContainer {
+      padding: 0 20px 60px 20px;
+
+      .ctaContent {
+        text-align: center;
+
+        h2 {
+          font-size: 32px;
+        }
+
+        .ctaDescription {
+          font-size: 16px;
+        }
+
+        .ctaActions {
+          justify-content: center;
+        }
+      }
+
+      .featuresGrid {
+        margin-top: 40px;
+
+        .featureCard {
+          .ant-card-body {
+            text-align: center;
+            flex-direction: column;
+            gap: 12px;
+          }
+        }
+      }
+    }
+
+    .bottomBanner {
+      .bannerContent {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+
+        .bannerActions {
+          justify-content: center;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .ctaSection {
+    padding: 40px 0 0 0;
+    margin-top: 60px;
+
+    .ctaContainer {
+      padding: 0 16px 40px 16px;
+
+      .ctaContent {
+        h2 {
+          font-size: 28px;
+        }
+
+        .ctaDescription {
+          font-size: 15px;
+        }
+
+        .benefitsList {
+          .benefitItem {
+            font-size: 15px;
+          }
+        }
+
+        .ctaActions {
+          flex-direction: column;
+          gap: 12px;
+
+          .primaryBtn,
+          .secondaryBtn {
+            width: 100%;
+            height: 44px;
+            font-size: 15px;
+          }
+        }
+      }
+
+      .featuresGrid {
+        .featureCard {
+          .featureIcon {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+          }
+
+          .featureContent {
+            h4 {
+              font-size: 16px;
+            }
+
+            p {
+              font-size: 13px;
+            }
+          }
+        }
+      }
+    }
+
+    .bottomBanner {
+      padding: 24px 0;
+
+      .bannerContent {
+        padding: 0 16px;
+
+        .bannerText {
+          h3 {
+            font-size: 18px;
+          }
+
+          p {
+            font-size: 13px;
+          }
+        }
+
+        .bannerActions {
+          flex-direction: column;
+          gap: 8px;
+          width: 100%;
+
+          .ant-btn {
+            width: 100%;
+            height: 36px;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}

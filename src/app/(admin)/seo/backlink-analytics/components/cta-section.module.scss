@@ -1,0 +1,220 @@
+.ctaSection {
+  padding: 80px 0;
+  background: #f8fafc;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ctaContent {
+    .ctaTitle {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 24px;
+      line-height: 1.2;
+
+      @media (max-width: 768px) {
+        font-size: 28px;
+      }
+    }
+
+    .ctaDescription {
+      font-size: 18px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 32px;
+
+      @media (max-width: 768px) {
+        font-size: 16px;
+      }
+    }
+
+    .features {
+      margin-bottom: 40px;
+
+      .feature {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        font-size: 16px;
+        color: #374151;
+
+        .checkmark {
+          width: 20px;
+          height: 20px;
+          background: #10b981;
+          color: white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 12px;
+          font-size: 12px;
+          font-weight: bold;
+          flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+          font-size: 15px;
+        }
+      }
+    }
+
+    .ctaButtons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+
+      .primaryButton {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        height: 48px;
+        padding: 0 32px;
+
+        &:hover {
+          background: linear-gradient(135deg, #2563eb, #1e40af);
+          transform: translateY(-2px);
+        }
+      }
+
+      .secondaryButton {
+        border: 2px solid #3b82f6;
+        color: #3b82f6;
+        border-radius: 8px;
+        font-weight: 600;
+        height: 48px;
+        padding: 0 32px;
+
+        &:hover {
+          background: #3b82f6;
+          color: white;
+          transform: translateY(-2px);
+        }
+      }
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+
+        .primaryButton,
+        .secondaryButton {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .promoCard {
+    border: none;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    :global(.ant-card-body) {
+      padding: 0;
+    }
+
+    .promoContent {
+      padding: 40px 32px;
+      text-align: center;
+      color: white;
+      position: relative;
+
+      .badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .promoTitle {
+        font-size: 32px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 16px;
+      }
+
+      .price {
+        margin-bottom: 20px;
+
+        .priceAmount {
+          font-size: 48px;
+          font-weight: 700;
+          color: white;
+        }
+
+        .pricePeriod {
+          font-size: 18px;
+          color: rgba(255, 255, 255, 0.8);
+          margin-left: 4px;
+        }
+      }
+
+      .promoDescription {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+
+      .promoFeatures {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 32px;
+        padding: 24px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+        .promoFeature {
+          text-align: center;
+
+          .promoNumber {
+            display: block;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+          }
+
+          .promoLabel {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+          gap: 16px;
+        }
+      }
+
+      .promoButton {
+        background: white;
+        color: #667eea;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        height: 48px;
+        font-size: 16px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.9);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+      }
+    }
+  }
+}

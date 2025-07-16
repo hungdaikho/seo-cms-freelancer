@@ -1,0 +1,57 @@
+.difficultySection {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 48px;
+  margin-bottom: 48px;
+
+  .sectionHeader {
+    text-align: center;
+    margin-bottom: 32px;
+
+    h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0;
+    }
+  }
+
+  .contentWrapper {
+    max-width: 800px;
+    margin: 0 auto;
+
+    .textContent {
+      p {
+        font-size: 16px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 16px;
+        text-align: center;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .difficultySection {
+    padding: 32px 24px;
+
+    .sectionHeader {
+      h2 {
+        font-size: 24px;
+      }
+    }
+
+    .contentWrapper {
+      .textContent {
+        p {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}

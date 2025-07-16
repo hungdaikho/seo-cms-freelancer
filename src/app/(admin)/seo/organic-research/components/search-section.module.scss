@@ -1,0 +1,113 @@
+.searchSection {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+  text-align: center;
+
+  .header {
+    margin-bottom: 32px;
+
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #6b7280;
+      margin: 4px 0;
+
+      &:first-of-type {
+        margin-top: 8px;
+      }
+    }
+  }
+
+  .searchForm {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+
+    .domainInput {
+      flex: 1;
+      max-width: 400px;
+      height: 48px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+
+      &:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+      }
+    }
+
+    .locationSelect {
+      width: 100px;
+      height: 48px;
+
+      .ant-select-selector {
+        height: 48px !important;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+
+        .ant-select-selection-item {
+          line-height: 46px;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .searchButton {
+      height: 48px;
+      padding: 0 24px;
+      background: #10b981;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+
+      &:hover {
+        background: #059669;
+      }
+    }
+  }
+
+  .examples {
+    font-size: 14px;
+    color: #6b7280;
+
+    span {
+      margin-right: 8px;
+    }
+
+    a {
+      color: #3b82f6;
+      text-decoration: none;
+      margin-right: 16px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .searchSection {
+    padding: 24px;
+
+    .searchForm {
+      flex-direction: column;
+
+      .domainInput {
+        max-width: 100%;
+      }
+    }
+  }
+}

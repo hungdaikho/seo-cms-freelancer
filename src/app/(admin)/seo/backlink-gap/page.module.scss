@@ -1,0 +1,17 @@
+.page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 24px;
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+  }
+}

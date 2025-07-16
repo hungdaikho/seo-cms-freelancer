@@ -1,0 +1,390 @@
+.pricingModal {
+  .ant-modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .ant-modal-header {
+    border-bottom: none;
+    padding: 0;
+  }
+
+  .ant-modal-body {
+    padding: 0;
+  }
+
+  .modalContent {
+    padding: 32px;
+
+    .modalHeader {
+      text-align: center;
+      margin-bottom: 32px;
+
+      h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 16px 0;
+      }
+
+      .billingToggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+
+        .active {
+          color: #1f2937;
+          font-weight: 500;
+        }
+
+        .highlight {
+          color: #f59e0b;
+          font-weight: 600;
+        }
+
+        .switch {
+          .ant-switch-checked {
+            background-color: #10b981;
+          }
+        }
+      }
+    }
+
+    .plansRow {
+      margin-bottom: 48px;
+
+      .planCard {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        height: 100%;
+        position: relative;
+        background: white;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: #10b981;
+          box-shadow: 0 8px 24px rgba(16, 185, 129, 0.1);
+        }
+
+        &.popular {
+          border-color: #10b981;
+          box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+
+          &::before {
+            content: "Most Popular";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+          }
+        }
+
+        .planHeader {
+          text-align: center;
+          margin-bottom: 24px;
+
+          h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 16px 0;
+          }
+
+          .priceSection {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 2px;
+
+            .currency {
+              font-size: 20px;
+              color: #1f2937;
+              font-weight: 600;
+            }
+
+            .price {
+              font-size: 48px;
+              font-weight: 700;
+              color: #1f2937;
+              line-height: 1;
+            }
+
+            .period {
+              font-size: 16px;
+              color: #6b7280;
+              font-weight: 500;
+            }
+          }
+        }
+
+        .selectBtn {
+          width: 100%;
+          height: 44px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 16px;
+          margin-bottom: 24px;
+        }
+
+        .featuresSection {
+          h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin: 0 0 16px 0;
+          }
+
+          .featuresList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 12px;
+              font-size: 14px;
+              color: #374151;
+              line-height: 1.4;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+
+              .checkIcon {
+                color: #10b981;
+                font-size: 16px;
+                flex-shrink: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .comparisonSection {
+      h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 24px 0;
+      }
+
+      .comparisonTable {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+
+        .comparisonHeader {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr 1fr;
+          background: #f9fafb;
+          border-bottom: 1px solid #e5e7eb;
+
+          .featureColumn,
+          .planColumn {
+            padding: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            text-align: center;
+
+            &:first-child {
+              text-align: left;
+            }
+          }
+        }
+
+        .comparisonRow {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr 1fr;
+          border-bottom: 1px solid #f3f4f6;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .featureColumn {
+            padding: 16px;
+            font-size: 14px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .expandIcon {
+              color: #6b7280;
+              font-size: 12px;
+            }
+          }
+
+          .planColumn {
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .dotsContainer {
+              display: flex;
+              gap: 4px;
+
+              .dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #e5e7eb;
+
+                &.active {
+                  background: #10b981;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .pricingModal {
+    .modalContent {
+      padding: 24px;
+
+      .modalHeader {
+        h2 {
+          font-size: 24px;
+        }
+      }
+
+      .plansRow {
+        .planCard {
+          padding: 20px;
+
+          .planHeader {
+            .priceSection {
+              .price {
+                font-size: 40px;
+              }
+            }
+          }
+        }
+      }
+
+      .comparisonSection {
+        .comparisonTable {
+          .comparisonHeader,
+          .comparisonRow {
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+
+            .featureColumn,
+            .planColumn {
+              padding: 12px 8px;
+              font-size: 13px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .pricingModal {
+    .ant-modal {
+      width: 95% !important;
+      max-width: none;
+    }
+
+    .modalContent {
+      padding: 20px;
+
+      .modalHeader {
+        h2 {
+          font-size: 22px;
+        }
+
+        .billingToggle {
+          font-size: 13px;
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+      }
+
+      .plansRow {
+        .planCard {
+          margin-bottom: 16px;
+          padding: 16px;
+
+          .planHeader {
+            .priceSection {
+              .price {
+                font-size: 36px;
+              }
+
+              .currency {
+                font-size: 18px;
+              }
+
+              .period {
+                font-size: 14px;
+              }
+            }
+          }
+
+          .selectBtn {
+            height: 40px;
+            font-size: 14px;
+          }
+
+          .featuresSection {
+            .featuresList li {
+              font-size: 13px;
+            }
+          }
+        }
+      }
+
+      .comparisonSection {
+        h3 {
+          font-size: 18px;
+        }
+
+        .comparisonTable {
+          .comparisonHeader,
+          .comparisonRow {
+            grid-template-columns: 1fr;
+            gap: 8px;
+
+            .featureColumn,
+            .planColumn {
+              padding: 8px;
+              font-size: 12px;
+              text-align: left;
+            }
+
+            .planColumn {
+              justify-content: flex-start;
+
+              &::before {
+                content: attr(data-plan) ": ";
+                font-weight: 600;
+                margin-right: 8px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

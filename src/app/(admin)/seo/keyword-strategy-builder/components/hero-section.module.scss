@@ -1,0 +1,175 @@
+.heroSection {
+  background: white;
+  border-radius: 12px;
+  padding: 48px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+
+  .header {
+    margin-bottom: 32px;
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  .formSection {
+    max-width: 600px;
+    margin: 0 auto;
+
+    .inputGroup {
+      margin-bottom: 24px;
+
+      .inputHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        text-align: left;
+
+        .inputLabel {
+          font-size: 14px;
+          color: #374151;
+          font-weight: 500;
+        }
+
+        .counter {
+          font-size: 14px;
+          color: #6b7280;
+        }
+      }
+
+      .textareaWrapper {
+        position: relative;
+
+        .keywordTextarea {
+          border-radius: 8px;
+          border: 1px solid #d1d5db;
+          font-size: 14px;
+          resize: none;
+
+          &:hover,
+          &:focus {
+            border-color: #3b82f6;
+          }
+
+          .ant-input {
+            border: none;
+            box-shadow: none;
+          }
+        }
+
+        .aiFeature {
+          position: absolute;
+          bottom: -20px;
+          left: 0;
+          font-size: 11px;
+          color: #8b5cf6;
+          background: #f3e8ff;
+          padding: 2px 6px;
+          border-radius: 4px;
+        }
+      }
+    }
+
+    .formActions {
+      .actionButtons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .sampleButton {
+          color: #3b82f6;
+          border: 1px solid #3b82f6;
+          background: transparent;
+          border-radius: 6px;
+          font-size: 14px;
+
+          &:hover {
+            background: #f0f9ff;
+            color: #2563eb;
+            border-color: #2563eb;
+          }
+        }
+
+        .createGroup {
+          display: flex;
+          gap: 8px;
+
+          .countrySelect {
+            min-width: 80px;
+
+            .ant-select-selector {
+              border-radius: 6px;
+              border: 1px solid #d1d5db;
+
+              .ant-select-selection-item {
+                font-size: 14px;
+              }
+            }
+          }
+
+          .createButton {
+            background: #10b981;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            padding: 0 24px;
+
+            &:hover {
+              background: #059669;
+            }
+          }
+        }
+      }
+
+      .trialInfo {
+        font-size: 14px;
+        color: #6b7280;
+
+        .trialLink {
+          color: #3b82f6;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    padding: 32px 24px;
+
+    .header h1 {
+      font-size: 24px;
+    }
+
+    .formSection {
+      .formActions .actionButtons {
+        flex-direction: column;
+        gap: 16px;
+
+        .createGroup {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}

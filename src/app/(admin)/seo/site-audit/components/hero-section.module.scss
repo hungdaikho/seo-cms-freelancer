@@ -1,0 +1,114 @@
+.heroSection {
+  padding: 80px 0;
+  text-align: center;
+
+  .auditCard {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    max-width: 800px;
+    margin: 0 auto;
+
+    :global(.ant-card-body) {
+      padding: 48px 40px;
+
+      @media (max-width: 768px) {
+        padding: 32px 24px;
+      }
+    }
+
+    .cardContent {
+      .badge {
+        display: inline-block;
+        background: #f0f9ff;
+        color: #3b82f6;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        border: 1px solid #dbeafe;
+      }
+
+      .title {
+        font-size: 36px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 20px;
+        line-height: 1.2;
+
+        @media (max-width: 768px) {
+          font-size: 28px;
+        }
+      }
+
+      .subtitle {
+        font-size: 16px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 40px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+
+        @media (max-width: 768px) {
+          font-size: 15px;
+          margin-bottom: 32px;
+        }
+      }
+
+      .searchContainer {
+        display: flex;
+        gap: 16px;
+        max-width: 500px;
+        margin: 0 auto;
+        align-items: stretch;
+
+        .searchInput {
+          flex: 1;
+          border-radius: 8px;
+          border: 2px solid #e5e7eb;
+
+          &:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+          }
+
+          :global(.ant-input) {
+            border: none;
+            box-shadow: none;
+            font-size: 16px;
+            padding: 12px 16px;
+          }
+        }
+
+        .searchButton {
+          background: #10b981;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          padding: 0 24px;
+          white-space: nowrap;
+
+          &:hover {
+            background: #059669;
+            transform: translateY(-2px);
+          }
+        }
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+
+          .searchButton {
+            padding: 0 20px;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 60px 0;
+  }
+}
