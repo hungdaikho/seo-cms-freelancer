@@ -1,0 +1,42 @@
+.container {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.pageWrapper {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+
+  // Ensure proper spacing between sections
+  > * {
+    margin-bottom: 0;
+  }
+
+  // Remove margin from last child
+  > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Global responsive container styles
+@media (max-width: 1200px) {
+  .pageWrapper {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageWrapper {
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageWrapper {
+    padding: 0 8px;
+  }
+}

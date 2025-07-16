@@ -1,0 +1,125 @@
+.faqSection {
+  padding: 80px 0;
+  background: #fafafa;
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 60px;
+
+    .title {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0;
+
+      @media (max-width: 768px) {
+        font-size: 28px;
+      }
+    }
+  }
+
+  .faqContent {
+    margin-bottom: 60px;
+
+    .collapse {
+      background: white;
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+
+      :global(.ant-collapse-item) {
+        border: none;
+        margin-bottom: 0;
+
+        &:last-child {
+          border-radius: 0 0 16px 16px;
+        }
+
+        &:first-child {
+          border-radius: 16px 16px 0 0;
+        }
+      }
+
+      :global(.ant-collapse-header) {
+        padding: 24px 32px;
+        background: white;
+        border: none;
+        font-weight: 600;
+        font-size: 16px;
+        color: #1a1a1a;
+        align-items: center;
+
+        &:hover {
+          background: #f8f9fa;
+        }
+
+        .ant-collapse-expand-icon {
+          color: #1890ff;
+          font-size: 14px;
+        }
+      }
+
+      :global(.ant-collapse-content) {
+        border: none;
+        background: white;
+
+        .ant-collapse-content-box {
+          padding: 0 32px 32px 32px;
+        }
+      }
+
+      :global(.ant-collapse-item-active) {
+        .ant-collapse-header {
+          background: #f8f9fa;
+        }
+      }
+
+      :global(.ant-collapse-item:not(:last-child)) {
+        border-bottom: 1px solid #f0f0f0;
+      }
+    }
+
+    .faqContent {
+      p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 16px;
+        font-size: 15px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .link {
+        color: #1890ff;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  .footer {
+    text-align: center;
+
+    .partnerInfo {
+      font-size: 16px;
+      color: #666;
+
+      .partnerLogo {
+        color: #ff6b35;
+        font-weight: 700;
+        font-size: 18px;
+      }
+    }
+  }
+}

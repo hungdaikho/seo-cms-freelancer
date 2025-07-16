@@ -1,0 +1,56 @@
+.trustedSection {
+  padding: 60px 0;
+  background: white;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .content {
+    text-align: center;
+
+    .label {
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 40px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .logosGrid {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 60px;
+      flex-wrap: wrap;
+
+      @media (max-width: 768px) {
+        gap: 30px;
+      }
+
+      .logoItem {
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        .logoText {
+          font-size: 18px;
+          font-weight: 600;
+          color: #666;
+          display: block;
+
+          &:first-child {
+            font-family: "Arial", sans-serif;
+          }
+        }
+      }
+    }
+  }
+}

@@ -53,7 +53,7 @@ const SiderDashBoard = () => {
     sensor: "/seo/sensor",
 
     // Traffic & Market routes
-    "get-started": "/traffic/get-started",
+    "get-started": "/traffic",
     "insider-knowledge": "/traffic/insider-knowledge",
     "traffic-analytics": "/traffic/traffic-analytics",
     "daily-trends": "/traffic/daily-trends",
@@ -460,7 +460,7 @@ const SiderDashBoard = () => {
         popupRender={() => (
           <div
             style={{
-              maxHeight: `900px`,
+              maxHeight: `800px`,
               overflowY: "auto",
               borderRadius: 8,
               background: "#fff",
@@ -493,12 +493,13 @@ const SiderDashBoard = () => {
         popupRender={() => (
           <div
             style={{
+              maxHeight: `auto`,
               overflowY: "auto",
               borderRadius: 8,
               background: "#fff",
               padding: 8,
               position: "absolute",
-              top: "-200px",
+              top: "-240px",
               left: "100%", // để menu hiện bên phải icon
               zIndex: 1000,
               minWidth: 240,
@@ -515,6 +516,7 @@ const SiderDashBoard = () => {
           className={`${styles.menuItem} ${
             isActive("/traffic") ? styles.active : ""
           }`}
+          onClick={() => router.push("/traffic")}
         >
           <BsBarChart />
           <span>Traffic & Market</span>

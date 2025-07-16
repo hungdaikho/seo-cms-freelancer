@@ -1,0 +1,149 @@
+.successSection {
+  padding: 80px 0;
+  background: white;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 60px;
+
+    .title {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 16px 0;
+      line-height: 1.3;
+
+      @media (max-width: 768px) {
+        font-size: 28px;
+      }
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .storiesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 32px;
+    margin-bottom: 60px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+
+  .storyCard {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .cardContent {
+      padding: 32px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      .logoSection {
+        margin-bottom: 24px;
+
+        .logoWrapper {
+          width: 100%;
+          height: 80px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .logoText {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+          }
+        }
+      }
+
+      .contentSection {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .storyTitle {
+          font-size: 20px;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin: 0 0 16px 0;
+          line-height: 1.3;
+        }
+
+        .storyDescription {
+          color: #666;
+          line-height: 1.6;
+          margin: 0 0 24px 0;
+          flex: 1;
+          font-size: 15px;
+        }
+
+        .actionBtn {
+          padding: 0;
+          height: auto;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          align-self: flex-start;
+
+          &:hover {
+            transform: translateX(4px);
+          }
+
+          .anticon {
+            transition: transform 0.2s ease;
+          }
+
+          &:hover .anticon {
+            transform: translateX(2px);
+          }
+        }
+      }
+    }
+  }
+
+  .footer {
+    text-align: center;
+
+    .exploreBtn {
+      background: #1890ff;
+      border-color: #1890ff;
+      border-radius: 8px;
+      height: 48px;
+      padding: 0 32px;
+      font-weight: 600;
+      font-size: 16px;
+
+      &:hover {
+        background: #40a9ff;
+        border-color: #40a9ff;
+        transform: translateY(-2px);
+      }
+    }
+  }
+}

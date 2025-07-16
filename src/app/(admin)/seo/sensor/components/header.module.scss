@@ -1,0 +1,138 @@
+.header {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  .headerRow {
+    margin-bottom: 24px;
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  .headerActions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+
+    .actionButton {
+      color: #1890ff;
+      padding: 4px 12px;
+
+      &:hover {
+        background: #f0f8ff;
+      }
+    }
+
+    .subscribeButton {
+      background: #1890ff;
+      border: none;
+      border-radius: 6px;
+      height: 36px;
+      padding: 0 16px;
+
+      &:hover {
+        background: #40a9ff;
+      }
+    }
+  }
+
+  .navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  .navTabs {
+    display: flex;
+    gap: 32px;
+
+    .navTab {
+      color: #666;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 8px 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #1890ff;
+      }
+
+      &.active {
+        color: #1890ff;
+        border-bottom-color: #1890ff;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .filters {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .countrySelect {
+      min-width: 150px;
+
+      :global(.ant-select-selector) {
+        border-radius: 6px;
+      }
+    }
+
+    .deviceToggle {
+      display: flex;
+      border-radius: 6px;
+      overflow: hidden;
+
+      button {
+        border-radius: 0;
+        margin: 0;
+
+        &:first-child {
+          border-top-left-radius: 6px;
+          border-bottom-left-radius: 6px;
+        }
+
+        &:last-child {
+          border-top-right-radius: 6px;
+          border-bottom-right-radius: 6px;
+        }
+      }
+    }
+
+    .compareSelect {
+      min-width: 120px;
+
+      :global(.ant-select-selector) {
+        border-radius: 6px;
+      }
+    }
+
+    .shareButton {
+      border-radius: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d9;
+
+      &:hover {
+        border-color: #1890ff;
+        color: #1890ff;
+      }
+    }
+  }
+}

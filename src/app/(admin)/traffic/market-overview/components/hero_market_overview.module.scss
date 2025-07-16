@@ -1,0 +1,393 @@
+.heroSection {
+  padding: 100px 0 80px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  position: relative;
+  overflow: hidden;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .content {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 40px;
+      text-align: center;
+    }
+  }
+
+  .leftSection {
+    flex: 1;
+    max-width: 500px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: #d1fae5;
+    color: #059669;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    border: 1px solid #a7f3d0;
+  }
+
+  .title {
+    font-size: 52px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.2;
+    margin-bottom: 20px;
+
+    @media (max-width: 768px) {
+      font-size: 36px;
+    }
+  }
+
+  .subtitle {
+    font-size: 20px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 40px;
+
+    @media (max-width: 768px) {
+      font-size: 18px;
+    }
+  }
+
+  .analysisForm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+  }
+
+  .inputGroup {
+    position: relative;
+  }
+
+  .domainInput,
+  .competitorInput {
+    height: 48px;
+    border-radius: 8px;
+    border: 1px solid #d1fae5;
+
+    &:focus,
+    &:hover {
+      border-color: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+    }
+
+    :global(.ant-input) {
+      background: #ecfdf5;
+      border: none;
+      font-size: 16px;
+
+      &::placeholder {
+        color: #999;
+      }
+    }
+  }
+
+  .inputLabel {
+    background: #10b981;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-right: 8px;
+  }
+
+  .actionGroup {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+    }
+  }
+
+  .addCompetitor {
+    background: none;
+    border: none;
+    color: #10b981;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      color: #059669;
+      text-decoration: underline;
+    }
+  }
+
+  .analyzeButton {
+    background: #10b981;
+    border-color: #10b981;
+    height: 40px;
+    padding: 0 24px;
+    font-weight: 500;
+    border-radius: 8px;
+
+    &:hover {
+      background: #059669;
+      border-color: #059669;
+    }
+  }
+
+  .rightSection {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .illustrationWrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .marketVisualization {
+    position: relative;
+  }
+
+  .marketSvg {
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 20px rgba(16, 185, 129, 0.1));
+  }
+
+  .marketBackground {
+    animation: backgroundPulse 6s ease-in-out infinite;
+  }
+
+  .analystIcon {
+    animation: analystFloat 4s ease-in-out infinite;
+  }
+
+  .marketChart {
+    .chartBackground {
+      animation: chartGlow 4s ease-in-out infinite;
+    }
+
+    .growthLine {
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      animation: lineGrowth 4s ease-in-out infinite;
+    }
+
+    .dataPoint1 {
+      animation: pointPulse 2s ease-in-out infinite;
+    }
+
+    .dataPoint2 {
+      animation: pointPulse 2s ease-in-out infinite 0.4s;
+    }
+
+    .dataPoint3 {
+      animation: pointPulse 2s ease-in-out infinite 0.8s;
+    }
+
+    .dataPoint4 {
+      animation: pointPulse 2s ease-in-out infinite 1.2s;
+    }
+
+    .dataPoint5 {
+      animation: pointPulse 2s ease-in-out infinite 1.6s;
+    }
+  }
+
+  .competitors {
+    .competitor1 {
+      animation: competitorFloat 3s ease-in-out infinite;
+    }
+
+    .competitor2 {
+      animation: competitorFloat 3s ease-in-out infinite 0.5s;
+    }
+
+    .competitor3 {
+      animation: competitorFloat 3s ease-in-out infinite 1s;
+    }
+
+    .yourPosition {
+      animation: yourPositionPulse 2s ease-in-out infinite;
+    }
+  }
+
+  .marketSize {
+    .marketBubble1 {
+      animation: bubbleFloat 4s ease-in-out infinite;
+    }
+
+    .marketBubble2 {
+      animation: bubbleFloat 4s ease-in-out infinite 1s;
+    }
+
+    .marketBubble3 {
+      animation: bubbleFloat 4s ease-in-out infinite 2s;
+    }
+  }
+
+  .connectionLines {
+    .connectionLine1 {
+      stroke-dashoffset: 0;
+      animation: connectionFlow 3s ease-in-out infinite;
+    }
+
+    .connectionLine2 {
+      stroke-dashoffset: 0;
+      animation: connectionFlow 3s ease-in-out infinite 1.5s;
+    }
+  }
+
+  .marketTrends {
+    .trendsBox {
+      animation: trendsGlow 3s ease-in-out infinite;
+    }
+  }
+
+  .animatedElements {
+    circle {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+  }
+
+  @keyframes backgroundPulse {
+    0%,
+    100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes analystFloat {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  @keyframes chartGlow {
+    0%,
+    100% {
+      opacity: 0.9;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes lineGrowth {
+    0% {
+      stroke-dashoffset: 200;
+      opacity: 0.5;
+    }
+    50% {
+      stroke-dashoffset: 100;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes pointPulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.3);
+      opacity: 1;
+    }
+  }
+
+  @keyframes competitorFloat {
+    0%,
+    100% {
+      transform: translateY(0px);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-3px);
+      opacity: 1;
+    }
+  }
+
+  @keyframes yourPositionPulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes bubbleFloat {
+    0%,
+    100% {
+      transform: translateY(0px) scale(1);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(-5px) scale(1.02);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes connectionFlow {
+    0% {
+      stroke-dashoffset: 16;
+      opacity: 0.5;
+    }
+    50% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: -16;
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes trendsGlow {
+    0%,
+    100% {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
+}

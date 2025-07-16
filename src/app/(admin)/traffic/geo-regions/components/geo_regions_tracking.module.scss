@@ -1,0 +1,255 @@
+.trackingSection {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #f8fdff 0%, #f0f8ff 100%);
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .content {
+    display: flex;
+    align-items: flex-start;
+    gap: 60px;
+    margin-bottom: 80px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+  }
+
+  .leftSection {
+    flex: 1;
+  }
+
+  .title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin-bottom: 30px;
+
+    @media (max-width: 768px) {
+      font-size: 28px;
+      text-align: center;
+    }
+  }
+
+  .trackingList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .trackingItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: #333;
+    line-height: 1.5;
+
+    .bullet {
+      color: #1890ff;
+      font-weight: bold;
+      font-size: 20px;
+      margin-top: -2px;
+    }
+  }
+
+  .rightSection {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .dashboardPreview {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(24, 144, 255, 0.08);
+    padding: 24px;
+    width: 100%;
+    max-width: 520px;
+    border: 1px solid rgba(24, 144, 255, 0.1);
+  }
+
+  .dashboardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .dashboardIcon {
+    font-size: 18px;
+    color: #1890ff;
+    margin-right: 8px;
+  }
+
+  .dashboardTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1890ff;
+  }
+
+  .regionSection {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .worldMap {
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e6f3ff;
+    background: #f8fbff;
+  }
+
+  .mapSvg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .continents {
+    .regionArea {
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 1 !important;
+        transform: scale(1.02);
+      }
+    }
+  }
+
+  .dataFlows {
+    .flowLine {
+      stroke-dashoffset: 0;
+      animation: geoFlowAnimation 3s ease-in-out infinite;
+    }
+  }
+
+  .regionStats {
+    background: #f8fbff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e6f3ff;
+  }
+
+  .statsHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e6f3ff;
+  }
+
+  .statsIcon {
+    font-size: 16px;
+    color: #1890ff;
+  }
+
+  .statsTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1890ff;
+  }
+
+  .geoStats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .statItem {
+    display: grid;
+    grid-template-columns: 50px 1fr 120px 50px;
+    gap: 12px;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .regionCode {
+    font-weight: 700;
+    color: #1890ff;
+    background: #e6f3ff;
+    padding: 4px 6px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 11px;
+    border: 1px solid #bae0ff;
+  }
+
+  .regionName {
+    font-weight: 500;
+    color: #333;
+    font-size: 12px;
+  }
+
+  .progressContainer {
+    width: 100%;
+  }
+
+  .progressBar {
+    :global(.ant-progress-bg) {
+      transition: width 0.3s ease;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        animation: shimmer 2s infinite;
+      }
+    }
+  }
+
+  .percentage {
+    font-weight: 700;
+    color: #333;
+    text-align: right;
+    font-size: 13px;
+  }
+
+  @keyframes geoFlowAnimation {
+    0% {
+      stroke-dashoffset: 16;
+      opacity: 0.5;
+    }
+    50% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: -16;
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}
