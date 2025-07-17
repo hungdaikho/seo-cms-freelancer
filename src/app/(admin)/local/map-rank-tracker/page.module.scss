@@ -1,0 +1,20 @@
+.map_rank_tracker_page {
+  min-height: 100vh;
+
+  // Ensure sections flow seamlessly
+  section {
+    position: relative;
+    z-index: 1;
+  }
+
+  // Global responsive adjustments
+  @media (max-width: 768px) {
+    section {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
+
+  // Smooth scrolling for better UX
+  scroll-behavior: smooth;
+}

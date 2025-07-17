@@ -1,0 +1,21 @@
+.container {
+  min-height: 100vh;
+  width: 100%;
+
+  // Global styles for the GBP optimization page
+  * {
+    box-sizing: border-box;
+  }
+
+  // Ensure sections stack properly
+  section {
+    position: relative;
+    z-index: 1;
+  }
+
+  // Override default margins for seamless sections
+  & > div {
+    margin: 0;
+    padding: 0;
+  }
+}

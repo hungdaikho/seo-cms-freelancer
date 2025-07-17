@@ -88,23 +88,23 @@ const SiderDashBoard = () => {
 
     // Content routes
     "content-dashboard": "/content",
-    "topic-finder": "/content/topic-finder",
-    "seo-brief-generator": "/content/seo-brief-generator",
-    "ai-article-generator": "/content/ai-article-generator",
-    "content-optimizer": "/content/content-optimizer",
-    "my-content": "/content/my-content",
+    "topic-finder": "/content?topic-finder",
+    "seo-brief-generator": "/content?seo-brief-generator",
+    "ai-article-generator": "/content?ai-article-generator",
+    "content-optimizer": "/content?content-optimizer",
+    "my-content": "/content?my-content",
 
     // AI routes
-    "brand-performance": "/ai/brand-performance",
-    visibility: "/ai/visibility",
-    perception: "/ai/perception",
-    questions: "/ai/questions",
+    "brand-performance": "/ai",
+    visibility: "/ai",
+    perception: "/ai",
+    questions: "/ai",
 
     // Social routes
     "social-dashboard": "/social",
-    "social-media-tracker": "/social/media-tracker",
-    "social-media-poster": "/social/media-poster",
-    "social-analytics": "/social/analytics",
+    "social-media-tracker": "/social?media-tracker",
+    "social-media-poster": "/social?media-poster",
+    "social-analytics": "/social?analytics",
 
     // AD routes
     "ad-dashboard": "/ad",
@@ -548,6 +548,7 @@ const SiderDashBoard = () => {
           className={`${styles.menuItem} ${
             isActive("/local") ? styles.active : ""
           }`}
+          onClick={() => router.push("/local")}
         >
           <CiLocationOn />
           <span>Local</span>
@@ -579,6 +580,7 @@ const SiderDashBoard = () => {
           className={`${styles.menuItem} ${
             isActive("/content") ? styles.active : ""
           }`}
+          onClick={() => router.push("/content")}
         >
           <TbEditCircle />
           <span>Content</span>
@@ -610,6 +612,7 @@ const SiderDashBoard = () => {
           className={`${styles.menuItem} ${
             isActive("/ai") ? styles.active : ""
           }`}
+          onClick={() => router.push("/ai")}
         >
           <GoStar />
           <span>AI</span>
@@ -641,6 +644,7 @@ const SiderDashBoard = () => {
           className={`${styles.menuItem} ${
             isActive("/social") ? styles.active : ""
           }`}
+          onClick={() => router.push("/social")}
         >
           <IoShareSocial />
           <span>Social</span>
