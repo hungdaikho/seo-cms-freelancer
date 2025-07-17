@@ -1,15 +1,27 @@
 import React from "react";
-import { Map, Marker } from "react-google-maps"; // Assuming you're using Google Maps
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import styles from "./map_rank_tracker.module.scss";
+
+const containerStyle = {
+  width: "100%",
+  height: "400px",
+};
+
+const center = {
+  lat: -34.397,
+  lng: 150.644,
+};
 
 const MapRankTracker = () => {
   const [rankData, setRankData] = React.useState([]);
 
-  // Fetch rank data (this is just a placeholder, implement your data fetching logic)
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "", // Set your API key in env
+  });
+
   React.useEffect(() => {
     const fetchRankData = async () => {
-      // Fetch your data here and update state
-      const data = await fetch("/api/rank-data").then(res => res.json());
+      const data = await fetch("/api/rank-data").then((res) => res.json());
       setRankData(data);
     };
 
@@ -19,14 +31,13 @@ const MapRankTracker = () => {
   return (
     <div className={styles.container}>
       <h2>Map Rank Tracker</h2>
-      <Map
-        defaultZoom={10}
-        defaultCenter={{ lat: -34.397, lng: 150.644 }} // Replace with your default coordinates
-      >
-        {rankData.map((rank, index) => (
-          <Marker key={index} position={{ lat: rank.lat, lng: rank.lng }} />
-        ))}
-      </Map>
+      {isLoaded && (
+        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
+          {rankData.map((rank: any, index) => (
+            <Marker key={index} position={{ lat: rank.lat, lng: rank.lng }} />
+          ))}
+        </GoogleMap>
+      )}
     </div>
   );
 };

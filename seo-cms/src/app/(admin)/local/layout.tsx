@@ -4,7 +4,7 @@ import styles from "./layout.module.scss";
 
 const { Header, Content, Footer } = AntLayout;
 
-const Layout = ({ children }) => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <AntLayout className={styles.layout}>
       <Header className={styles.header}>
