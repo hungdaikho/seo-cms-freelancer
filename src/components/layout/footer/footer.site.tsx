@@ -12,9 +12,9 @@ const FooterSite = () => {
           <button className="border border-neutral-700 rounded px-4 py-2 flex items-center gap-2 hover:bg-neutral-800">
             <span>📧</span> {t("contact_us")}
           </button>
-          <span className="text-neutral-400 text-sm text-center">
+          {/* <span className="text-neutral-400 text-sm text-center">
             {t("address")}
-          </span>
+          </span> */}
           <div className="flex flex-col items-center gap-2">
             <button className="bg-[#00b087] text-white font-bold px-6 py-2 rounded hover:bg-[#009e76] transition">
               {t("get_start")}
@@ -36,19 +36,19 @@ const FooterSite = () => {
               {t("semrush")}
             </div>
             <ul className="space-y-1 text-sm text-neutral-400">
-              <li>
+              {/* <li>
                 <a href="#">{t("features")}</a>
-              </li>
+              </li> */}
               <li>
                 <a href="#">{t("pricing")}</a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#">{t("free_trial")}</a>
-              </li>
+              </li> */}
               <li>
                 <a href="#">{t("success_stories")}</a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#">{t("stats_and_facts")}</a>
               </li>
               <li>
@@ -59,7 +59,7 @@ const FooterSite = () => {
               </li>
               <li>
                 <a href="#">{t("affiliate_program")}</a>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -96,7 +96,7 @@ const FooterSite = () => {
           </div>
 
           {/* More Tools */}
-          <div>
+          {/* <div>
             <div className="font-bold text-lg mb-2 uppercase">
               {t("more_tools")}
             </div>
@@ -126,7 +126,7 @@ const FooterSite = () => {
                 <a href="#">{t("splitsignal")}</a>
               </li>
             </ul>
-          </div>
+          </div> */}
 
           {/* Company */}
           <div>
@@ -137,10 +137,10 @@ const FooterSite = () => {
               <li>
                 <a href="#">{t("about_us")}</a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#">{t("newsroom")}</a>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <a href="#">{t("careers")}</a>
               </li>
               <li>
@@ -148,28 +148,28 @@ const FooterSite = () => {
               </li>
               <li>
                 <a href="#">{t("legal_info")}</a>
-              </li>
+              </li> */}
               <li>
                 <a href="#">{t("privacy_policy")}</a>
               </li>
               <li>
                 <a href="#">{t("cookie_settings")}</a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#">{t("do_not_sell")}</a>
-              </li>
+              </li> */}
               <li>
                 <a href="#">{t("security_info")}</a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#">{t("investors")}</a>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <a href="#">{t("semrush_select")}</a>
               </li>
               <li>
                 <a href="#">{t("global_issues")}</a>
-              </li>
+              </li> */}
               <li>
                 <a href="#">{t("contact_us")}</a>
               </li>
@@ -177,7 +177,7 @@ const FooterSite = () => {
           </div>
 
           {/* Follow Us & Language */}
-          <div>
+          {/* <div>
             <div className="font-bold text-lg mb-2 uppercase">
               {t("follow_us")}
             </div>
@@ -205,7 +205,7 @@ const FooterSite = () => {
               {t("language")}
             </div>
             <div className="text-sm text-neutral-400">English ▼</div>
-          </div>
+          </div> */}
 
           {/* Help */}
           <div>

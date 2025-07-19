@@ -2,10 +2,8 @@ import React from "react";
 import styles from "./list_tool.module.scss";
 import { TbSettingsSearch } from "react-icons/tb";
 import { BsBarChart } from "react-icons/bs";
-import { CiLocationOn } from "react-icons/ci";
-import { TbEditCircle, TbTargetArrow } from "react-icons/tb";
+import { TbEditCircle } from "react-icons/tb";
 import { GoStar } from "react-icons/go";
-import { IoShareSocial } from "react-icons/io5";
 type Props = {};
 
 const ListTool = (props: Props) => {
@@ -20,11 +18,11 @@ const ListTool = (props: Props) => {
       title: "Traffic & Market",
       des: "Track competitors, analyze markets, uncover growth opportunities.",
     },
-    {
-      icon: <CiLocationOn style={{ color: "#eab676" }} />,
-      title: "Local",
-      des: "Manage reviews, boost local search visibility, track local competitors.",
-    },
+    // {
+    //   icon: <CiLocationOn style={{ color: "#eab676" }} />,
+    //   title: "Local",
+    //   des: "Manage reviews, boost local search visibility, track local competitors.",
+    // },
     {
       icon: <TbEditCircle style={{ color: "#abdbe3" }} />,
       title: "Content",
@@ -35,16 +33,16 @@ const ListTool = (props: Props) => {
       title: "AI",
       des: "Grow your visibility in AI search tools like ChatGPT and Google’s AI Overviews.",
     },
-    {
-      icon: <IoShareSocial style={{ color: "#4ebdd8" }} />,
-      title: "Social",
-      des: "Find influencers and manage the entire social media cycle in one place.",
-    },
-    {
-      icon: <TbTargetArrow />,
-      title: "Advertising",
-      des: "Research competitors, launch and optimize Google and Meta ads.",
-    },
+    // {
+    //   icon: <IoShareSocial style={{ color: "#4ebdd8" }} />,
+    //   title: "Social",
+    //   des: "Find influencers and manage the entire social media cycle in one place.",
+    // },
+    // {
+    //   icon: <TbTargetArrow />,
+    //   title: "Advertising",
+    //   des: "Research competitors, launch and optimize Google and Meta ads.",
+    // },
   ];
   return (
     <div className={styles.listTool}>

@@ -1,18 +1,18 @@
-import React, { useState } from 'react'
-import styles from './header.site.module.scss'
-import Image from 'next/image'
-import { Button, Dropdown, Menu } from 'antd'
-import { DownOutlined, MenuOutlined, CloseOutlined } from '@ant-design/icons'
-import { useTranslation } from 'react-i18next'
+import React, { useState } from "react";
+import styles from "./header.site.module.scss";
+import Image from "next/image";
+import { Button, Dropdown } from "antd";
+import { DownOutlined, MenuOutlined, CloseOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const menu = [
-  { label: 'features', href: '#' },
-  { label: 'pricing', href: '#' },
-  { label: 'resources', href: '#' },
-  { label: 'company', href: '#' },
-  { label: 'app_center', href: '#', tag: 'new' },
-  { label: 'enterprise', href: '#' }
-]
+  { label: "features", href: "#" },
+  { label: "pricing", href: "#" },
+  { label: "blogs", href: "#" },
+  { label: "aboutus", href: "#" },
+  { label: "contactus", href: "#" },
+  { label: "news", href: "#", tag: "New" },
+];
 
 const HeaderSite = () => {
   const { t, i18n } = useTranslation();
@@ -24,7 +24,7 @@ const HeaderSite = () => {
       </div>
       <nav className={styles.navMenu}>
         <ul className={styles.menu}>
-          {menu.map(item => (
+          {menu.map((item) => (
             <li key={item.label}>
               <a href={item.href}>
                 {t(item.label)}
@@ -35,27 +35,58 @@ const HeaderSite = () => {
         </ul>
       </nav>
       <div className={styles.actions}>
-        <Dropdown menu={{ items: [
-          { key: 'en', label: <span onClick={() => i18n.changeLanguage('en')}>English</span> },
-          { key: 'ph', label: <span onClick={() => i18n.changeLanguage('ph')}>PH</span> },
-        ] }} placement="bottomRight" trigger={["click"]}>
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "en",
+                label: (
+                  <span onClick={() => i18n.changeLanguage("en")}>English</span>
+                ),
+              },
+              {
+                key: "ph",
+                label: (
+                  <span onClick={() => i18n.changeLanguage("ph")}>PH</span>
+                ),
+              },
+            ],
+          }}
+          placement="bottomRight"
+          trigger={["click"]}
+        >
           <Button type="text" className={styles.langBtn}>
             <Image src="/globe.svg" alt="Lang" width={20} height={20} />
-            <span style={{color: '#fff', marginLeft: 4, fontWeight: 500, fontSize: 15}}>{i18n.language.toUpperCase()}</span>
-            <DownOutlined style={{color: '#fff', fontSize: 10, marginLeft: 2}} />
+            <span
+              style={{
+                color: "#fff",
+                marginLeft: 4,
+                fontWeight: 500,
+                fontSize: 15,
+              }}
+            >
+              {i18n.language.toUpperCase()}
+            </span>
+            <DownOutlined
+              style={{ color: "#fff", fontSize: 10, marginLeft: 2 }}
+            />
           </Button>
         </Dropdown>
-        <Button type="default" className={styles.loginBtn}>{t('login')}</Button>
-        <Button type="primary" className={styles.signupBtn}>{t('signup')}</Button>
+        <Button type="default" className={styles.loginBtn}>
+          {t("login")}
+        </Button>
+        <Button type="primary" className={styles.signupBtn}>
+          {t("signup")}
+        </Button>
         {/* Hamburger icon for mobile */}
         <Button
           type="text"
           className={styles.menuMobileBtn}
           onClick={() => setMobileMenuOpen(true)}
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           aria-label="Open menu"
         >
-          <MenuOutlined style={{ fontSize: 22, color: '#fff' }} />
+          <MenuOutlined style={{ fontSize: 22, color: "#fff" }} />
         </Button>
       </div>
       {/* Mobile menu overlay */}
@@ -73,7 +104,7 @@ const HeaderSite = () => {
             </Button>
           </div>
           <ul className={styles.mobileMenuList}>
-            {menu.map(item => (
+            {menu.map((item) => (
               <li key={item.label}>
                 <a href={item.href} onClick={() => setMobileMenuOpen(false)}>
                   {t(item.label)}
@@ -83,17 +114,72 @@ const HeaderSite = () => {
             ))}
           </ul>
           <div className={styles.mobileMenuActions}>
-            <Button type="default" block className={styles.loginBtn} onClick={() => setMobileMenuOpen(false)}>{t('login')}</Button>
-            <Button type="primary" block className={styles.signupBtn} onClick={() => setMobileMenuOpen(false)}>{t('signup')}</Button>
+            <Button
+              type="default"
+              block
+              className={styles.loginBtn}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {t("login")}
+            </Button>
+            <Button
+              type="primary"
+              block
+              className={styles.signupBtn}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {t("signup")}
+            </Button>
             <div style={{ marginTop: 16 }}>
-              <Dropdown menu={{ items: [
-                { key: 'en', label: <span onClick={() => { i18n.changeLanguage('en'); setMobileMenuOpen(false); }}>English</span> },
-                { key: 'ph', label: <span onClick={() => { i18n.changeLanguage('ph'); setMobileMenuOpen(false); }}>PH</span> },
-              ] }} placement="bottomRight" trigger={["click"]}>
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "en",
+                      label: (
+                        <span
+                          onClick={() => {
+                            i18n.changeLanguage("en");
+                            setMobileMenuOpen(false);
+                          }}
+                        >
+                          English
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "ph",
+                      label: (
+                        <span
+                          onClick={() => {
+                            i18n.changeLanguage("ph");
+                            setMobileMenuOpen(false);
+                          }}
+                        >
+                          PH
+                        </span>
+                      ),
+                    },
+                  ],
+                }}
+                placement="bottomRight"
+                trigger={["click"]}
+              >
                 <Button type="text" className={styles.langBtn} block>
                   <Image src="/globe.svg" alt="Lang" width={20} height={20} />
-                  <span style={{color: '#222', marginLeft: 4, fontWeight: 500, fontSize: 15}}>{i18n.language.toUpperCase()}</span>
-                  <DownOutlined style={{color: '#222', fontSize: 10, marginLeft: 2}} />
+                  <span
+                    style={{
+                      color: "#222",
+                      marginLeft: 4,
+                      fontWeight: 500,
+                      fontSize: 15,
+                    }}
+                  >
+                    {i18n.language.toUpperCase()}
+                  </span>
+                  <DownOutlined
+                    style={{ color: "#222", fontSize: 10, marginLeft: 2 }}
+                  />
                 </Button>
               </Dropdown>
             </div>
@@ -101,7 +187,7 @@ const HeaderSite = () => {
         </div>
       )}
     </header>
-  )
-}
+  );
+};
 
-export default HeaderSite
+export default HeaderSite;

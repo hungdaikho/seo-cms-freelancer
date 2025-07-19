@@ -1,14 +1,11 @@
 import React from "react";
 import styles from "./sider.dashboard.module.scss";
 import { FaHome } from "react-icons/fa";
-import { TbReport, TbSettingsSearch } from "react-icons/tb";
+import { TbSettingsSearch } from "react-icons/tb";
 import { Dropdown, Menu } from "antd";
 import { BsBarChart } from "react-icons/bs";
-import { CiLocationOn } from "react-icons/ci";
-import { TbEditCircle, TbTargetArrow } from "react-icons/tb";
+import { TbEditCircle } from "react-icons/tb";
 import { GoStar } from "react-icons/go";
-import { IoShareSocial } from "react-icons/io5";
-import { RiApps2AiFill } from "react-icons/ri";
 import { useRouter, usePathname } from "next/navigation";
 const SiderDashBoard = () => {
   const router = useRouter();
@@ -210,11 +207,6 @@ const SiderDashBoard = () => {
             { key: "seo-content-template", label: "SEO Content Template" },
           ],
         },
-        {
-          type: "group",
-          label: "Extras",
-          children: [{ key: "sensor", label: "Sensor" }],
-        },
       ]}
     />
   );
@@ -300,25 +292,25 @@ const SiderDashBoard = () => {
       ]}
     />
   );
-  const localMenu = (
-    <Menu
-      onClick={({ key }) => handleMenuClick(key)}
-      selectedKeys={getSelectedKeys()}
-      items={[
-        {
-          type: "group",
-          label: "Local",
-          children: [
-            { key: "local-dashboard", label: "Local Dashboard" },
-            { key: "gbp-optimization", label: "GBP Optimization" },
-            { key: "listing-management", label: "Listing Management" },
-            { key: "map-rank-tracker", label: "Map Rank Tracker" },
-            { key: "review-management", label: "Review Management" },
-          ],
-        },
-      ]}
-    />
-  );
+  // const localMenu = (
+  //   <Menu
+  //     onClick={({ key }) => handleMenuClick(key)}
+  //     selectedKeys={getSelectedKeys()}
+  //     items={[
+  //       {
+  //         type: "group",
+  //         label: "Local",
+  //         children: [
+  //           { key: "local-dashboard", label: "Local Dashboard" },
+  //           { key: "gbp-optimization", label: "GBP Optimization" },
+  //           { key: "listing-management", label: "Listing Management" },
+  //           { key: "map-rank-tracker", label: "Map Rank Tracker" },
+  //           { key: "review-management", label: "Review Management" },
+  //         ],
+  //       },
+  //     ]}
+  //   />
+  // );
   const contentMenu = (
     <Menu
       onClick={({ key }) => handleMenuClick(key)}
@@ -370,79 +362,79 @@ const SiderDashBoard = () => {
     />
   );
 
-  const socialMenu = (
-    <Menu
-      onClick={({ key }) => handleMenuClick(key)}
-      selectedKeys={getSelectedKeys()}
-      items={[
-        {
-          type: "group",
-          label: "Social Media",
-          children: [
-            { key: "social-dashboard", label: "Social Dashboard" },
-            { key: "social-media-tracker", label: "Social Media Tracker" },
-            { key: "social-media-poster", label: "Social Media Poster" },
-            { key: "social-analytics", label: "Social Analytics" },
-          ],
-        },
-      ]}
-    />
-  );
+  // const socialMenu = (
+  //   <Menu
+  //     onClick={({ key }) => handleMenuClick(key)}
+  //     selectedKeys={getSelectedKeys()}
+  //     items={[
+  //       {
+  //         type: "group",
+  //         label: "Social Media",
+  //         children: [
+  //           { key: "social-dashboard", label: "Social Dashboard" },
+  //           { key: "social-media-tracker", label: "Social Media Tracker" },
+  //           { key: "social-media-poster", label: "Social Media Poster" },
+  //           { key: "social-analytics", label: "Social Analytics" },
+  //         ],
+  //       },
+  //     ]}
+  //   />
+  // );
 
-  const adMenu = (
-    <Menu
-      onClick={({ key }) => handleMenuClick(key)}
-      selectedKeys={getSelectedKeys()}
-      items={[
-        {
-          type: "group",
-          label: "Advertising",
-          children: [
-            { key: "ad-dashboard", label: "AD Dashboard" },
-            { key: "ppc-keyword-tool", label: "PPC Keyword Tool" },
-            { key: "advertising-research", label: "Advertising Research" },
-            { key: "display-advertising", label: "Display Advertising" },
-          ],
-        },
-      ]}
-    />
-  );
+  // const adMenu = (
+  //   <Menu
+  //     onClick={({ key }) => handleMenuClick(key)}
+  //     selectedKeys={getSelectedKeys()}
+  //     items={[
+  //       {
+  //         type: "group",
+  //         label: "Advertising",
+  //         children: [
+  //           { key: "ad-dashboard", label: "AD Dashboard" },
+  //           { key: "ppc-keyword-tool", label: "PPC Keyword Tool" },
+  //           { key: "advertising-research", label: "Advertising Research" },
+  //           { key: "display-advertising", label: "Display Advertising" },
+  //         ],
+  //       },
+  //     ]}
+  //   />
+  // );
 
-  const reportMenu = (
-    <Menu
-      onClick={({ key }) => handleMenuClick(key)}
-      selectedKeys={getSelectedKeys()}
-      items={[
-        {
-          type: "group",
-          label: "Reports",
-          children: [
-            { key: "report-dashboard", label: "Report Dashboard" },
-            { key: "my-reports", label: "My Reports" },
-            { key: "report-templates", label: "Report Templates" },
-          ],
-        },
-      ]}
-    />
-  );
+  // const reportMenu = (
+  //   <Menu
+  //     onClick={({ key }) => handleMenuClick(key)}
+  //     selectedKeys={getSelectedKeys()}
+  //     items={[
+  //       {
+  //         type: "group",
+  //         label: "Reports",
+  //         children: [
+  //           { key: "report-dashboard", label: "Report Dashboard" },
+  //           { key: "my-reports", label: "My Reports" },
+  //           { key: "report-templates", label: "Report Templates" },
+  //         ],
+  //       },
+  //     ]}
+  //   />
+  // );
 
-  const appCenterMenu = (
-    <Menu
-      onClick={({ key }) => handleMenuClick(key)}
-      selectedKeys={getSelectedKeys()}
-      items={[
-        {
-          type: "group",
-          label: "App Center",
-          children: [
-            { key: "app-center", label: "App Center" },
-            { key: "marketplace", label: "Marketplace" },
-            { key: "my-apps", label: "My Apps" },
-          ],
-        },
-      ]}
-    />
-  );
+  // const appCenterMenu = (
+  //   <Menu
+  //     onClick={({ key }) => handleMenuClick(key)}
+  //     selectedKeys={getSelectedKeys()}
+  //     items={[
+  //       {
+  //         type: "group",
+  //         label: "App Center",
+  //         children: [
+  //           { key: "app-center", label: "App Center" },
+  //           { key: "marketplace", label: "Marketplace" },
+  //           { key: "my-apps", label: "My Apps" },
+  //         ],
+  //       },
+  //     ]}
+  //   />
+  // );
 
   return (
     <div className={styles.sider}>
@@ -522,7 +514,7 @@ const SiderDashBoard = () => {
           <span>Traffic & Market</span>
         </div>
       </Dropdown>
-      <Dropdown
+      {/* <Dropdown
         popupRender={() => (
           <div
             style={{
@@ -553,7 +545,7 @@ const SiderDashBoard = () => {
           <CiLocationOn />
           <span>Local</span>
         </div>
-      </Dropdown>
+      </Dropdown> */}
       <Dropdown
         popupRender={() => (
           <div
@@ -618,7 +610,7 @@ const SiderDashBoard = () => {
           <span>AI</span>
         </div>
       </Dropdown>
-      <Dropdown
+      {/* <Dropdown
         popupRender={() => (
           <div
             style={{
@@ -649,8 +641,8 @@ const SiderDashBoard = () => {
           <IoShareSocial />
           <span>Social</span>
         </div>
-      </Dropdown>
-      <Dropdown
+      </Dropdown> */}
+      {/* <Dropdown
         popupRender={() => (
           <div
             style={{
@@ -680,8 +672,8 @@ const SiderDashBoard = () => {
           <TbTargetArrow />
           <span>AD</span>
         </div>
-      </Dropdown>
-      <Dropdown
+      </Dropdown> */}
+      {/* <Dropdown
         popupRender={() => (
           <div
             style={{
@@ -742,7 +734,7 @@ const SiderDashBoard = () => {
           <RiApps2AiFill />
           <span>App Center</span>
         </div>
-      </Dropdown>
+      </Dropdown> */}
     </div>
   );
 };

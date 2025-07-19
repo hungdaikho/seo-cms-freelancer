@@ -80,7 +80,7 @@
   }
 
   .toolkit {
-    width: 900px;
+    width: 500px;
     height: auto;
     display: flex;
     flex-direction: column;
@@ -159,6 +159,17 @@
               letter-spacing: 2px;
             }
           }
+          .img {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            .cardIcon {
+              font-size: 48px;
+              color: #cccccc;
+              opacity: 0.3;
+            }
+          }
           .btn {
             display: none;
           }
@@ -178,6 +189,23 @@
               font-size: 16px;
               align-items: center;
               font-weight: 500;
+            }
+          }
+
+          .img {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            .cardIcon {
+              font-size: 80px;
+              color: #ff622d;
+              opacity: 0.8;
+              transition: all 0.3s ease;
+              &:hover {
+                color: #4b2490;
+                transform: scale(1.1);
+              }
             }
           }
 

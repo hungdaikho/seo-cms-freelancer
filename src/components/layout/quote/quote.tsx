@@ -22,7 +22,7 @@ const Quote = (props: Props) => {
           <span style={{ opacity: 0.8 }}>Source: Semrush G2 reviews</span>
         </div>
       </div>
-      <div className={styles.figures}>
+      {/* <div className={styles.figures}>
         <div className={styles.title}>{t("figures")}</div>
         <div className={styles.content}>
           <div className={styles.item}>
@@ -48,7 +48,7 @@ const Quote = (props: Props) => {
             </span>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className={styles.stats}>
         <div className={styles.left}>
           <div className={styles.title}>{t("stats")}</div>
