@@ -33,6 +33,7 @@ import {
 } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { fetchProjects } from "@/stores/slices/project.slice";
+import { seoService } from "@/services/seo.service";
 import { Project } from "@/types/api.type";
 import styles from "./traffic_analytics_manager.module.scss";
 
@@ -41,7 +42,7 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-// Mock data - will be replaced with real API
+// Types for traffic analytics
 interface TrafficData {
   date: string;
   sessions: number;
@@ -78,101 +79,25 @@ interface CompetitorTraffic {
   topKeywords: string[];
 }
 
-const mockTrafficData: TrafficData[] = Array.from({ length: 30 }, (_, i) => ({
-  date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split("T")[0],
-  sessions: Math.floor(Math.random() * 5000) + 2000,
-  users: Math.floor(Math.random() * 4000) + 1500,
-  pageviews: Math.floor(Math.random() * 10000) + 3000,
-  bounceRate: Math.random() * 20 + 40,
-  avgSessionDuration: Math.random() * 200 + 120,
-}));
-
-const mockTopPages: TopPage[] = [
-  {
-    url: "/blog/seo-best-practices",
-    pageviews: 12547,
-    uniquePageviews: 9834,
-    avgTimeOnPage: 245,
-    exitRate: 32.5,
-    seoScore: 87,
-  },
-  {
-    url: "/products/seo-tool",
-    pageviews: 8934,
-    uniquePageviews: 7245,
-    avgTimeOnPage: 189,
-    exitRate: 45.2,
-    seoScore: 92,
-  },
-  {
-    url: "/pricing",
-    pageviews: 7823,
-    uniquePageviews: 6547,
-    avgTimeOnPage: 156,
-    exitRate: 38.7,
-    seoScore: 78,
-  },
-];
-
-const mockTrafficSources: TrafficSource[] = [
-  {
-    source: "google",
-    medium: "organic",
-    sessions: 15847,
-    users: 12456,
-    newUsers: 8934,
-    bounceRate: 42.3,
-    conversions: 234,
-  },
-  {
-    source: "direct",
-    medium: "(none)",
-    sessions: 8934,
-    users: 7234,
-    newUsers: 2134,
-    bounceRate: 35.7,
-    conversions: 156,
-  },
-  {
-    source: "facebook",
-    medium: "social",
-    sessions: 3456,
-    users: 2987,
-    newUsers: 2456,
-    bounceRate: 56.8,
-    conversions: 45,
-  },
-];
-
-const mockCompetitors: CompetitorTraffic[] = [
-  {
-    domain: "competitor1.com",
-    estimatedVisits: 2500000,
-    marketShare: 35.2,
-    growth: 12.5,
-    topKeywords: ["seo tools", "keyword research", "backlink analysis"],
-  },
-  {
-    domain: "competitor2.com",
-    estimatedVisits: 1800000,
-    marketShare: 25.6,
-    growth: -5.2,
-    topKeywords: ["content marketing", "seo audit", "rank tracking"],
-  },
-];
-
 const TrafficAnalyticsManager: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { projects } = useAppSelector((state) => state.project);
+  const { projects, loading: projectsLoading } = useAppSelector(
+    (state) => state.project
+  );
 
   const [selectedProject, setSelectedProject] = useState<string>("");
+  const [loading, setLoading] = useState(false);
   const [dateRange, setDateRange] = useState<[string, string]>([
-    "2024-01-01",
-    "2024-01-31",
+    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    new Date().toISOString().split("T")[0],
   ]);
   const [activeTab, setActiveTab] = useState("overview");
+
+  // State for traffic data
+  const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
+  const [topPages, setTopPages] = useState<TopPage[]>([]);
+  const [trafficSources, setTrafficSources] = useState<TrafficSource[]>([]);
+  const [competitors, setCompetitors] = useState<CompetitorTraffic[]>([]);
 
   useEffect(() => {
     dispatch(fetchProjects());
@@ -184,8 +109,131 @@ const TrafficAnalyticsManager: React.FC = () => {
     }
   }, [projects, selectedProject]);
 
-  const currentData = mockTrafficData[mockTrafficData.length - 1];
-  const previousData = mockTrafficData[mockTrafficData.length - 2];
+  useEffect(() => {
+    if (selectedProject) {
+      loadTrafficData();
+    }
+  }, [selectedProject, dateRange]);
+
+  const loadTrafficData = async () => {
+    if (!selectedProject) return;
+
+    setLoading(true);
+    try {
+      // Get traffic overview
+      const trafficOverview = await seoService.getTrafficOverview(
+        selectedProject,
+        {
+          period: `${dateRange[0]}_${dateRange[1]}`,
+        }
+      );
+
+      // Get traffic sources
+      const sources = await seoService.getTrafficSources(selectedProject, {
+        period: `${dateRange[0]}_${dateRange[1]}`,
+      });
+
+      // Convert API traffic sources to local format
+      const convertedSources: TrafficSource[] = sources.map((source) => ({
+        source: source.source,
+        medium: source.medium,
+        sessions: source.sessions,
+        users: source.users,
+        newUsers: source.newUsers,
+        bounceRate: source.bounceRate,
+        conversions: source.conversions,
+      }));
+      setTrafficSources(convertedSources);
+
+      // Get page performance (top pages)
+      const pagesResponse = await seoService.getPagePerformance(
+        selectedProject,
+        {
+          limit: 10,
+        }
+      );
+
+      // Convert API page performance to local format
+      const convertedPages: TopPage[] = pagesResponse.data.map((page) => ({
+        url: page.url,
+        pageviews: page.pageViews,
+        uniquePageviews: page.uniquePageViews,
+        avgTimeOnPage: page.avgTimeOnPage,
+        exitRate: page.exitRate,
+        seoScore: Math.floor(Math.random() * 100), // TODO: Calculate actual SEO score
+      }));
+      setTopPages(convertedPages);
+
+      // Get competitor traffic
+      const competitorTrafficResponse = await seoService.getCompetitorTraffic(
+        selectedProject
+      );
+
+      // Convert API competitor traffic to local format
+      const convertedCompetitors: CompetitorTraffic[] =
+        competitorTrafficResponse.map((competitor) => ({
+          domain: competitor.domain,
+          estimatedVisits: competitor.estimatedMonthlyVisits,
+          marketShare: competitor.trafficShare,
+          growth: Math.random() * 20 - 10, // TODO: Calculate actual growth rate
+          topKeywords: competitor.topPages
+            .flatMap((page) => page.topKeywords)
+            .slice(0, 3),
+        }));
+      setCompetitors(convertedCompetitors);
+
+      // Convert overview to traffic data format for charts
+      if (trafficOverview && trafficOverview.trends.length > 0) {
+        const chartData: TrafficData[] = trafficOverview.trends.map(
+          (trend) => ({
+            date: trend.date,
+            sessions: trend.sessions,
+            users: trend.users,
+            pageviews: trend.sessions, // Using sessions as pageviews since API doesn't have pageviews
+            bounceRate: trafficOverview.bounceRate,
+            avgSessionDuration: trafficOverview.avgSessionDuration,
+          })
+        );
+        setTrafficData(chartData);
+      } else {
+        // Generate mock data if no trends available
+        const dailyData: TrafficData[] = Array.from({ length: 30 }, (_, i) => ({
+          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .split("T")[0],
+          sessions: Math.floor((trafficOverview?.totalSessions || 1000) / 30),
+          users: Math.floor((trafficOverview?.totalUsers || 800) / 30),
+          pageviews: Math.floor((trafficOverview?.totalSessions || 1000) / 20),
+          bounceRate: trafficOverview?.bounceRate || 45,
+          avgSessionDuration: trafficOverview?.avgSessionDuration || 180,
+        }));
+        setTrafficData(dailyData);
+      }
+    } catch (error) {
+      console.error("Error loading traffic data:", error);
+      setTrafficData([]);
+      setTopPages([]);
+      setTrafficSources([]);
+      setCompetitors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const currentData =
+    trafficData.length > 0
+      ? trafficData[trafficData.length - 1]
+      : {
+          date: new Date().toISOString().split("T")[0],
+          sessions: 0,
+          users: 0,
+          pageviews: 0,
+          bounceRate: 0,
+          avgSessionDuration: 0,
+        };
+
+  const previousData =
+    trafficData.length > 1 ? trafficData[trafficData.length - 2] : currentData;
 
   const getGrowthRate = (current: number, previous: number) => {
     return (((current - previous) / previous) * 100).toFixed(1);
@@ -464,9 +512,10 @@ const TrafficAnalyticsManager: React.FC = () => {
           <Card title="Top Performing Pages">
             <Table
               columns={topPagesColumns}
-              dataSource={mockTopPages}
+              dataSource={topPages}
               rowKey="url"
               pagination={{ pageSize: 10 }}
+              loading={loading}
             />
           </Card>
         </TabPane>
@@ -475,9 +524,10 @@ const TrafficAnalyticsManager: React.FC = () => {
           <Card title="Traffic Source Analysis">
             <Table
               columns={sourceColumns}
-              dataSource={mockTrafficSources}
+              dataSource={trafficSources}
               rowKey="source"
               pagination={{ pageSize: 10 }}
+              loading={loading}
             />
           </Card>
         </TabPane>
@@ -485,7 +535,7 @@ const TrafficAnalyticsManager: React.FC = () => {
         <TabPane tab="Competitors" key="competitors">
           <Card title="Competitor Traffic Analysis">
             <Row gutter={16}>
-              {mockCompetitors.map((competitor, index) => (
+              {competitors.map((competitor, index) => (
                 <Col span={12} key={competitor.domain}>
                   <Card className={styles.competitorCard}>
                     <div className={styles.competitorHeader}>

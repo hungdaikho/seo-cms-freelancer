@@ -117,6 +117,11 @@ const AiToolsManager: React.FC = () => {
   };
 
   const handleGenerateContent = async (values: any) => {
+    if (!selectedProject) {
+      message.error("Please select a project first");
+      return;
+    }
+
     try {
       const request: ContentGenerationRequest = {
         type: values.type,
@@ -126,6 +131,7 @@ const AiToolsManager: React.FC = () => {
         length: values.length,
         language: values.language || "en",
         targetAudience: values.targetAudience,
+        projectId: selectedProject,
       };
 
       await dispatch(generateContent(request)).unwrap();
@@ -141,6 +147,11 @@ const AiToolsManager: React.FC = () => {
   };
 
   const handleAnalyzeSeo = async (values: any) => {
+    if (!selectedProject) {
+      message.error("Please select a project first");
+      return;
+    }
+
     try {
       const request: SeoAnalysisRequest = {
         url: values.url,
@@ -148,6 +159,7 @@ const AiToolsManager: React.FC = () => {
         competitors: values.competitors
           ?.split(",")
           .map((c: string) => c.trim()),
+        projectId: selectedProject,
       };
 
       await dispatch(analyzeSeо(request)).unwrap();
@@ -163,6 +175,11 @@ const AiToolsManager: React.FC = () => {
   };
 
   const handleResearchKeywords = async (values: any) => {
+    if (!selectedProject) {
+      message.error("Please select a project first");
+      return;
+    }
+
     try {
       const request: KeywordResearchRequest = {
         seedKeywords: values.seedKeywords
@@ -171,6 +188,7 @@ const AiToolsManager: React.FC = () => {
         location: values.location,
         language: values.language || "en",
         includeQuestions: values.includeQuestions,
+        projectId: selectedProject,
       };
 
       await dispatch(researchKeywords(request)).unwrap();

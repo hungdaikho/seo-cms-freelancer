@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { seoService } from '@/services/seo.service';
 
 // AI Tool Types
 export interface AiTool {
@@ -105,114 +106,86 @@ const initialState: AiState = {
     },
 };
 
-// Mock data generators
-const generateMockTools = (): AiTool[] => [
-    {
-        id: 'content-generator',
-        name: 'Content Generator',
-        description: 'Generate high-quality content for blogs, articles, and web pages',
-        category: 'content',
-        icon: '📝',
-        isActive: true,
-        isPremium: false,
-        usageCount: 45,
-        maxUsage: 100,
-        features: ['Blog posts', 'Articles', 'Product descriptions', 'Meta descriptions'],
-    },
-    {
-        id: 'seo-optimizer',
-        name: 'SEO Optimizer',
-        description: 'Optimize your content for search engines with AI-powered suggestions',
-        category: 'seo',
-        icon: '🎯',
-        isActive: true,
-        isPremium: true,
-        usageCount: 23,
-        features: ['Keyword optimization', 'Title suggestions', 'Meta tags', 'Content structure'],
-    },
-    {
-        id: 'keyword-research',
-        name: 'Keyword Research',
-        description: 'Discover profitable keywords with AI-powered research',
-        category: 'research',
-        icon: '🔍',
-        isActive: true,
-        isPremium: false,
-        usageCount: 67,
-        maxUsage: 200,
-        features: ['Keyword suggestions', 'Search volume', 'Competition analysis', 'Long-tail keywords'],
-    },
-    {
-        id: 'competitor-analysis',
-        name: 'Competitor Analysis',
-        description: 'Analyze your competitors\' strategies with AI insights',
-        category: 'analysis',
-        icon: '📊',
-        isActive: true,
-        isPremium: true,
-        usageCount: 12,
-        features: ['Content gaps', 'Keyword gaps', 'Backlink analysis', 'Strategy insights'],
-    },
-    {
-        id: 'content-optimizer',
-        name: 'Content Optimizer',
-        description: 'Optimize existing content for better performance',
-        category: 'optimization',
-        icon: '⚡',
-        isActive: true,
-        isPremium: false,
-        usageCount: 34,
-        maxUsage: 150,
-        features: ['Readability improvement', 'SEO optimization', 'Structure analysis', 'Performance tips'],
-    },
-    {
-        id: 'social-media-generator',
-        name: 'Social Media Generator',
-        description: 'Create engaging social media content automatically',
-        category: 'content',
-        icon: '📱',
-        isActive: true,
-        isPremium: false,
-        usageCount: 56,
-        maxUsage: 300,
-        features: ['Post generation', 'Hashtag suggestions', 'Caption writing', 'Multi-platform'],
-    },
-];
-
-const generateMockRequests = (count: number): AiRequest[] => {
-    const tools = generateMockTools();
-    const statuses: AiRequest['status'][] = ['completed', 'pending', 'processing', 'failed'];
-
-    return Array.from({ length: count }, (_, i) => {
-        const tool = tools[Math.floor(Math.random() * tools.length)];
-        const status = statuses[Math.floor(Math.random() * statuses.length)];
-        const createdAt = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString();
-
-        return {
-            id: `request-${i + 1}`,
-            toolId: tool.id,
-            toolName: tool.name,
-            input: `Sample input for ${tool.name} request ${i + 1}`,
-            output: status === 'completed' ? `Generated output for request ${i + 1}` : undefined,
-            status,
-            createdAt,
-            completedAt: status === 'completed' ?
-                new Date(new Date(createdAt).getTime() + Math.random() * 60 * 60 * 1000).toISOString() :
-                undefined,
-            tokens: status === 'completed' ? Math.floor(Math.random() * 2000) + 500 : undefined,
-            cost: status === 'completed' ? Math.random() * 0.1 + 0.01 : undefined,
-            projectId: `project-${Math.floor(Math.random() * 3) + 1}`,
-        };
-    });
-};
-
 // Async thunks
 export const fetchAiTools = createAsyncThunk(
     'ai/fetchTools',
     async (_, { rejectWithValue }) => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            return generateMockTools();
+            // Return predefined AI tools available in the system
+            const tools: AiTool[] = [
+                {
+                    id: 'content-generator',
+                    name: 'Content Generator',
+                    description: 'Generate high-quality content for blogs, articles, and web pages',
+                    category: 'content',
+                    icon: '📝',
+                    isActive: true,
+                    isPremium: false,
+                    usageCount: 0,
+                    maxUsage: 100,
+                    features: ['Blog posts', 'Articles', 'Product descriptions', 'Meta descriptions'],
+                },
+                {
+                    id: 'seo-optimizer',
+                    name: 'SEO Optimizer',
+                    description: 'Optimize your content for search engines with AI-powered suggestions',
+                    category: 'seo',
+                    icon: '🎯',
+                    isActive: true,
+                    isPremium: true,
+                    usageCount: 0,
+                    features: ['Keyword optimization', 'Title suggestions', 'Meta tags', 'Content structure'],
+                },
+                {
+                    id: 'keyword-research',
+                    name: 'Keyword Research',
+                    description: 'Discover profitable keywords with AI-powered research',
+                    category: 'research',
+                    icon: '🔍',
+                    isActive: true,
+                    isPremium: false,
+                    usageCount: 0,
+                    maxUsage: 200,
+                    features: ['Keyword suggestions', 'Search volume', 'Competition analysis', 'Long-tail keywords'],
+                },
+                {
+                    id: 'competitor-analysis',
+                    name: 'Competitor Analysis',
+                    description: 'Analyze your competitors\' strategies with AI insights',
+                    category: 'analysis',
+                    icon: '📊',
+                    isActive: true,
+                    isPremium: true,
+                    usageCount: 0,
+                    features: ['Content gaps', 'Keyword gaps', 'Backlink analysis', 'Strategy insights'],
+                },
+                {
+                    id: 'content-optimizer',
+                    name: 'Content Optimizer',
+                    description: 'Optimize existing content for better performance',
+                    category: 'optimization',
+                    icon: '⚡',
+                    isActive: true,
+                    isPremium: false,
+                    usageCount: 0,
+                    maxUsage: 150,
+                    features: ['Readability improvement', 'SEO optimization', 'Structure analysis', 'Performance tips'],
+                },
+                {
+                    id: 'social-media-generator',
+                    name: 'Social Media Generator',
+                    description: 'Create engaging social media content automatically',
+                    category: 'content',
+                    icon: '📱',
+                    isActive: true,
+                    isPremium: false,
+                    usageCount: 0,
+                    maxUsage: 300,
+                    features: ['Post generation', 'Hashtag suggestions', 'Caption writing', 'Multi-platform'],
+                },
+            ];
+
+            return tools;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to fetch AI tools');
         }
@@ -223,35 +196,17 @@ export const fetchAiRequests = createAsyncThunk(
     'ai/fetchRequests',
     async (params: { filters?: any; pagination?: { page: number; limit: number } }, { rejectWithValue }) => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const mockData = generateMockRequests(50);
-            let filteredData = mockData;
-
-            // Apply filters
-            if (params.filters) {
-                const { category, status } = params.filters;
-
-                if (status && status !== 'all') {
-                    filteredData = filteredData.filter(request => request.status === status);
-                }
-            }
-
-            // Apply pagination
-            const page = params.pagination?.page || 1;
-            const limit = params.pagination?.limit || 10;
-            const total = filteredData.length;
-            const totalPages = Math.ceil(total / limit);
-            const startIndex = (page - 1) * limit;
-            const paginatedData = filteredData.slice(startIndex, startIndex + limit);
-
-            return {
-                data: paginatedData,
-                total,
-                page,
-                limit,
-                totalPages,
+            // TODO: Replace with actual API call when AI requests endpoint is available
+            // For now, return empty data structure
+            const emptyResponse = {
+                data: [] as AiRequest[],
+                total: 0,
+                page: params.pagination?.page || 1,
+                limit: params.pagination?.limit || 10,
+                totalPages: 0,
             };
+
+            return emptyResponse;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to fetch AI requests');
         }
@@ -262,24 +217,65 @@ export const generateContent = createAsyncThunk(
     'ai/generateContent',
     async (request: ContentGenerationRequest, { rejectWithValue }) => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate AI processing time
+            // Convert local types to API types
+            const typeMapping: Record<string, string> = {
+                'blog_post': 'blog-post',
+                'meta_description': 'meta-description',
+                'title_tags': 'meta-description', // Map to closest equivalent
+                'product_description': 'product-description',
+                'social_post': 'social-post',
+            };
 
+            const toneMapping: Record<string, string> = {
+                'professional': 'professional',
+                'casual': 'casual',
+                'friendly': 'friendly',
+                'authoritative': 'authoritative',
+                'creative': 'friendly', // Map creative to friendly as fallback
+            };
+
+            // Use the actual AI content generation API from seoService
+            const generatedContent = await seoService.generateContent({
+                projectId: request.projectId || '',
+                type: typeMapping[request.type] as any,
+                topic: request.prompt, // Use prompt as topic
+                targetKeywords: request.keywords || [],
+                tone: toneMapping[request.tone || 'professional'] as any,
+                length: request.length || 'medium',
+                audience: request.targetAudience || 'general audience',
+            });
+
+            // Convert API response to AiRequest format for the request history
             const newRequest: AiRequest = {
                 id: `request-${Date.now()}`,
                 toolId: 'content-generator',
                 toolName: 'Content Generator',
                 input: request.prompt,
-                output: `Generated ${request.type.replace('_', ' ')} content based on: ${request.prompt}`,
+                output: generatedContent.content || 'Content generated successfully',
                 status: 'completed',
                 createdAt: new Date().toISOString(),
                 completedAt: new Date().toISOString(),
-                tokens: Math.floor(Math.random() * 2000) + 500,
-                cost: Math.random() * 0.1 + 0.01,
+                tokens: generatedContent.usageCredits || 500,
+                cost: (generatedContent.usageCredits || 500) * 0.00002, // Estimate cost per token
                 projectId: request.projectId,
             };
 
             return newRequest;
         } catch (error: any) {
+            console.error('Content generation failed:', error);
+
+            // Create a failed request record
+            const failedRequest: AiRequest = {
+                id: `request-${Date.now()}`,
+                toolId: 'content-generator',
+                toolName: 'Content Generator',
+                input: request.prompt,
+                status: 'failed',
+                createdAt: new Date().toISOString(),
+                projectId: request.projectId,
+            };
+
+            // Still return the failed request for tracking, but also reject
             return rejectWithValue(error.message || 'Failed to generate content');
         }
     }
@@ -289,24 +285,29 @@ export const analyzeSeо = createAsyncThunk(
     'ai/analyzeSeo',
     async (request: SeoAnalysisRequest, { rejectWithValue }) => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Use the actual AI SEO analysis API from seoService
+            const seoAnalysis = await seoService.aiAnalyzePage({
+                url: request.url,
+                targetKeywords: request.targetKeywords,
+            });
 
             const newRequest: AiRequest = {
                 id: `request-${Date.now()}`,
                 toolId: 'seo-optimizer',
                 toolName: 'SEO Optimizer',
                 input: `Analyze SEO for ${request.url} with keywords: ${request.targetKeywords.join(', ')}`,
-                output: 'SEO analysis completed with recommendations for improvement',
+                output: `SEO analysis completed. Score: ${seoAnalysis.overallScore}/100. Found ${seoAnalysis.recommendations?.length || 0} recommendations.`,
                 status: 'completed',
                 createdAt: new Date().toISOString(),
                 completedAt: new Date().toISOString(),
-                tokens: Math.floor(Math.random() * 1500) + 300,
-                cost: Math.random() * 0.08 + 0.02,
+                tokens: 300, // Estimate for SEO analysis
+                cost: 0.006, // Estimate cost
                 projectId: request.projectId,
             };
 
             return newRequest;
         } catch (error: any) {
+            console.error('SEO analysis failed:', error);
             return rejectWithValue(error.message || 'Failed to analyze SEO');
         }
     }
@@ -316,24 +317,30 @@ export const researchKeywords = createAsyncThunk(
     'ai/researchKeywords',
     async (request: KeywordResearchRequest, { rejectWithValue }) => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 2500));
+            // Use the actual AI keyword suggestions API from seoService
+            const keywordSuggestions = await seoService.aiKeywordSuggestions({
+                seedKeyword: request.seedKeywords[0], // Use first seed keyword
+                location: request.location,
+                // Note: API doesn't have language parameter, so we'll skip it
+            });
 
             const newRequest: AiRequest = {
                 id: `request-${Date.now()}`,
                 toolId: 'keyword-research',
                 toolName: 'Keyword Research',
                 input: `Research keywords for: ${request.seedKeywords.join(', ')}`,
-                output: 'Keyword research completed with 50+ relevant keywords and search volumes',
+                output: `Keyword research completed with ${keywordSuggestions.length} relevant keywords found.`,
                 status: 'completed',
                 createdAt: new Date().toISOString(),
                 completedAt: new Date().toISOString(),
-                tokens: Math.floor(Math.random() * 1000) + 200,
-                cost: Math.random() * 0.05 + 0.01,
+                tokens: 250, // Estimate for keyword research
+                cost: 0.005, // Estimate cost
                 projectId: request.projectId,
             };
 
             return newRequest;
         } catch (error: any) {
+            console.error('Keyword research failed:', error);
             return rejectWithValue(error.message || 'Failed to research keywords');
         }
     }
@@ -384,12 +391,12 @@ const aiSlice = createSlice({
                 };
 
                 // Update stats
-                const completedRequests = action.payload.data.filter(r => r.status === 'completed');
+                const completedRequests = action.payload.data.filter((r: AiRequest) => r.status === 'completed');
                 state.stats = {
                     totalRequests: action.payload.total,
                     completedRequests: completedRequests.length,
-                    tokensUsed: completedRequests.reduce((sum, r) => sum + (r.tokens || 0), 0),
-                    monthlyCost: completedRequests.reduce((sum, r) => sum + (r.cost || 0), 0),
+                    tokensUsed: completedRequests.reduce((sum: number, r: AiRequest) => sum + (r.tokens || 0), 0),
+                    monthlyCost: completedRequests.reduce((sum: number, r: AiRequest) => sum + (r.cost || 0), 0),
                 };
             })
             .addCase(fetchAiRequests.rejected, (state, action) => {

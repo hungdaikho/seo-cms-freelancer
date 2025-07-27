@@ -21,14 +21,11 @@ import Domain from "./features/domain";
 import FooterProject from "./features/footer";
 import { useProject } from "@/stores/hooks/useProject";
 
-const { TabPane } = Tabs;
-
 type Props = {};
 
 const Page = (props: Props) => {
   const { currentProject, projects, setCurrentProject } = useProject();
   const [activeTab, setActiveTab] = useState("projects");
-
   // Auto-select first project if available and no current project
   useEffect(() => {
     if (!currentProject && projects.length > 0) {
@@ -55,6 +52,111 @@ const Page = (props: Props) => {
     </div>
   );
 
+  const tabItems = [
+    {
+      key: "projects",
+      label: (
+        <span>
+          <ProjectOutlined />
+          Projects
+        </span>
+      ),
+      children: (
+        <>
+          <ListTool />
+          <CopilotAI />
+          <ProjectManager onProjectSelect={handleProjectSelect} />
+          <Domain />
+          <FooterProject />
+        </>
+      ),
+    },
+    {
+      key: "dashboard",
+      label: (
+        <span>
+          <DashboardOutlined />
+          Dashboard
+        </span>
+      ),
+      disabled: !currentProject,
+      children: currentProject ? (
+        <ProjectDashboard
+          projectId={currentProject.id}
+          projectName={currentProject.name}
+        />
+      ) : (
+        renderEmptyState()
+      ),
+    },
+    {
+      key: "keywords",
+      label: (
+        <span>
+          <SearchOutlined />
+          Keywords
+        </span>
+      ),
+      disabled: !currentProject,
+      children: currentProject ? (
+        <KeywordManager
+          projectId={currentProject.id}
+          projectName={currentProject.name}
+        />
+      ) : (
+        renderEmptyState()
+      ),
+    },
+    {
+      key: "audits",
+      label: (
+        <span>
+          <FileSearchOutlined />
+          SEO Audits
+        </span>
+      ),
+      disabled: !currentProject,
+      children: currentProject ? (
+        <AuditManager
+          projectId={currentProject.id}
+          projectName={currentProject.name}
+        />
+      ) : (
+        renderEmptyState()
+      ),
+    },
+    {
+      key: "tools",
+      label: (
+        <span>
+          <ToolOutlined />
+          Tools
+        </span>
+      ),
+      children: <ListTool />,
+    },
+    {
+      key: "ai",
+      label: (
+        <span>
+          <RobotOutlined />
+          AI Assistant
+        </span>
+      ),
+      children: <CopilotAI />,
+    },
+    {
+      key: "domain",
+      label: (
+        <span>
+          <GlobalOutlined />
+          Domain Analysis
+        </span>
+      ),
+      children: <Domain />,
+    },
+  ];
+
   return (
     <div style={{ padding: "0", minHeight: "100vh", background: "#f5f5f5" }}>
       <Tabs
@@ -62,119 +164,8 @@ const Page = (props: Props) => {
         onChange={setActiveTab}
         type="card"
         style={{ margin: "0", background: "white" }}
-      >
-        <TabPane
-          tab={
-            <span>
-              <ProjectOutlined />
-              Projects
-            </span>
-          }
-          key="projects"
-        >
-          <ListTool />
-          <CopilotAI />
-          <ProjectManager onProjectSelect={handleProjectSelect} />
-          <Domain />
-          <FooterProject />
-        </TabPane>
-
-        <TabPane
-          tab={
-            <span>
-              <DashboardOutlined />
-              Dashboard
-            </span>
-          }
-          key="dashboard"
-          disabled={!currentProject}
-        >
-          {currentProject ? (
-            <ProjectDashboard
-              projectId={currentProject.id}
-              projectName={currentProject.name}
-            />
-          ) : (
-            renderEmptyState()
-          )}
-        </TabPane>
-
-        <TabPane
-          tab={
-            <span>
-              <SearchOutlined />
-              Keywords
-            </span>
-          }
-          key="keywords"
-          disabled={!currentProject}
-        >
-          {currentProject ? (
-            <KeywordManager
-              projectId={currentProject.id}
-              projectName={currentProject.name}
-            />
-          ) : (
-            renderEmptyState()
-          )}
-        </TabPane>
-
-        <TabPane
-          tab={
-            <span>
-              <FileSearchOutlined />
-              SEO Audits
-            </span>
-          }
-          key="audits"
-          disabled={!currentProject}
-        >
-          {currentProject ? (
-            <AuditManager
-              projectId={currentProject.id}
-              projectName={currentProject.name}
-            />
-          ) : (
-            renderEmptyState()
-          )}
-        </TabPane>
-
-        <TabPane
-          tab={
-            <span>
-              <ToolOutlined />
-              Tools
-            </span>
-          }
-          key="tools"
-        >
-          <ListTool />
-        </TabPane>
-
-        <TabPane
-          tab={
-            <span>
-              <RobotOutlined />
-              AI Assistant
-            </span>
-          }
-          key="ai"
-        >
-          <CopilotAI />
-        </TabPane>
-
-        <TabPane
-          tab={
-            <span>
-              <GlobalOutlined />
-              Domain Analysis
-            </span>
-          }
-          key="domain"
-        >
-          <Domain />
-        </TabPane>
-      </Tabs>
+        items={tabItems}
+      />
     </div>
   );
 };

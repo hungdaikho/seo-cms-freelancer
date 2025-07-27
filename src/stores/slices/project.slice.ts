@@ -23,50 +23,9 @@ export interface ProjectState {
         totalPages: number;
     };
 }
-
-// Mock data for development
-const mockProjects: Project[] = [
-    {
-        id: "1",
-        name: "E-commerce Website",
-        domain: "example-shop.com",
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        settings: {
-            location: "United States",
-            language: "en"
-        }
-    },
-    {
-        id: "2",
-        name: "Blog Platform",
-        domain: "myblog.com",
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        settings: {
-            location: "United States",
-            language: "en"
-        }
-    },
-    {
-        id: "3",
-        name: "SaaS Product",
-        domain: "saas-app.com",
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        settings: {
-            location: "United States",
-            language: "en"
-        }
-    }
-];
-
 // Initial state
 const initialState: ProjectState = {
-    projects: mockProjects, // Start with mock data
+    projects: [], // Start with mock data
     currentProject: null,
     projectStats: null,
     loading: false,

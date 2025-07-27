@@ -139,6 +139,8 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ onProjectSelect }) => {
   };
 
   const handleViewStats = async (project: Project) => {
+    console.log(project);
+
     setCurrentProject(project);
     await fetchProjectStats(project.id);
     setIsStatsDrawerVisible(true);

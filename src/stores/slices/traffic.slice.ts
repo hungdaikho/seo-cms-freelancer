@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { seoService } from '@/services/seo.service';
 
 // Traffic Analytics Types (tạm thời, sẽ mở rộng sau khi có API thực tế)
 export interface TrafficData {
@@ -86,22 +87,49 @@ export const fetchTrafficData = createAsyncThunk(
     'traffic/fetchTrafficData',
     async (params: { projectId: string; filters?: TrafficFilters }, { rejectWithValue }) => {
         try {
-            // Mock data - sẽ thay bằng API call thực tế
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const dateRange = params.filters?.dateRange || {
+                start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                end: new Date().toISOString().split('T')[0]
+            };
 
+            // Get traffic overview from API
+            const trafficOverview = await seoService.getTrafficOverview(params.projectId, {
+                period: `${dateRange.start}_${dateRange.end}`
+            });
+
+            // Convert API response to TrafficData format
+            if (trafficOverview && trafficOverview.trends.length > 0) {
+                const trafficData: TrafficData[] = trafficOverview.trends.map((trend, index) => ({
+                    id: `traffic-${index}`,
+                    projectId: params.projectId,
+                    date: trend.date,
+                    pageViews: trend.sessions, // Using sessions as pageviews
+                    uniqueVisitors: trend.users,
+                    bounceRate: trafficOverview.bounceRate,
+                    avgSessionDuration: trafficOverview.avgSessionDuration,
+                    organicTraffic: trend.organicSessions,
+                    paidTraffic: Math.floor(trend.sessions * 0.15), // Estimated 15% paid
+                    socialTraffic: Math.floor(trend.sessions * 0.10), // Estimated 10% social
+                    referralTraffic: Math.floor(trend.sessions * 0.08), // Estimated 8% referral
+                    directTraffic: Math.floor(trend.sessions * 0.25), // Estimated 25% direct
+                }));
+                return trafficData;
+            }
+
+            // Fallback: generate estimated data from overview
             const mockData: TrafficData[] = Array.from({ length: 30 }, (_, i) => ({
                 id: `traffic-${i}`,
                 projectId: params.projectId,
                 date: new Date(Date.now() - (30 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                pageViews: Math.floor(Math.random() * 1000) + 500,
-                uniqueVisitors: Math.floor(Math.random() * 800) + 300,
-                bounceRate: Math.random() * 0.4 + 0.3, // 30-70%
-                avgSessionDuration: Math.random() * 300 + 120, // 2-7 minutes
-                organicTraffic: Math.floor(Math.random() * 400) + 200,
-                paidTraffic: Math.floor(Math.random() * 200) + 50,
-                socialTraffic: Math.floor(Math.random() * 150) + 30,
-                referralTraffic: Math.floor(Math.random() * 100) + 20,
-                directTraffic: Math.floor(Math.random() * 200) + 100,
+                pageViews: Math.floor((trafficOverview?.totalSessions || 1000) / 30),
+                uniqueVisitors: Math.floor((trafficOverview?.totalUsers || 800) / 30),
+                bounceRate: trafficOverview?.bounceRate || 45,
+                avgSessionDuration: trafficOverview?.avgSessionDuration || 180,
+                organicTraffic: Math.floor((trafficOverview?.organicSessions || 600) / 30),
+                paidTraffic: Math.floor((trafficOverview?.totalSessions || 1000) * 0.15 / 30),
+                socialTraffic: Math.floor((trafficOverview?.totalSessions || 1000) * 0.10 / 30),
+                referralTraffic: Math.floor((trafficOverview?.totalSessions || 1000) * 0.08 / 30),
+                directTraffic: Math.floor((trafficOverview?.totalSessions || 1000) * 0.25 / 30),
             }));
 
             return mockData;
@@ -115,9 +143,32 @@ export const fetchTrafficSources = createAsyncThunk(
     'traffic/fetchTrafficSources',
     async (params: { projectId: string; filters?: TrafficFilters }, { rejectWithValue }) => {
         try {
-            // Mock data
-            await new Promise(resolve => setTimeout(resolve, 500));
+            const dateRange = params.filters?.dateRange || {
+                start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                end: new Date().toISOString().split('T')[0]
+            };
 
+            // Get traffic sources from API
+            const trafficSources = await seoService.getTrafficSources(params.projectId, {
+                period: `${dateRange.start}_${dateRange.end}`
+            });
+
+            // Convert API response to local format
+            if (trafficSources && trafficSources.length > 0) {
+                const totalSessions = trafficSources.reduce((sum, source) => sum + source.sessions, 0);
+
+                const sourcesData: TrafficSource[] = trafficSources.map(source => ({
+                    source: `${source.source} (${source.medium})`,
+                    visits: source.sessions,
+                    percentage: totalSessions > 0 ? Math.round((source.sessions / totalSessions) * 100) : 0,
+                    trend: 'stable' as const, // TODO: Calculate actual trend
+                    change: 0, // TODO: Calculate actual change
+                }));
+
+                return sourcesData;
+            }
+
+            // Fallback mock data if no API data available
             const mockSources: TrafficSource[] = [
                 { source: 'Organic Search', visits: 4500, percentage: 45, trend: 'up', change: 12 },
                 { source: 'Direct', visits: 2800, percentage: 28, trend: 'stable', change: 0 },
@@ -137,9 +188,26 @@ export const fetchTopPages = createAsyncThunk(
     'traffic/fetchTopPages',
     async (params: { projectId: string; filters?: TrafficFilters }, { rejectWithValue }) => {
         try {
-            // Mock data
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Get page performance from API
+            const pagePerformance = await seoService.getPagePerformance(params.projectId, {
+                limit: 10
+            });
 
+            // Convert API response to local format
+            if (pagePerformance && pagePerformance.data.length > 0) {
+                const topPagesData: TopPage[] = pagePerformance.data.map(page => ({
+                    url: page.url,
+                    pageTitle: page.url.split('/').pop()?.replace(/-/g, ' ') || page.url, // Generate title from URL
+                    pageViews: page.pageViews,
+                    uniquePageViews: page.uniquePageViews,
+                    avgTimeOnPage: page.avgTimeOnPage,
+                    bounceRate: page.exitRate / 100, // Convert percentage to decimal
+                }));
+
+                return topPagesData;
+            }
+
+            // Fallback mock data if no API data available
             const mockPages: TopPage[] = [
                 {
                     url: '/blog/seo-tips',

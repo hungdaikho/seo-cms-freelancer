@@ -8,11 +8,24 @@ import {
   TrophyOutlined,
   FileTextOutlined,
   PlusOutlined,
+  LinkOutlined,
+  BookOutlined,
+  EditOutlined,
+  BulbOutlined,
 } from "@ant-design/icons";
 import { useAppSelector, useAppDispatch } from "@/stores/hooks";
 import { fetchProjects } from "@/stores/slices/project.slice";
 import { Project } from "@/types/api.type";
 import KeywordManager from "./features/keyword_manager";
+// Import các component con
+import PositionTrackingManager from "./position-tracking/features/position_tracking_manager_fixed";
+import SiteAuditManager from "./site-audit/features/site_audit_manager";
+import KeywordMagicTool from "./keyword-magic-tool/features/keyword_magic_tool";
+import BacklinkAnalyticsManager from "./backlink-analytics/features/backlink_analytics_manager";
+import KeywordGapAnalyzer from "./keyword-gap/features/keyword_gap_analyzer";
+import OrganicResearchPage from "./organic-research/page";
+import DomainOverviewPage from "./domain-overview/page";
+import TopicResearchPage from "./topic-research/page";
 import styles from "./page.module.scss";
 
 const { Title, Text } = Typography;
@@ -88,39 +101,19 @@ const SeoPage: React.FC = () => {
             }
             key="tracking"
           >
-            <div className={styles.comingSoon}>
-              <Title level={3}>Position Tracking</Title>
-              <Text type="secondary">
-                Track your keyword rankings over time
-              </Text>
-              <div style={{ marginTop: 16 }}>
-                <Button type="primary" icon={<PlusOutlined />}>
-                  Set up Tracking
-                </Button>
-              </div>
-            </div>
+            <PositionTrackingManager />
           </TabPane>
 
           <TabPane
             tab={
               <span>
                 <TrophyOutlined />
-                Competitor Analysis
+                Organic Research
               </span>
             }
-            key="competitors"
+            key="organic-research"
           >
-            <div className={styles.comingSoon}>
-              <Title level={3}>Competitor Analysis</Title>
-              <Text type="secondary">
-                Analyze your competitors' SEO strategies
-              </Text>
-              <div style={{ marginTop: 16 }}>
-                <Button type="primary" icon={<PlusOutlined />}>
-                  Add Competitors
-                </Button>
-              </div>
-            </div>
+            <OrganicResearchPage />
           </TabPane>
 
           <TabPane
@@ -132,14 +125,108 @@ const SeoPage: React.FC = () => {
             }
             key="audit"
           >
+            <SiteAuditManager />
+          </TabPane>
+
+          <TabPane
+            tab={
+              <span>
+                <SearchOutlined />
+                Keyword Magic Tool
+              </span>
+            }
+            key="keyword-magic"
+          >
+            <KeywordMagicTool />
+          </TabPane>
+
+          <TabPane
+            tab={
+              <span>
+                <BarChartOutlined />
+                Domain Overview
+              </span>
+            }
+            key="domain-overview"
+          >
+            <DomainOverviewPage />
+          </TabPane>
+
+          <TabPane
+            tab={
+              <span>
+                <LinkOutlined />
+                Backlink Analytics
+              </span>
+            }
+            key="backlink-analytics"
+          >
+            <BacklinkAnalyticsManager />
+          </TabPane>
+
+          <TabPane
+            tab={
+              <span>
+                <SearchOutlined />
+                Keyword Gap
+              </span>
+            }
+            key="keyword-gap"
+          >
+            <KeywordGapAnalyzer />
+          </TabPane>
+
+          <TabPane
+            tab={
+              <span>
+                <BookOutlined />
+                Topic Research
+              </span>
+            }
+            key="topic-research"
+          >
+            <TopicResearchPage />
+          </TabPane>
+
+          <TabPane
+            tab={
+              <span>
+                <EditOutlined />
+                SEO Content Template
+              </span>
+            }
+            key="seo-content-template"
+          >
             <div className={styles.comingSoon}>
-              <Title level={3}>Site Audit</Title>
+              <Title level={3}>SEO Content Template</Title>
               <Text type="secondary">
-                Comprehensive SEO audit of your website
+                Create SEO-optimized content templates
               </Text>
               <div style={{ marginTop: 16 }}>
                 <Button type="primary" icon={<PlusOutlined />}>
-                  Start Audit
+                  Create Template
+                </Button>
+              </div>
+            </div>
+          </TabPane>
+
+          <TabPane
+            tab={
+              <span>
+                <BulbOutlined />
+                On-Page SEO Checker
+              </span>
+            }
+            key="on-page-seo-checker"
+          >
+            <div className={styles.comingSoon}>
+              <Title level={3}>On-Page SEO Checker</Title>
+              <Text type="secondary">
+                Analyze and optimize your pages for better SEO
+              </Text>
+              <div style={{ marginTop: 16 }}>
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Check Page
                 </Button>
               </div>
             </div>

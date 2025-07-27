@@ -124,6 +124,94 @@ export class SeoService extends BaseService {
   }
 
   // =============================================================================
+  // 🔍 ORGANIC RESEARCH METHODS
+  // =============================================================================
+
+  /**
+   * Analyze domain for organic research
+   */
+  analyzeDomain(domain: string, country: string = "US"): Promise<any> {
+    return this.get<any>(`/seo/organic-research/domain/${domain}?country=${country}`);
+  }
+
+  /**
+   * Get organic keywords for domain
+   */
+  getOrganicKeywords(domain: string, params?: any): Promise<any[]> {
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return this.get<any[]>(`/seo/organic-research/keywords/${domain}${queryString}`);
+  }
+
+  /**
+   * Get competitors for domain
+   */
+  getDomainCompetitors(domain: string, params?: any): Promise<any[]> {
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return this.get<any[]>(`/seo/organic-research/competitors/${domain}${queryString}`);
+  }
+
+  /**
+   * Get top pages for domain
+   */
+  getDomainTopPages(domain: string, params?: any): Promise<any[]> {
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return this.get<any[]>(`/seo/organic-research/top-pages/${domain}${queryString}`);
+  }
+
+  /**
+   * Get comprehensive domain overview
+   */
+  getDomainOverview(domain: string, params?: any): Promise<any> {
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return this.get<any>(`/seo/domain-overview/${domain}${queryString}`);
+  }
+
+  /**
+   * Get top keywords for domain
+   */
+  getDomainTopKeywords(domain: string, params?: any): Promise<any[]> {
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return this.get<any[]>(`/seo/domain-overview/top-keywords/${domain}${queryString}`);
+  }
+
+  /**
+   * Generate topic ideas
+   */
+  generateTopicIdeas(data: any): Promise<any[]> {
+    return this.post<any[]>("/seo/topic-research/ideas", data);
+  }
+
+  /**
+   * Get related topics
+   */
+  getRelatedTopics(topic: string, params?: any): Promise<any[]> {
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return this.get<any[]>(`/seo/topic-research/related/${topic}${queryString}`);
+  }
+
+  /**
+   * Get topic questions
+   */
+  getTopicQuestions(topic: string, params?: any): Promise<any[]> {
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return this.get<any[]>(`/seo/topic-research/questions/${topic}${queryString}`);
+  }
+
+  /**
+   * Research keywords using magic tool
+   */
+  researchKeywords(data: any): Promise<any[]> {
+    return this.post<any[]>("/seo/keyword-magic/research", data);
+  }
+
+  /**
+   * Get position tracking overview
+   */
+  getPositionTrackingOverview(projectId: string): Promise<any> {
+    return this.get<any>(`/projects/${projectId}/position-tracking/overview`);
+  }
+
+  // =============================================================================
   // 👤 USER METHODS
   // =============================================================================
 
