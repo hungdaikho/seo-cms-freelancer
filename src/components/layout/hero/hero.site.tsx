@@ -151,6 +151,7 @@ export default function Hero() {
           {tab.map((item: ITab, index) => {
             return (
               <div
+                key={item.key || index}
                 className={`${styles.tabItem} ${item.active && styles.active}`}
                 onClick={() => {
                   const currentTab: Array<ITab> = [...tab];

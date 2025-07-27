@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Button, Dropdown } from "antd";
 import { DownOutlined, MenuOutlined, CloseOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import AuthModal from "@/components/ui/modal/auth_modal_new";
 
 const menu = [
   { label: "features", href: "#" },
@@ -17,6 +18,8 @@ const menu = [
 const HeaderSite = () => {
   const { t, i18n } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<"login" | "signup">("login");
   return (
     <header className={styles.headerSite}>
       <div className={styles.logo}>
@@ -72,10 +75,24 @@ const HeaderSite = () => {
             />
           </Button>
         </Dropdown>
-        <Button type="default" className={styles.loginBtn}>
+        <Button
+          type="default"
+          className={styles.loginBtn}
+          onClick={() => {
+            setAuthModalTab("login");
+            setAuthModalOpen(true);
+          }}
+        >
           {t("login")}
         </Button>
-        <Button type="primary" className={styles.signupBtn}>
+        <Button
+          type="primary"
+          className={styles.signupBtn}
+          onClick={() => {
+            setAuthModalTab("signup");
+            setAuthModalOpen(true);
+          }}
+        >
           {t("signup")}
         </Button>
         {/* Hamburger icon for mobile */}
@@ -118,7 +135,11 @@ const HeaderSite = () => {
               type="default"
               block
               className={styles.loginBtn}
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={() => {
+                setAuthModalTab("login");
+                setAuthModalOpen(true);
+                setMobileMenuOpen(false);
+              }}
             >
               {t("login")}
             </Button>
@@ -126,7 +147,11 @@ const HeaderSite = () => {
               type="primary"
               block
               className={styles.signupBtn}
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={() => {
+                setAuthModalTab("signup");
+                setAuthModalOpen(true);
+                setMobileMenuOpen(false);
+              }}
             >
               {t("signup")}
             </Button>
@@ -186,6 +211,13 @@ const HeaderSite = () => {
           </div>
         </div>
       )}
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        initialTab={authModalTab}
+      />
     </header>
   );
 };

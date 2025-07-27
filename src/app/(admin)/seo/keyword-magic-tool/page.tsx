@@ -1,28 +1,13 @@
 "use client";
 
-import {
-  SearchSection,
-  AboutSection,
-  ResultsSection,
-  MetricsSection,
-  HowToUseSection,
-  FeaturesSection,
-  CTASection,
-} from "./components";
+import React from "react";
+import KeywordMagicTool from "./features/keyword_magic_tool";
 import styles from "./page.module.scss";
 
 const KeywordMagicToolPage = () => {
   return (
     <div className={styles.keywordMagicToolPage}>
-      <div className={styles.container}>
-        <SearchSection />
-        <AboutSection />
-        <ResultsSection />
-        <MetricsSection />
-        <HowToUseSection />
-        <FeaturesSection />
-      </div>
-      <CTASection />
+      <KeywordMagicTool />
     </div>
   );
 };

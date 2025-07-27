@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense } from "react";
-import ContentPageContent from "./components/content-page-content";
+import React from "react";
+import ContentPlanningManager from "./features/content_planning_manager";
+import styles from "./page.module.scss";
 
 export default function ContentPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ContentPageContent />
-    </Suspense>
+    <div className={styles.contentPage}>
+      <ContentPlanningManager />
+    </div>
   );
 }

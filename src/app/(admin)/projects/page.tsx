@@ -1,21 +1,181 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Tabs, Empty, Button } from "antd";
+import {
+  ProjectOutlined,
+  SearchOutlined,
+  FileSearchOutlined,
+  ToolOutlined,
+  RobotOutlined,
+  GlobalOutlined,
+  DashboardOutlined,
+} from "@ant-design/icons";
+import ProjectManager from "./features/project_manager";
+import ProjectDashboard from "./features/project_dashboard";
+import KeywordManager from "./features/keyword_manager";
+import AuditManager from "./features/audit_manager";
 import ListTool from "./features/list_tool";
 import CopilotAI from "./features/copilot_ai";
-import SeoProject from "./features/seo_project";
 import Domain from "./features/domain";
 import FooterProject from "./features/footer";
+import { useProject } from "@/stores/hooks/useProject";
+
+const { TabPane } = Tabs;
 
 type Props = {};
 
 const Page = (props: Props) => {
+  const { currentProject, projects, setCurrentProject } = useProject();
+  const [activeTab, setActiveTab] = useState("projects");
+
+  // Auto-select first project if available and no current project
+  useEffect(() => {
+    if (!currentProject && projects.length > 0) {
+      setCurrentProject(projects[0]);
+      setActiveTab("dashboard");
+    }
+  }, [projects, currentProject, setCurrentProject]);
+
+  const handleProjectSelect = (project: any) => {
+    setCurrentProject(project);
+    setActiveTab("dashboard");
+  };
+
+  const renderEmptyState = () => (
+    <div style={{ padding: "60px 0", textAlign: "center" }}>
+      <Empty
+        description="Please select a project first"
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+      >
+        <Button type="primary" onClick={() => setActiveTab("projects")}>
+          Go to Projects
+        </Button>
+      </Empty>
+    </div>
+  );
+
   return (
-    <>
-      <ListTool />
-      <CopilotAI />
-      <SeoProject />
-      <Domain />
-      <FooterProject />
-    </>
+    <div style={{ padding: "0", minHeight: "100vh", background: "#f5f5f5" }}>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        type="card"
+        style={{ margin: "0", background: "white" }}
+      >
+        <TabPane
+          tab={
+            <span>
+              <ProjectOutlined />
+              Projects
+            </span>
+          }
+          key="projects"
+        >
+          <ListTool />
+          <CopilotAI />
+          <ProjectManager onProjectSelect={handleProjectSelect} />
+          <Domain />
+          <FooterProject />
+        </TabPane>
+
+        <TabPane
+          tab={
+            <span>
+              <DashboardOutlined />
+              Dashboard
+            </span>
+          }
+          key="dashboard"
+          disabled={!currentProject}
+        >
+          {currentProject ? (
+            <ProjectDashboard
+              projectId={currentProject.id}
+              projectName={currentProject.name}
+            />
+          ) : (
+            renderEmptyState()
+          )}
+        </TabPane>
+
+        <TabPane
+          tab={
+            <span>
+              <SearchOutlined />
+              Keywords
+            </span>
+          }
+          key="keywords"
+          disabled={!currentProject}
+        >
+          {currentProject ? (
+            <KeywordManager
+              projectId={currentProject.id}
+              projectName={currentProject.name}
+            />
+          ) : (
+            renderEmptyState()
+          )}
+        </TabPane>
+
+        <TabPane
+          tab={
+            <span>
+              <FileSearchOutlined />
+              SEO Audits
+            </span>
+          }
+          key="audits"
+          disabled={!currentProject}
+        >
+          {currentProject ? (
+            <AuditManager
+              projectId={currentProject.id}
+              projectName={currentProject.name}
+            />
+          ) : (
+            renderEmptyState()
+          )}
+        </TabPane>
+
+        <TabPane
+          tab={
+            <span>
+              <ToolOutlined />
+              Tools
+            </span>
+          }
+          key="tools"
+        >
+          <ListTool />
+        </TabPane>
+
+        <TabPane
+          tab={
+            <span>
+              <RobotOutlined />
+              AI Assistant
+            </span>
+          }
+          key="ai"
+        >
+          <CopilotAI />
+        </TabPane>
+
+        <TabPane
+          tab={
+            <span>
+              <GlobalOutlined />
+              Domain Analysis
+            </span>
+          }
+          key="domain"
+        >
+          <Domain />
+        </TabPane>
+      </Tabs>
+    </div>
   );
 };
 

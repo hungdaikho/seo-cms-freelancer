@@ -1,0 +1,152 @@
+.trafficAnalyticsManager {
+  padding: 24px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .titleSection {
+      flex: 1;
+    }
+
+    .headerActions {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .noProject {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+  }
+
+  .analyticsTabs {
+    .ant-tabs-content-holder {
+      padding: 0;
+    }
+  }
+
+  .metricsRow {
+    margin-bottom: 24px;
+
+    .ant-card {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .ant-statistic-title {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+      margin-bottom: 8px;
+    }
+
+    .ant-statistic-content {
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
+
+  .chartCard {
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .chartPlaceholder {
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+      border-radius: 6px;
+    }
+  }
+
+  .urlCell {
+    display: flex;
+    align-items: center;
+    max-width: 300px;
+  }
+
+  .seoScore {
+    display: flex;
+    align-items: center;
+  }
+
+  .competitorCard {
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .competitorHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+
+      h4 {
+        margin: 0;
+      }
+    }
+
+    .topKeywords {
+      margin-top: 16px;
+
+      .keywordTags {
+        margin-top: 8px;
+
+        .ant-tag {
+          margin-bottom: 4px;
+        }
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    .header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+
+      .headerActions {
+        justify-content: stretch;
+
+        .ant-space {
+          width: 100%;
+
+          .ant-space-item {
+            flex: 1;
+          }
+        }
+      }
+    }
+
+    .metricsRow {
+      .ant-col {
+        width: 50% !important;
+        margin-bottom: 16px;
+      }
+    }
+
+    .urlCell {
+      max-width: 200px;
+    }
+
+    .competitorCard {
+      .ant-col {
+        width: 100% !important;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .metricsRow {
+      .ant-col {
+        width: 100% !important;
+      }
+    }
+  }
+}

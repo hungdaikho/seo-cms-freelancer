@@ -1,0 +1,408 @@
+.contentPlanningManager {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .headerContent {
+      h1 {
+        margin: 0 0 8px 0;
+        color: #262626;
+        font-size: 28px;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+        color: #666;
+        font-size: 16px;
+      }
+    }
+
+    .headerActions {
+      flex-shrink: 0;
+    }
+  }
+
+  .statsRow {
+    margin-bottom: 24px;
+
+    .ant-card {
+      text-align: center;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .mainTabs {
+    .ant-tabs-content-holder {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .ant-tabs-tabpane {
+      padding: 24px;
+    }
+  }
+
+  .calendarTab {
+    .calendarEvents {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      li {
+        margin: 2px 0;
+
+        .ant-badge {
+          font-size: 11px;
+          line-height: 1.2;
+
+          .ant-badge-status-text {
+            font-size: 11px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 80px;
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+
+  .contentListTab {
+    .filtersSection {
+      margin-bottom: 24px;
+      padding: 20px;
+      background: #fafafa;
+      border-radius: 8px;
+      border: 1px solid #f0f0f0;
+    }
+
+    .ant-table {
+      .contentCell {
+        .contentHeader {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 8px;
+
+          .contentTitle {
+            font-weight: 500;
+            color: #262626;
+          }
+        }
+
+        .contentMeta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+
+          .publishDate {
+            font-size: 12px;
+            color: #8c8c8c;
+          }
+        }
+      }
+
+      .authorCell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .authorName {
+          font-size: 14px;
+          color: #262626;
+        }
+      }
+
+      .progressCell {
+        min-width: 120px;
+      }
+
+      .scoreCell {
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .performanceCell {
+        font-size: 13px;
+        color: #262626;
+      }
+    }
+  }
+
+  .ideasTab {
+    .ideasList {
+      .ideaItem {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .ideaTitle {
+          font-weight: 500;
+          color: #262626;
+          flex: 1;
+          min-width: 200px;
+        }
+
+        .ideaMeta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+
+          span {
+            font-size: 12px;
+            color: #8c8c8c;
+          }
+        }
+      }
+    }
+  }
+
+  .noProject {
+    .ant-card {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    .header {
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+
+      .headerActions {
+        align-self: stretch;
+      }
+    }
+
+    .statsRow {
+      .ant-col {
+        margin-bottom: 16px;
+      }
+    }
+
+    .filtersSection {
+      .ant-col {
+        margin-bottom: 12px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .mainTabs .ant-tabs-tabpane {
+      padding: 16px;
+    }
+
+    .calendarTab {
+      .ant-picker-calendar {
+        .ant-picker-calendar-date-content {
+          height: auto;
+          min-height: 40px;
+        }
+      }
+
+      .calendarEvents {
+        li {
+          .ant-badge .ant-badge-status-text {
+            max-width: 60px;
+          }
+        }
+      }
+    }
+
+    .contentListTab {
+      .ant-table {
+        .ant-table-tbody > tr > td {
+          padding: 8px 4px;
+          font-size: 12px;
+        }
+
+        .contentCell {
+          .contentHeader {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+
+            .contentTitle {
+              font-size: 13px;
+            }
+          }
+
+          .contentMeta {
+            gap: 4px;
+          }
+        }
+
+        .authorCell {
+          .authorName {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .ideasTab {
+      .ideasList {
+        .ideaItem {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+
+          .ideaTitle {
+            font-size: 14px;
+            min-width: auto;
+          }
+
+          .ideaMeta {
+            width: 100%;
+            justify-content: flex-start;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    padding: 12px;
+
+    .header {
+      padding: 12px;
+
+      .headerContent h1 {
+        font-size: 24px;
+      }
+
+      .headerContent p {
+        font-size: 14px;
+      }
+    }
+
+    .calendarTab {
+      .ant-picker-calendar {
+        .ant-picker-calendar-date-content {
+          min-height: 30px;
+        }
+      }
+
+      .calendarEvents {
+        li {
+          margin: 1px 0;
+
+          .ant-badge .ant-badge-status-text {
+            max-width: 50px;
+            font-size: 10px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Ant Design customizations
+.contentPlanningManager {
+  .ant-statistic {
+    .ant-statistic-title {
+      color: #8c8c8c;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .ant-statistic-content {
+      color: #262626;
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
+
+  .ant-tag {
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 20px;
+  }
+
+  .ant-tabs-tab {
+    font-weight: 500;
+  }
+
+  .ant-btn {
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .ant-select,
+  .ant-input {
+    border-radius: 6px;
+  }
+
+  .ant-card {
+    .ant-card-head {
+      border-bottom: 1px solid #f0f0f0;
+
+      .ant-card-head-title {
+        font-weight: 600;
+        color: #262626;
+      }
+    }
+
+    .ant-card-body {
+      padding: 20px;
+    }
+  }
+
+  .ant-calendar {
+    .ant-calendar-date {
+      border-radius: 4px;
+    }
+  }
+
+  .ant-progress {
+    .ant-progress-text {
+      font-size: 11px;
+    }
+  }
+
+  .ant-form {
+    .ant-form-item-label > label {
+      font-weight: 500;
+      color: #262626;
+    }
+  }
+
+  .ant-modal {
+    .ant-modal-header {
+      border-bottom: 1px solid #f0f0f0;
+
+      .ant-modal-title {
+        font-weight: 600;
+        color: #262626;
+      }
+    }
+  }
+}

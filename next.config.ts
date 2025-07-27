@@ -44,6 +44,16 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: false, // Tắt optimization trong dev
   },
+
+  // Suppress React 19 compatibility warnings for Ant Design
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+
+  compiler: {
+    // Suppress specific warnings in development
+    styledComponents: true,
+  },
 };
 
 export default nextConfig;

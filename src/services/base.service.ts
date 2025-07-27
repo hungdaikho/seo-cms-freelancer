@@ -55,6 +55,11 @@ export class BaseService {
     return this.axiosInstance.put<T>(url, data, config).then((res) => res.data);
   }
 
+  // Hàm patch
+  protected patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.axiosInstance.patch<T>(url, data, config).then((res) => res.data);
+  }
+
   // Hàm delete
   protected delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return this.axiosInstance.delete<T>(url, config).then((res) => res.data);

@@ -1,0 +1,152 @@
+.aiToolsManager {
+  padding: 24px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .titleSection {
+      text-align: left;
+    }
+
+    .headerActions {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .mainTabs {
+    .ant-tabs-content-holder {
+      padding: 0;
+    }
+  }
+
+  .statsRow {
+    margin-bottom: 24px;
+
+    .ant-card {
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .toolsGrid {
+    margin-bottom: 24px;
+
+    .toolCard {
+      height: 100%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .toolHeader {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 16px;
+
+        .toolIcon {
+          font-size: 24px;
+          color: #1890ff;
+          flex-shrink: 0;
+        }
+
+        .toolMeta {
+          flex: 1;
+
+          .toolTitle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+          }
+        }
+      }
+
+      .toolDescription {
+        margin-bottom: 16px;
+        color: #666;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .usageProgress {
+        margin-bottom: 12px;
+
+        .ant-progress {
+          margin-top: 4px;
+        }
+      }
+
+      .toolFeatures {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-bottom: 16px;
+      }
+    }
+  }
+
+  .filtersCard {
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .ant-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+
+  .ant-table-thead > tr > th {
+    background-color: #fafafa;
+    font-weight: 600;
+  }
+
+  .ant-modal {
+    .ant-modal-header {
+      border-bottom: 1px solid #f0f0f0;
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .aiToolsManager {
+    .toolsGrid {
+      .ant-col {
+        margin-bottom: 16px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .aiToolsManager {
+    padding: 16px;
+
+    .statsRow {
+      .ant-col {
+        margin-bottom: 16px;
+      }
+    }
+
+    .toolsGrid {
+      .ant-col {
+        width: 100% !important;
+        margin-bottom: 16px;
+      }
+    }
+
+    .filtersCard {
+      .ant-row .ant-col {
+        margin-bottom: 8px;
+      }
+    }
+  }
+}

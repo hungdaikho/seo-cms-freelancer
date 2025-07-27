@@ -1,18 +1,38 @@
-const saveToken = (token: string) =>{
-    localStorage.setItem("token",token)
+const saveToken = (token: string) => {
+    localStorage.setItem("accessToken", token)
 }
-const getToken = ()=>{
-    return localStorage.getItem("token")
+
+const getToken = () => {
+    return localStorage.getItem("accessToken")
 }
-const saveRefreshToken = (refreshToken: string)=>{
-    localStorage.setItem("refreshToken",refreshToken)
+
+const removeToken = () => {
+    localStorage.removeItem("accessToken")
 }
-const getRefreshToken = ()=>{
+
+const saveRefreshToken = (refreshToken: string) => {
+    localStorage.setItem("refreshToken", refreshToken)
+}
+
+const getRefreshToken = () => {
     return localStorage.getItem("refreshToken")
 }
+
+const removeRefreshToken = () => {
+    localStorage.removeItem("refreshToken")
+}
+
+const clearAllTokens = () => {
+    localStorage.removeItem("accessToken")
+    localStorage.removeItem("refreshToken")
+}
+
 export {
     getRefreshToken,
     saveRefreshToken,
+    removeRefreshToken,
     getToken,
-    saveToken
+    saveToken,
+    removeToken,
+    clearAllTokens
 }
