@@ -68,7 +68,7 @@ const HeaderSite = () => {
                 fontSize: 15,
               }}
             >
-              {i18n.language.toUpperCase()}
+              {i18n.language}
             </span>
             <DownOutlined
               style={{ color: "#fff", fontSize: 10, marginLeft: 2 }}
@@ -200,7 +200,7 @@ const HeaderSite = () => {
                       fontSize: 15,
                     }}
                   >
-                    {i18n.language.toUpperCase()}
+                    {i18n.language}
                   </span>
                   <DownOutlined
                     style={{ color: "#222", fontSize: 10, marginLeft: 2 }}

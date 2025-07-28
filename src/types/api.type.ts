@@ -406,6 +406,171 @@ export interface SiteAuditResult {
     performance: PerformanceMetrics;
 }
 
+// =============================================================================
+// 🚀 REAL AUDIT SYSTEM TYPES (NEW IMPLEMENTATION)
+// =============================================================================
+
+export interface RealAuditResult {
+    id: string;
+    projectId: string;
+    url: string;
+    status: "running" | "completed" | "failed";
+    progress: number;
+    startedAt: string;
+    completedAt?: string;
+    overview: {
+        score: number;
+        total_issues: number;
+        critical_issues: number;
+        warnings: number;
+        passed_checks: number;
+        pages_analyzed: number;
+        total_response_time: number;
+    };
+    performance: {
+        score: number;
+        metrics: {
+            lcp: number; // Largest Contentful Paint
+            fid: number; // First Input Delay
+            cls: number; // Cumulative Layout Shift
+            fcp: number; // First Contentful Paint
+            tti: number; // Time to Interactive
+        };
+        mobile_friendly: boolean;
+    };
+    seo_analysis: {
+        title: string;
+        meta_description: string;
+        h1_tags: string[];
+        images_without_alt: number;
+        internal_links: number;
+        external_links: number;
+        schema_markup: number;
+        word_count: number;
+        canonical_url?: string;
+        og_title?: string;
+        og_description?: string;
+        meta_keywords?: string;
+    };
+    accessibility: {
+        score: number;
+        issues: Array<{
+            type: "error" | "warning" | "notice";
+            message: string;
+            impact: "low" | "medium" | "high" | "critical";
+            selector?: string;
+            code?: string;
+        }>;
+        wcag_compliance: "A" | "AA" | "AAA";
+    };
+    technical_seo: {
+        robots_txt: {
+            exists: boolean;
+            issues: string[];
+        };
+        sitemap: {
+            exists: boolean;
+            urls_count: number;
+            issues: string[];
+        };
+        ssl_certificate: {
+            valid: boolean;
+            expires_at?: string;
+        };
+        page_speed: {
+            desktop_score: number;
+            mobile_score: number;
+            suggestions: string[];
+        };
+    };
+    content_analysis: {
+        thin_content_pages: number;
+        duplicate_content_issues: number;
+        missing_meta_descriptions: number;
+        duplicate_title_tags: number;
+        missing_h1_tags: number;
+    };
+    link_analysis: {
+        broken_internal_links: Array<{
+            url: string;
+            status_code: number;
+            found_on_pages: string[];
+        }>;
+        broken_external_links: Array<{
+            url: string;
+            status_code: number;
+            found_on_pages: string[];
+        }>;
+    };
+    image_analysis: {
+        large_images: Array<{
+            url: string;
+            size_kb: number;
+            dimensions: string;
+            recommendations: string[];
+        }>;
+        missing_alt_text: Array<{
+            url: string;
+            found_on_pages: string[];
+        }>;
+    };
+}
+
+export interface AuditProgress {
+    id: string;
+    status: "running" | "completed" | "failed";
+    progress: number;
+    current_step: string;
+    eta_seconds?: number;
+    message?: string;
+}
+
+export interface AuditSchedule {
+    id: string;
+    projectId: string;
+    frequency: "daily" | "weekly" | "monthly";
+    url: string;
+    auditType: "full" | "technical" | "content" | "performance";
+    notificationEmail?: string;
+    nextRun: string;
+    lastRun?: string;
+    status: "active" | "paused";
+}
+
+// Response type for getScheduledAudits API
+export interface AuditScheduleResponse {
+    id: string;
+    frequency: string;
+    next_run: string;
+    last_run?: string;
+    url: string;
+    audit_type: string;
+    status: "active" | "paused";
+}
+
+export interface AuditComparison {
+    comparison: Array<{
+        audit_id: string;
+        date: string;
+        score: number;
+        issues: number;
+        improvements: string[];
+        regressions: string[];
+    }>;
+}
+
+export interface AuditSummaryDashboard {
+    total_audits: number;
+    last_audit_date?: string;
+    average_score: number;
+    trending_issues: Array<{
+        type: string;
+        count: number;
+        trend: "up" | "down" | "stable";
+    }>;
+    critical_issues_count: number;
+}
+
 export interface SiteIssue {
     id: string;
     type: string;

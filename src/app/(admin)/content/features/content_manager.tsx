@@ -302,7 +302,7 @@ const ContentManager: React.FC = () => {
       width: 120,
       render: (status: ContentItem["status"]) => (
         <Tag color={getStatusColor(status)}>
-          {status.charAt(0).toUpperCase() + status.slice(1)}
+          {status.charAt(0) + status.slice(1)}
         </Tag>
       ),
     },
@@ -312,7 +312,7 @@ const ContentManager: React.FC = () => {
       key: "type",
       width: 120,
       render: (type: ContentItem["type"]) => (
-        <Text>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+        <Text>{type.charAt(0) + type.slice(1)}</Text>
       ),
     },
     {

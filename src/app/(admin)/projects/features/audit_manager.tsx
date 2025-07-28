@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Table,
   Button,
@@ -68,6 +68,51 @@ const AuditManager: React.FC<AuditManagerProps> = ({
   const [isResultsDrawerVisible, setIsResultsDrawerVisible] = useState(false);
   const [form] = Form.useForm();
 
+  // Generate stable mock data using audit ID as seed to prevent jumping
+  const generateStableScore = (auditId: string): number => {
+    if (!auditId) return 0;
+    let hash = 0;
+    for (let i = 0; i < auditId.length; i++) {
+      const char = auditId.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash % 100);
+  };
+
+  const generateStableIssues = (auditId: string) => {
+    if (!auditId) return { high: 0, medium: 0, low: 0 };
+    let hash = 0;
+    for (let i = 0; i < auditId.length; i++) {
+      const char = auditId.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash;
+    }
+    const absHash = Math.abs(hash);
+    return {
+      high: absHash % 5,
+      medium: (absHash >> 3) % 10,
+      low: (absHash >> 6) % 15,
+    };
+  };
+
+  // Memoize stable data generators to prevent recalculation on every render
+  const stableScores = useMemo(() => {
+    const scores = new Map();
+    audits?.forEach((audit) => {
+      scores.set(audit.id, generateStableScore(audit.id));
+    });
+    return scores;
+  }, [audits]);
+
+  const stableIssues = useMemo(() => {
+    const issues = new Map();
+    audits?.forEach((audit) => {
+      issues.set(audit.id, generateStableIssues(audit.id));
+    });
+    return issues;
+  }, [audits]);
+
   useEffect(() => {
     if (projectId) {
       loadAudits();
@@ -124,6 +169,14 @@ const AuditManager: React.FC<AuditManagerProps> = ({
     setIsResultsDrawerVisible(true);
   };
 
+  // Memoize pagination handler to prevent table re-renders
+  const handleTableChange = useMemo(
+    () => (page: number, pageSize?: number) => {
+      loadAudits({ current: page, pageSize });
+    },
+    []
+  );
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
@@ -173,111 +226,115 @@ const AuditManager: React.FC<AuditManagerProps> = ({
     }
   };
 
-  const columns = [
-    {
-      title: "Audit ID",
-      dataIndex: "id",
-      key: "id",
-      render: (id: string) => (
-        <Text code style={{ fontSize: "12px" }}>
-          {id.substring(0, 8)}...
-        </Text>
-      ),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => (
-        <Space>
-          {getStatusIcon(status)}
-          <Tag color={getStatusColor(status)}>
-            {status.toUpperCase().replace("_", " ")}
-          </Tag>
-        </Space>
-      ),
-    },
-    {
-      title: "Overall Score",
-      key: "score",
-      render: (_: any, record: Audit) => {
-        // This would come from audit results
-        const score = Math.floor(Math.random() * 100); // Demo data
-        return record.status === "completed" ? (
-          <div className={styles.scoreCell}>
-            <Progress
-              type="circle"
-              size={40}
-              percent={score}
-              format={() => score}
-              strokeColor={getScoreColor(score)}
-            />
-          </div>
-        ) : (
-          "-"
-        );
+  const columns = useMemo(
+    () => [
+      {
+        title: "Audit ID",
+        dataIndex: "id",
+        key: "id",
+        render: (id: string) => (
+          <Text code style={{ fontSize: "12px" }}>
+            {id?.substring(0, 8)}...
+          </Text>
+        ),
       },
-    },
-    {
-      title: "Issues Found",
-      key: "issues",
-      render: (_: any, record: Audit) => {
-        if (record.status !== "completed") return "-";
-
-        // Demo data - would come from actual results
-        const issues = {
-          high: Math.floor(Math.random() * 5),
-          medium: Math.floor(Math.random() * 10),
-          low: Math.floor(Math.random() * 15),
-        };
-
-        return (
-          <Space direction="vertical" size="small">
-            <div className={styles.issueItem}>
-              <Tag color="red">{issues.high} High</Tag>
-              <Tag color="orange">{issues.medium} Medium</Tag>
-              <Tag color="green">{issues.low} Low</Tag>
-            </div>
+      {
+        title: "Status",
+        dataIndex: "status",
+        key: "status",
+        render: (status: string) => (
+          <Space>
+            {getStatusIcon(status)}
+            <Tag color={getStatusColor(status)}>
+              {status?.replace("_", " ")}
+            </Tag>
           </Space>
-        );
+        ),
       },
-    },
-    {
-      title: "Created",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => new Date(date).toLocaleString(),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_: any, record: Audit) => (
-        <Space size="small">
-          <Tooltip title="View Results">
-            <Button
-              icon={<EyeOutlined />}
-              size="small"
-              onClick={() => handleViewResults(record)}
-              disabled={
-                record.status === "pending" || record.status === "in_progress"
-              }
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Delete Audit"
-            description="Are you sure you want to delete this audit?"
-            onConfirm={() => handleDeleteAudit(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Tooltip title="Delete Audit">
-              <Button icon={<DeleteOutlined />} size="small" danger />
+      {
+        title: "Overall Score",
+        key: "score",
+        render: (_: any, record: Audit) => {
+          // Use stable score from memoized data to prevent jumping
+          const score = stableScores.get(record.id) || 0;
+          return record.status === "completed" ? (
+            <div className={styles.scoreCell}>
+              <Progress
+                type="circle"
+                size={40}
+                percent={score}
+                format={() => score}
+                strokeColor={getScoreColor(score)}
+              />
+            </div>
+          ) : (
+            "-"
+          );
+        },
+      },
+      {
+        title: "Issues Found",
+        key: "issues",
+        render: (_: any, record: Audit) => {
+          if (record.status !== "completed") return "-";
+
+          // Use stable issues from memoized data to prevent jumping
+          const issues = stableIssues.get(record.id) || {
+            high: 0,
+            medium: 0,
+            low: 0,
+          };
+
+          return (
+            <Space direction="vertical" size="small">
+              <div className={styles.issueItem}>
+                <Tag color="red">{issues.high} High</Tag>
+                <Tag color="orange">{issues.medium} Medium</Tag>
+                <Tag color="green">{issues.low} Low</Tag>
+              </div>
+            </Space>
+          );
+        },
+      },
+      {
+        title: "Created",
+        dataIndex: "createdAt",
+        key: "createdAt",
+        render: (date: string) =>
+          date ? new Date(date).toLocaleString() : "-",
+      },
+      {
+        title: "Actions",
+        key: "actions",
+        render: (_: any, record: Audit) => (
+          <Space size="small">
+            <Tooltip title="View Results">
+              <Button
+                icon={<EyeOutlined />}
+                size="small"
+                onClick={() => handleViewResults(record)}
+                disabled={
+                  record.status === "pending" || record.status === "in_progress"
+                }
+              />
             </Tooltip>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+            <Popconfirm
+              title="Delete Audit"
+              description="Are you sure you want to delete this audit?"
+              onConfirm={() => handleDeleteAudit(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Tooltip title="Delete Audit">
+                <Button icon={<DeleteOutlined />} size="small" danger />
+              </Tooltip>
+            </Popconfirm>
+          </Space>
+        ),
+      },
+    ],
+    [stableScores, stableIssues]
+  );
 
   return (
     <div className={styles.auditManager}>
@@ -298,13 +355,13 @@ const AuditManager: React.FC<AuditManagerProps> = ({
       </div>
 
       {/* Summary Cards */}
-      {auditSummary && (
+      {auditSummary ? (
         <Row gutter={[16, 16]} className={styles.summarySection}>
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
                 title="Total Audits"
-                value={auditSummary.totalAudits || 0}
+                value={auditSummary.total_audits || 0}
                 prefix={<CheckCircleOutlined />}
               />
             </Card>
@@ -313,10 +370,10 @@ const AuditManager: React.FC<AuditManagerProps> = ({
             <Card>
               <Statistic
                 title="Average Score"
-                value={auditSummary.averageScore || 0}
+                value={auditSummary.average_score || 0}
                 suffix="/100"
                 valueStyle={{
-                  color: getScoreColor(auditSummary.averageScore || 0),
+                  color: getScoreColor(auditSummary.average_score || 0),
                 }}
               />
             </Card>
@@ -325,7 +382,7 @@ const AuditManager: React.FC<AuditManagerProps> = ({
             <Card>
               <Statistic
                 title="Critical Issues"
-                value={auditSummary.criticalIssues || 0}
+                value={auditSummary.critical_issues_count || 0}
                 prefix={<WarningOutlined />}
                 valueStyle={{ color: "#ff4d4f" }}
               />
@@ -336,15 +393,27 @@ const AuditManager: React.FC<AuditManagerProps> = ({
               <Statistic
                 title="Last Audit"
                 value={
-                  auditSummary.lastAuditDate
-                    ? new Date(auditSummary.lastAuditDate).toLocaleDateString()
+                  auditSummary.last_audit_date
+                    ? new Date(
+                        auditSummary.last_audit_date
+                      ).toLocaleDateString()
                     : "Never"
                 }
               />
             </Card>
           </Col>
         </Row>
-      )}
+      ) : loading ? (
+        <Row gutter={[16, 16]} className={styles.summarySection}>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Col key={index} xs={24} sm={12} md={6}>
+              <Card loading={true}>
+                <Statistic title="Loading..." value={0} />
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      ) : null}
 
       {/* Audits Table */}
       <Card className={styles.tableCard}>
@@ -358,8 +427,7 @@ const AuditManager: React.FC<AuditManagerProps> = ({
             pageSize: pagination.limit,
             total: pagination.total,
             showSizeChanger: true,
-            onChange: (page, pageSize) =>
-              loadAudits({ current: page, pageSize }),
+            onChange: handleTableChange,
           }}
         />
       </Card>
@@ -506,27 +574,37 @@ const AuditManager: React.FC<AuditManagerProps> = ({
 
               <TabPane tab="Technical Issues" key="technical">
                 <div className={styles.issuesSection}>
-                  {auditResults.results?.technical_seo?.issues?.map(
-                    (issue, index) => (
-                      <Card
-                        key={index}
-                        size="small"
-                        className={styles.issueCard}
-                      >
-                        <div className={styles.issueHeader}>
-                          <Tag color={getSeverityColor(issue.severity)}>
-                            {issue.severity.toUpperCase()}
-                          </Tag>
-                          <Text strong>
-                            {issue.type.replace(/_/g, " ").toUpperCase()}
+                  {auditResults?.results?.technical_seo?.issues &&
+                  auditResults.results.technical_seo.issues.length > 0 ? (
+                    auditResults.results.technical_seo.issues.map(
+                      (issue, index) => (
+                        <Card
+                          key={index}
+                          size="small"
+                          className={styles.issueCard}
+                        >
+                          <div className={styles.issueHeader}>
+                            <Tag color={getSeverityColor(issue.severity)}>
+                              {issue.severity?.toUpperCase() || "UNKNOWN"}
+                            </Tag>
+                            <Text strong>
+                              {issue.type?.replace(/_/g, " ") ||
+                                "Unknown Issue"}
+                            </Text>
+                          </div>
+                          <Text>
+                            {issue.description || "No description available"}
                           </Text>
-                        </div>
-                        <Text>{issue.description}</Text>
-                        <Text type="secondary" style={{ fontSize: "12px" }}>
-                          {issue.count} instance(s) found
-                        </Text>
-                      </Card>
+                          <Text type="secondary" style={{ fontSize: "12px" }}>
+                            {issue.count || 0} instance(s) found
+                          </Text>
+                        </Card>
+                      )
                     )
+                  ) : (
+                    <div style={{ textAlign: "center", padding: "40px 0" }}>
+                      <Text type="secondary">No technical issues found</Text>
+                    </div>
                   )}
                 </div>
               </TabPane>

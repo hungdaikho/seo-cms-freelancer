@@ -3,17 +3,35 @@ import {
     Audit,
     CreateAuditRequest,
     AuditResults,
+    RealAuditResult,
+    AuditProgress,
+    AuditSchedule,
+    AuditComparison,
+    AuditSummaryDashboard,
     PaginationParams,
     ApiResponse
 } from '@/types/api.type';
 import { seoService } from '@/services/seo.service';
+import { auditService } from '@/services/audit.service';
 
 // State interface
 export interface AuditState {
+    // Legacy audit data
     audits: Audit[];
     currentAudit: Audit | null;
     auditResults: AuditResults | null;
-    auditSummary: any | null;
+
+    // Real audit system data
+    realAudits: RealAuditResult[];
+    currentRealAudit: RealAuditResult | null;
+    auditProgress: AuditProgress | null;
+    scheduledAudits: AuditSchedule[];
+    auditComparison: AuditComparison | null;
+
+    // Summary and dashboard data
+    auditSummary: AuditSummaryDashboard | null;
+
+    // UI State
     loading: boolean;
     error: string | null;
     pagination: {
@@ -22,14 +40,30 @@ export interface AuditState {
         limit: number;
         totalPages: number;
     };
+
+    // Progress tracking
+    isRunningAudit: boolean;
+    currentStep: string;
 }
 
 // Initial state
 const initialState: AuditState = {
+    // Legacy audit data
     audits: [],
     currentAudit: null,
     auditResults: null,
+
+    // Real audit system data
+    realAudits: [],
+    currentRealAudit: null,
+    auditProgress: null,
+    scheduledAudits: [],
+    auditComparison: null,
+
+    // Summary and dashboard data
     auditSummary: null,
+
+    // UI State
     loading: false,
     error: null,
     pagination: {
@@ -38,6 +72,10 @@ const initialState: AuditState = {
         limit: 10,
         totalPages: 0,
     },
+
+    // Progress tracking
+    isRunningAudit: false,
+    currentStep: "",
 };
 
 // Async thunks
@@ -113,6 +151,157 @@ export const deleteAudit = createAsyncThunk(
     }
 );
 
+// =============================================================================
+// 🚀 REAL AUDIT SYSTEM ASYNC THUNKS
+// =============================================================================
+
+export const startComprehensiveAudit = createAsyncThunk(
+    'audit/startComprehensive',
+    async ({
+        projectId,
+        url,
+        options
+    }: {
+        projectId: string;
+        url: string;
+        options?: {
+            auditType?: "full" | "technical" | "content" | "performance";
+            settings?: {
+                crawlDepth?: number;
+                includeImages?: boolean;
+                checkMobileFriendly?: boolean;
+                analyzePageSpeed?: boolean;
+            };
+        };
+    }, { rejectWithValue }) => {
+        try {
+            const audit = await auditService.startComprehensiveAudit(projectId, url, options);
+            return audit;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to start comprehensive audit');
+        }
+    }
+);
+
+export const fetchAuditProgress = createAsyncThunk(
+    'audit/fetchProgress',
+    async (auditId: string, { rejectWithValue }) => {
+        try {
+            const progress = await auditService.getAuditProgress(auditId);
+            return progress;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch audit progress');
+        }
+    }
+);
+
+export const fetchRealAuditResults = createAsyncThunk(
+    'audit/fetchRealResults',
+    async (auditId: string, { rejectWithValue }) => {
+        try {
+            const results = await auditService.getRealAuditResults(auditId);
+            return results;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch real audit results');
+        }
+    }
+);
+
+export const fetchProjectAuditHistory = createAsyncThunk(
+    'audit/fetchProjectHistory',
+    async ({ projectId, params }: { projectId: string; params?: PaginationParams }, { rejectWithValue }) => {
+        try {
+            const response = await auditService.getProjectAuditHistory(projectId, params);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch project audit history');
+        }
+    }
+);
+
+export const fetchAuditSummaryDashboard = createAsyncThunk(
+    'audit/fetchSummaryDashboard',
+    async (projectId: string, { rejectWithValue }) => {
+        try {
+            const summary = await auditService.getAuditSummary(projectId);
+            return summary;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch audit summary');
+        }
+    }
+);
+
+export const fetchScheduledAudits = createAsyncThunk(
+    'audit/fetchScheduled',
+    async (projectId: string, { rejectWithValue }) => {
+        try {
+            const scheduled = await auditService.getScheduledAudits(projectId);
+            return scheduled;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch scheduled audits');
+        }
+    }
+);
+
+export const compareAudits = createAsyncThunk(
+    'audit/compare',
+    async ({ projectId, auditIds }: { projectId: string; auditIds: string[] }, { rejectWithValue }) => {
+        try {
+            const comparison = await auditService.compareAudits(projectId, auditIds);
+            return comparison;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to compare audits');
+        }
+    }
+);
+
+export const cancelAudit = createAsyncThunk(
+    'audit/cancel',
+    async (auditId: string, { rejectWithValue }) => {
+        try {
+            await auditService.cancelAudit(auditId);
+            return auditId;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to cancel audit');
+        }
+    }
+);
+
+export const deleteRealAudit = createAsyncThunk(
+    'audit/deleteReal',
+    async (auditId: string, { rejectWithValue }) => {
+        try {
+            await auditService.deleteAudit(auditId);
+            return auditId;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete audit');
+        }
+    }
+);
+
+export const exportAuditResults = createAsyncThunk(
+    'audit/export',
+    async ({ auditId, format }: { auditId: string; format: "pdf" | "excel" | "csv" }, { rejectWithValue }) => {
+        try {
+            const blob = await auditService.exportAuditResults(auditId, format);
+
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `audit-${auditId}.${format}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            return { auditId, format };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to export audit results');
+        }
+    }
+);
+
 // Slice
 const auditSlice = createSlice({
     name: 'audit',
@@ -124,13 +313,23 @@ const auditSlice = createSlice({
         setCurrentAudit: (state, action: PayloadAction<Audit | null>) => {
             state.currentAudit = action.payload;
         },
+        setCurrentRealAudit: (state, action: PayloadAction<RealAuditResult | null>) => {
+            state.currentRealAudit = action.payload;
+        },
         clearCurrentAudit: (state) => {
             state.currentAudit = null;
             state.auditResults = null;
+            state.currentRealAudit = null;
         },
         clearAudits: (state) => {
             state.audits = [];
+            state.realAudits = [];
             state.pagination = initialState.pagination;
+        },
+        setAuditProgress: (state, action: PayloadAction<AuditProgress>) => {
+            state.auditProgress = action.payload;
+            state.isRunningAudit = action.payload.status === "running";
+            state.currentStep = action.payload.current_step;
         },
     },
     extraReducers: (builder) => {
@@ -228,8 +427,135 @@ const auditSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             });
+
+        // =============================================================================
+        // 🚀 REAL AUDIT SYSTEM REDUCERS
+        // =============================================================================
+
+        // Start comprehensive audit
+        builder
+            .addCase(startComprehensiveAudit.pending, (state) => {
+                state.loading = true;
+                state.isRunningAudit = true;
+                state.error = null;
+                state.currentStep = "Initializing audit...";
+            })
+            .addCase(startComprehensiveAudit.fulfilled, (state, action) => {
+                state.loading = false;
+                state.realAudits.unshift(action.payload);
+                state.currentRealAudit = action.payload;
+                state.isRunningAudit = action.payload.status === "running";
+            })
+            .addCase(startComprehensiveAudit.rejected, (state, action) => {
+                state.loading = false;
+                state.isRunningAudit = false;
+                state.error = action.payload as string;
+            });
+
+        // Fetch audit progress
+        builder
+            .addCase(fetchAuditProgress.fulfilled, (state, action) => {
+                state.auditProgress = action.payload;
+                state.isRunningAudit = action.payload.status === "running";
+                state.currentStep = action.payload.current_step;
+
+                // Update current audit if it's the same one
+                if (state.currentRealAudit?.id === action.payload.id) {
+                    state.currentRealAudit = {
+                        ...state.currentRealAudit,
+                        status: action.payload.status,
+                        progress: action.payload.progress,
+                    };
+                }
+            });
+
+        // Fetch real audit results
+        builder
+            .addCase(fetchRealAuditResults.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchRealAuditResults.fulfilled, (state, action) => {
+                state.loading = false;
+                state.currentRealAudit = action.payload;
+                state.isRunningAudit = action.payload.status === "running";
+            })
+            .addCase(fetchRealAuditResults.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            });
+
+        // Fetch project audit history
+        builder
+            .addCase(fetchProjectAuditHistory.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchProjectAuditHistory.fulfilled, (state, action) => {
+                state.loading = false;
+                state.realAudits = action.payload.data;
+                state.pagination = {
+                    total: action.payload.total || 0,
+                    page: action.payload.page || 1,
+                    limit: action.payload.limit || 10,
+                    totalPages: action.payload.totalPages || 0,
+                };
+            })
+            .addCase(fetchProjectAuditHistory.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            });
+
+        // Fetch audit summary dashboard
+        builder
+            .addCase(fetchAuditSummaryDashboard.fulfilled, (state, action) => {
+                state.auditSummary = action.payload;
+            });
+
+        // Fetch scheduled audits
+        builder
+            .addCase(fetchScheduledAudits.fulfilled, (state, action) => {
+                state.scheduledAudits = action.payload;
+            });
+
+        // Compare audits
+        builder
+            .addCase(compareAudits.fulfilled, (state, action) => {
+                state.auditComparison = action.payload;
+            });
+
+        // Cancel audit
+        builder
+            .addCase(cancelAudit.fulfilled, (state, action) => {
+                const auditId = action.payload;
+                const auditIndex = state.realAudits.findIndex(a => a.id === auditId);
+                if (auditIndex !== -1) {
+                    state.realAudits[auditIndex].status = "failed";
+                }
+                if (state.currentRealAudit?.id === auditId) {
+                    state.currentRealAudit.status = "failed";
+                }
+                state.isRunningAudit = false;
+            });
+
+        // Delete real audit
+        builder
+            .addCase(deleteRealAudit.fulfilled, (state, action) => {
+                state.realAudits = state.realAudits.filter(a => a.id !== action.payload);
+                if (state.currentRealAudit?.id === action.payload) {
+                    state.currentRealAudit = null;
+                }
+            });
     },
 });
 
-export const { clearError, setCurrentAudit, clearCurrentAudit, clearAudits } = auditSlice.actions;
+export const {
+    clearError,
+    setCurrentAudit,
+    setCurrentRealAudit,
+    clearCurrentAudit,
+    clearAudits,
+    setAuditProgress
+} = auditSlice.actions;
+
 export default auditSlice.reducer;

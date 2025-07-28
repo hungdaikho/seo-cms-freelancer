@@ -240,7 +240,7 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
                           : "blue"
                       }
                     >
-                      {audit.status.toUpperCase()}
+                      {audit.status}
                     </Tag>
                   </div>
                 </List.Item>

@@ -29,7 +29,6 @@ import TopicResearchPage from "./topic-research/page";
 import styles from "./page.module.scss";
 
 const { Title, Text } = Typography;
-const { TabPane } = Tabs;
 const { Option } = Select;
 
 const SeoPage: React.FC = () => {
@@ -79,159 +78,146 @@ const SeoPage: React.FC = () => {
       </div>
 
       {selectedProject ? (
-        <Tabs defaultActiveKey="keywords" className={styles.seoTabs}>
-          <TabPane
-            tab={
-              <span>
-                <SearchOutlined />
-                Keyword Management
-              </span>
-            }
-            key="keywords"
-          >
-            <KeywordManager projectId={selectedProject} />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <BarChartOutlined />
-                Position Tracking
-              </span>
-            }
-            key="tracking"
-          >
-            <PositionTrackingManager />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <TrophyOutlined />
-                Organic Research
-              </span>
-            }
-            key="organic-research"
-          >
-            <OrganicResearchPage />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <FileTextOutlined />
-                Site Audit
-              </span>
-            }
-            key="audit"
-          >
-            <SiteAuditManager />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <SearchOutlined />
-                Keyword Magic Tool
-              </span>
-            }
-            key="keyword-magic"
-          >
-            <KeywordMagicTool />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <BarChartOutlined />
-                Domain Overview
-              </span>
-            }
-            key="domain-overview"
-          >
-            <DomainOverviewPage />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <LinkOutlined />
-                Backlink Analytics
-              </span>
-            }
-            key="backlink-analytics"
-          >
-            <BacklinkAnalyticsManager />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <SearchOutlined />
-                Keyword Gap
-              </span>
-            }
-            key="keyword-gap"
-          >
-            <KeywordGapAnalyzer />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <BookOutlined />
-                Topic Research
-              </span>
-            }
-            key="topic-research"
-          >
-            <TopicResearchPage />
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <EditOutlined />
-                SEO Content Template
-              </span>
-            }
-            key="seo-content-template"
-          >
-            <div className={styles.comingSoon}>
-              <Title level={3}>SEO Content Template</Title>
-              <Text type="secondary">
-                Create SEO-optimized content templates
-              </Text>
-              <div style={{ marginTop: 16 }}>
-                <Button type="primary" icon={<PlusOutlined />}>
-                  Create Template
-                </Button>
-              </div>
-            </div>
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <BulbOutlined />
-                On-Page SEO Checker
-              </span>
-            }
-            key="on-page-seo-checker"
-          >
-            <div className={styles.comingSoon}>
-              <Title level={3}>On-Page SEO Checker</Title>
-              <Text type="secondary">
-                Analyze and optimize your pages for better SEO
-              </Text>
-              <div style={{ marginTop: 16 }}>
-                <Button type="primary" icon={<PlusOutlined />}>
-                  Check Page
-                </Button>
-              </div>
-            </div>
-          </TabPane>
-        </Tabs>
+        <Tabs
+          defaultActiveKey="keywords"
+          className={styles.seoTabs}
+          items={[
+            {
+              key: "keywords",
+              label: (
+                <span>
+                  <SearchOutlined />
+                  Keyword Management
+                </span>
+              ),
+              children: <KeywordManager projectId={selectedProject} />,
+            },
+            {
+              key: "tracking",
+              label: (
+                <span>
+                  <BarChartOutlined />
+                  Position Tracking
+                </span>
+              ),
+              children: <PositionTrackingManager />,
+            },
+            {
+              key: "organic-research",
+              label: (
+                <span>
+                  <TrophyOutlined />
+                  Organic Research
+                </span>
+              ),
+              children: <OrganicResearchPage />,
+            },
+            {
+              key: "audit",
+              label: (
+                <span>
+                  <FileTextOutlined />
+                  Site Audit
+                </span>
+              ),
+              children: <SiteAuditManager />,
+            },
+            {
+              key: "keyword-magic",
+              label: (
+                <span>
+                  <SearchOutlined />
+                  Keyword Magic Tool
+                </span>
+              ),
+              children: <KeywordMagicTool />,
+            },
+            {
+              key: "domain-overview",
+              label: (
+                <span>
+                  <BarChartOutlined />
+                  Domain Overview
+                </span>
+              ),
+              children: <DomainOverviewPage />,
+            },
+            {
+              key: "backlink-analytics",
+              label: (
+                <span>
+                  <LinkOutlined />
+                  Backlink Analytics
+                </span>
+              ),
+              children: <BacklinkAnalyticsManager />,
+            },
+            {
+              key: "keyword-gap",
+              label: (
+                <span>
+                  <SearchOutlined />
+                  Keyword Gap
+                </span>
+              ),
+              children: <KeywordGapAnalyzer />,
+            },
+            {
+              key: "topic-research",
+              label: (
+                <span>
+                  <BookOutlined />
+                  Topic Research
+                </span>
+              ),
+              children: <TopicResearchPage />,
+            },
+            {
+              key: "seo-content-template",
+              label: (
+                <span>
+                  <EditOutlined />
+                  SEO Content Template
+                </span>
+              ),
+              children: (
+                <div className={styles.comingSoon}>
+                  <Title level={3}>SEO Content Template</Title>
+                  <Text type="secondary">
+                    Create SEO-optimized content templates
+                  </Text>
+                  <div style={{ marginTop: 16 }}>
+                    <Button type="primary" icon={<PlusOutlined />}>
+                      Create Template
+                    </Button>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              key: "on-page-seo-checker",
+              label: (
+                <span>
+                  <BulbOutlined />
+                  On-Page SEO Checker
+                </span>
+              ),
+              children: (
+                <div className={styles.comingSoon}>
+                  <Title level={3}>On-Page SEO Checker</Title>
+                  <Text type="secondary">
+                    Analyze and optimize your pages for better SEO
+                  </Text>
+                  <div style={{ marginTop: 16 }}>
+                    <Button type="primary" icon={<PlusOutlined />}>
+                      Check Page
+                    </Button>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+        />
       ) : (
         <Card className={styles.noProject}>
           <div className={styles.emptyState}>

@@ -279,7 +279,7 @@ const AiToolsManager: React.FC = () => {
       width: 120,
       render: (status: AiRequest["status"]) => (
         <Tag color={getStatusColor(status)}>
-          {status.charAt(0).toUpperCase() + status.slice(1)}
+          {status.charAt(0) + status.slice(1)}
         </Tag>
       ),
     },

@@ -337,7 +337,7 @@ const BacklinkAnalyticsManager: React.FC = () => {
       ],
       onFilter: (value: any, record: Backlink) => record.linkStatus === value,
       render: (status: string) => (
-        <Tag color={getStatusColor(status)}>{status.toUpperCase()}</Tag>
+        <Tag color={getStatusColor(status)}>{status}</Tag>
       ),
     },
     {
