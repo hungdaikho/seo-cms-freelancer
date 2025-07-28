@@ -34,7 +34,7 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
   projectName,
 }) => {
   const { projectStats, fetchProjectStats } = useProject();
-  const { keywords, fetchProjectKeywords } = useKeyword();
+  const { fetchProjectKeywords } = useKeyword();
   const { audits, auditSummary, fetchProjectAudits, fetchAuditSummary }: any =
     useAudit();
 
@@ -59,7 +59,6 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
     if (change < 0) return <ArrowDownOutlined style={{ color: "#ff4d4f" }} />;
     return null;
   };
-
   return (
     <div className={styles.projectDashboard}>
       {/* Header */}

@@ -199,7 +199,15 @@ const Page = (props: Props) => {
           AI Assistant
         </span>
       ),
-      children: <CopilotAI />,
+      disabled: !currentProject,
+      children: currentProject ? (
+        <>
+          {renderProjectSelector()}
+          <CopilotAI />
+        </>
+      ) : (
+        renderEmptyState()
+      ),
     },
     {
       key: "domain",
