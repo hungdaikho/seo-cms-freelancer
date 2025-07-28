@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Tabs, Empty, Button } from "antd";
+import { Tabs, Empty, Button, Select, Space, Typography } from "antd";
 import {
   ProjectOutlined,
   SearchOutlined,
@@ -10,6 +10,7 @@ import {
   RobotOutlined,
   GlobalOutlined,
   DashboardOutlined,
+  SwapOutlined,
 } from "@ant-design/icons";
 import ProjectManager from "./features/project_manager";
 import ProjectDashboard from "./features/project_dashboard";
@@ -26,6 +27,7 @@ type Props = {};
 const Page = (props: Props) => {
   const { currentProject, projects, setCurrentProject } = useProject();
   const [activeTab, setActiveTab] = useState("projects");
+
   // Auto-select first project if available and no current project
   useEffect(() => {
     if (!currentProject && projects.length > 0) {
@@ -38,6 +40,51 @@ const Page = (props: Props) => {
     setCurrentProject(project);
     setActiveTab("dashboard");
   };
+
+  const handleProjectChange = (projectId: string) => {
+    const selectedProject = projects.find((p) => p.id === projectId);
+    if (selectedProject) {
+      setCurrentProject(selectedProject);
+    }
+  };
+
+  const renderProjectSelector = () => (
+    <div
+      style={{
+        marginBottom: 16,
+        padding: "0 16px",
+        background: "#fafafa",
+        borderRadius: 8,
+      }}
+    >
+      <Space
+        align="center"
+        style={{
+          width: "100%",
+          justifyContent: "space-between",
+          padding: "12px 0",
+        }}
+      >
+        <Typography.Text strong>
+          <SwapOutlined style={{ marginRight: 8 }} />
+          Current Project:
+        </Typography.Text>
+        <Select
+          value={currentProject?.id}
+          onChange={handleProjectChange}
+          placeholder="Select a project"
+          style={{ minWidth: 200 }}
+          size="small"
+        >
+          {projects.map((project) => (
+            <Select.Option key={project.id} value={project.id}>
+              {project.name} ({project.domain})
+            </Select.Option>
+          ))}
+        </Select>
+      </Space>
+    </div>
+  );
 
   const renderEmptyState = () => (
     <div style={{ padding: "60px 0", textAlign: "center" }}>
@@ -66,8 +113,8 @@ const Page = (props: Props) => {
           <ListTool />
           <CopilotAI />
           <ProjectManager onProjectSelect={handleProjectSelect} />
-          <Domain />
-          <FooterProject />
+          {/* <Domain />
+          <FooterProject /> */}
         </>
       ),
     },
@@ -81,10 +128,13 @@ const Page = (props: Props) => {
       ),
       disabled: !currentProject,
       children: currentProject ? (
-        <ProjectDashboard
-          projectId={currentProject.id}
-          projectName={currentProject.name}
-        />
+        <>
+          {renderProjectSelector()}
+          <ProjectDashboard
+            projectId={currentProject.id}
+            projectName={currentProject.name}
+          />
+        </>
       ) : (
         renderEmptyState()
       ),
@@ -99,10 +149,13 @@ const Page = (props: Props) => {
       ),
       disabled: !currentProject,
       children: currentProject ? (
-        <KeywordManager
-          projectId={currentProject.id}
-          projectName={currentProject.name}
-        />
+        <>
+          {renderProjectSelector()}
+          <KeywordManager
+            projectId={currentProject.id}
+            projectName={currentProject.name}
+          />
+        </>
       ) : (
         renderEmptyState()
       ),
@@ -117,10 +170,13 @@ const Page = (props: Props) => {
       ),
       disabled: !currentProject,
       children: currentProject ? (
-        <AuditManager
-          projectId={currentProject.id}
-          projectName={currentProject.name}
-        />
+        <>
+          {renderProjectSelector()}
+          <AuditManager
+            projectId={currentProject.id}
+            projectName={currentProject.name}
+          />
+        </>
       ) : (
         renderEmptyState()
       ),

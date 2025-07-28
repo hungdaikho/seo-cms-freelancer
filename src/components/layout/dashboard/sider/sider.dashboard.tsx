@@ -447,7 +447,7 @@ const SiderDashBoard = () => {
         <FaHome />
         <span>Home</span>
       </div>
-
+      {/* 
       <Dropdown
         popupRender={() => (
           <div
@@ -480,8 +480,17 @@ const SiderDashBoard = () => {
           <TbSettingsSearch />
           <span>SEO</span>
         </div>
-      </Dropdown>
-      <Dropdown
+      </Dropdown> */}
+      <div
+        className={`${styles.menuItem} ${
+          isActive("/seo") ? styles.active : ""
+        }`}
+        onClick={() => router.push("/seo")}
+      >
+        <TbSettingsSearch />
+        <span>SEO</span>
+      </div>
+      {/* <Dropdown
         popupRender={() => (
           <div
             style={{
@@ -513,7 +522,16 @@ const SiderDashBoard = () => {
           <BsBarChart />
           <span>Traffic & Market</span>
         </div>
-      </Dropdown>
+      </Dropdown> */}
+      <div
+        className={`${styles.menuItem} ${
+          isActive("/traffic") ? styles.active : ""
+        }`}
+        onClick={() => router.push("/traffic")}
+      >
+        <BsBarChart />
+        <span>Traffic & Market</span>
+      </div>
       {/* <Dropdown
         popupRender={() => (
           <div
@@ -546,7 +564,7 @@ const SiderDashBoard = () => {
           <span>Local</span>
         </div>
       </Dropdown> */}
-      <Dropdown
+      {/* <Dropdown
         popupRender={() => (
           <div
             style={{
@@ -577,8 +595,17 @@ const SiderDashBoard = () => {
           <TbEditCircle />
           <span>Content</span>
         </div>
-      </Dropdown>
-      <Dropdown
+      </Dropdown> */}
+      <div
+        className={`${styles.menuItem} ${
+          isActive("/content") ? styles.active : ""
+        }`}
+        onClick={() => router.push("/content")}
+      >
+        <TbEditCircle />
+        <span>Content</span>
+      </div>
+      {/* <Dropdown
         popupRender={() => (
           <div
             style={{
@@ -609,7 +636,14 @@ const SiderDashBoard = () => {
           <GoStar />
           <span>AI</span>
         </div>
-      </Dropdown>
+      </Dropdown> */}
+      <div
+        className={`${styles.menuItem} ${isActive("/ai") ? styles.active : ""}`}
+        onClick={() => router.push("/ai")}
+      >
+        <GoStar />
+        <span>AI</span>
+      </div>
       {/* <Dropdown
         popupRender={() => (
           <div

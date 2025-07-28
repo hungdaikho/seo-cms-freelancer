@@ -29,8 +29,13 @@ import {
   ClockCircleOutlined,
   ExclamationCircleOutlined,
   WarningOutlined,
+  ReloadOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 import { useAudit } from "@/stores/hooks/useAudit";
+import { useProject } from "@/stores/hooks/useProject";
+import { useAppDispatch } from "@/stores/hooks";
+import { startComprehensiveAudit } from "@/stores/slices/audit.slice";
 import { Audit, CreateAuditRequest } from "@/types/api.type";
 import styles from "./audit_manager.module.scss";
 
@@ -46,6 +51,7 @@ const AuditManager: React.FC<AuditManagerProps> = ({
   projectId,
   projectName,
 }) => {
+  const dispatch = useAppDispatch();
   const {
     audits,
     currentAudit,
@@ -64,8 +70,12 @@ const AuditManager: React.FC<AuditManagerProps> = ({
     setCurrentAudit,
   } = useAudit();
 
+  const { projects, fetchProjectById } = useProject();
+
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isResultsDrawerVisible, setIsResultsDrawerVisible] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [websiteUrl, setWebsiteUrl] = useState<string>("");
   const [form] = Form.useForm();
 
   // Generate stable mock data using audit ID as seed to prevent jumping
@@ -117,8 +127,16 @@ const AuditManager: React.FC<AuditManagerProps> = ({
     if (projectId) {
       loadAudits();
       loadAuditSummary();
+
+      // Auto-fill website URL from project domain
+      const currentProject = projects?.find((p) => p.id === projectId);
+      if (currentProject?.domain && !websiteUrl) {
+        const domain = currentProject.domain;
+        const url = domain.startsWith("http") ? domain : `https://${domain}`;
+        setWebsiteUrl(url);
+      }
     }
-  }, [projectId]);
+  }, [projectId, projects]);
 
   useEffect(() => {
     if (error) {
@@ -126,6 +144,35 @@ const AuditManager: React.FC<AuditManagerProps> = ({
       clearError();
     }
   }, [error]);
+
+  // Debug auditResults changes
+  useEffect(() => {
+    console.log("auditResults state changed:", auditResults);
+  }, [auditResults]);
+
+  // Auto-refresh logic for pending/in_progress audits
+  useEffect(() => {
+    if (!audits || !autoRefresh) return;
+
+    const hasRunningAudits = audits.some(
+      (audit) => audit.status === "pending" || audit.status === "in_progress"
+    );
+
+    if (hasRunningAudits) {
+      const interval = setInterval(() => {
+        console.log("Auto-refreshing audits...");
+        loadAudits();
+      }, 10000); // Refresh every 10 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [audits, autoRefresh]);
+
+  // Show running audits count
+  const runningAuditsCount =
+    audits?.filter(
+      (audit) => audit.status === "pending" || audit.status === "in_progress"
+    ).length || 0;
 
   const loadAudits = (params?: any) => {
     fetchProjectAudits(projectId, {
@@ -139,15 +186,59 @@ const AuditManager: React.FC<AuditManagerProps> = ({
     fetchAuditSummary(projectId);
   };
 
-  const handleStartAudit = async (values: CreateAuditRequest) => {
+  const handleStartAudit = async (values: any) => {
+    if (!websiteUrl) {
+      message.error("Please enter website URL");
+      return;
+    }
+
+    if (!websiteUrl.startsWith("http")) {
+      message.error(
+        "Please enter a valid URL starting with http:// or https://"
+      );
+      return;
+    }
+
     try {
-      await startNewAudit(projectId, values);
-      message.success("Audit started successfully!");
+      console.log("Starting audit with:", {
+        projectId,
+        url: websiteUrl,
+        options: {
+          auditType: "full",
+          settings: {
+            crawlDepth: 3,
+            includeImages: true,
+            checkMobileFriendly: values.include_mobile,
+            analyzePageSpeed: values.analyze_performance,
+          },
+        },
+      });
+
+      const result = await dispatch(
+        startComprehensiveAudit({
+          projectId,
+          url: websiteUrl,
+          options: {
+            auditType: "full",
+            settings: {
+              crawlDepth: 3,
+              includeImages: true,
+              checkMobileFriendly: values.include_mobile,
+              analyzePageSpeed: values.analyze_performance,
+            },
+          },
+        })
+      ).unwrap();
+
+      console.log("Audit started successfully:", result);
+      message.success("Comprehensive website audit started successfully!");
       setIsCreateModalVisible(false);
       form.resetFields();
+      setWebsiteUrl("");
       loadAudits();
-    } catch (error) {
-      // Error handled by Redux slice
+    } catch (error: any) {
+      console.error("Audit start failed:", error);
+      message.error(error || "Failed to start audit");
     }
   };
 
@@ -162,11 +253,19 @@ const AuditManager: React.FC<AuditManagerProps> = ({
   };
 
   const handleViewResults = async (audit: Audit) => {
+    console.log("Opening results for audit:", audit);
     setCurrentAudit(audit);
-    if (audit.status === "completed") {
-      await fetchAuditResults(audit.id);
-    }
     setIsResultsDrawerVisible(true);
+
+    if (audit.status === "completed") {
+      console.log("Fetching audit results for:", audit.id);
+      try {
+        await fetchAuditResults(audit.id);
+        console.log("Audit results fetched successfully");
+      } catch (error) {
+        console.error("Error fetching audit results:", error);
+      }
+    }
   };
 
   // Memoize pagination handler to prevent table re-renders
@@ -255,20 +354,38 @@ const AuditManager: React.FC<AuditManagerProps> = ({
         title: "Overall Score",
         key: "score",
         render: (_: any, record: Audit) => {
-          // Use stable score from memoized data to prevent jumping
-          const score = stableScores.get(record.id) || 0;
-          return record.status === "completed" ? (
+          if (record.status !== "completed") return "-";
+
+          // Try to get real score from audit results first
+          const realScore = auditResults?.results?.overall_score;
+
+          // If we have real score and this is the current audit, use it
+          if (realScore !== undefined && currentAudit?.id === record.id) {
+            return (
+              <div className={styles.scoreCell}>
+                <Progress
+                  type="circle"
+                  size={40}
+                  percent={realScore}
+                  format={() => realScore}
+                  strokeColor={getScoreColor(realScore)}
+                />
+              </div>
+            );
+          }
+
+          // Otherwise, use stable mock score for consistency
+          const mockScore = stableScores.get(record.id) || 0;
+          return (
             <div className={styles.scoreCell}>
               <Progress
                 type="circle"
                 size={40}
-                percent={score}
-                format={() => score}
-                strokeColor={getScoreColor(score)}
+                percent={mockScore}
+                format={() => mockScore}
+                strokeColor={getScoreColor(mockScore)}
               />
             </div>
-          ) : (
-            "-"
           );
         },
       },
@@ -278,8 +395,32 @@ const AuditManager: React.FC<AuditManagerProps> = ({
         render: (_: any, record: Audit) => {
           if (record.status !== "completed") return "-";
 
-          // Use stable issues from memoized data to prevent jumping
-          const issues = stableIssues.get(record.id) || {
+          // Try to get real issues data from audit results first
+          if (
+            auditResults?.results?.technical_seo?.issues &&
+            currentAudit?.id === record.id
+          ) {
+            const issues = auditResults.results.technical_seo.issues;
+            const issueCounts = {
+              high: issues.filter((issue) => issue.severity === "high").length,
+              medium: issues.filter((issue) => issue.severity === "medium")
+                .length,
+              low: issues.filter((issue) => issue.severity === "low").length,
+            };
+
+            return (
+              <Space direction="vertical" size="small">
+                <div className={styles.issueItem}>
+                  <Tag color="red">{issueCounts.high} High</Tag>
+                  <Tag color="orange">{issueCounts.medium} Medium</Tag>
+                  <Tag color="green">{issueCounts.low} Low</Tag>
+                </div>
+              </Space>
+            );
+          }
+
+          // Use stable mock issues from memoized data to prevent jumping
+          const mockIssues = stableIssues.get(record.id) || {
             high: 0,
             medium: 0,
             low: 0,
@@ -288,9 +429,9 @@ const AuditManager: React.FC<AuditManagerProps> = ({
           return (
             <Space direction="vertical" size="small">
               <div className={styles.issueItem}>
-                <Tag color="red">{issues.high} High</Tag>
-                <Tag color="orange">{issues.medium} Medium</Tag>
-                <Tag color="green">{issues.low} Low</Tag>
+                <Tag color="red">{mockIssues.high} High</Tag>
+                <Tag color="orange">{mockIssues.medium} Medium</Tag>
+                <Tag color="green">{mockIssues.low} Low</Tag>
               </div>
             </Space>
           );
@@ -344,14 +485,44 @@ const AuditManager: React.FC<AuditManagerProps> = ({
           <Title level={3}>SEO Audits - {projectName}</Title>
           <Text type="secondary">Monitor your website's SEO health</Text>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsCreateModalVisible(true)}
-          loading={loading}
-        >
-          Start New Audit
-        </Button>
+        <Space>
+          <Space align="center">
+            <Text type="secondary">Auto-refresh:</Text>
+            <Switch
+              size="small"
+              checked={autoRefresh}
+              onChange={setAutoRefresh}
+              checkedChildren="ON"
+              unCheckedChildren="OFF"
+            />
+            {autoRefresh && runningAuditsCount > 0 && (
+              <Text type="secondary" style={{ fontSize: "12px" }}>
+                ({runningAuditsCount} running)
+              </Text>
+            )}
+          </Space>
+          <Tooltip title="Refresh audits status">
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => {
+                loadAudits();
+                loadAuditSummary();
+                message.success("Audits refreshed!");
+              }}
+              loading={loading}
+            >
+              Refresh
+            </Button>
+          </Tooltip>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setIsCreateModalVisible(true)}
+            loading={loading}
+          >
+            Start New Audit
+          </Button>
+        </Space>
       </div>
 
       {/* Summary Cards */}
@@ -416,7 +587,25 @@ const AuditManager: React.FC<AuditManagerProps> = ({
       ) : null}
 
       {/* Audits Table */}
-      <Card className={styles.tableCard}>
+      <Card
+        className={styles.tableCard}
+        title="Audit History"
+        extra={
+          <Tooltip title="Refresh table data">
+            <Button
+              size="small"
+              icon={<ReloadOutlined />}
+              onClick={() => {
+                loadAudits();
+                message.info("Table refreshed");
+              }}
+              loading={loading}
+            >
+              Reload
+            </Button>
+          </Tooltip>
+        }
+      >
         <Table
           columns={columns}
           dataSource={audits}
@@ -438,6 +627,7 @@ const AuditManager: React.FC<AuditManagerProps> = ({
         open={isCreateModalVisible}
         onCancel={() => {
           setIsCreateModalVisible(false);
+          setWebsiteUrl("");
           form.resetFields();
         }}
         footer={null}
@@ -455,24 +645,67 @@ const AuditManager: React.FC<AuditManagerProps> = ({
         >
           <Title level={4}>Audit Settings</Title>
 
+          <Form.Item
+            label="Website URL"
+            rules={[
+              { required: true, message: "Please enter website URL" },
+              {
+                pattern: /^https?:\/\/.+/,
+                message:
+                  "Please enter a valid URL starting with http:// or https://",
+              },
+            ]}
+            extra={
+              <Space>
+                <Text type="secondary">Or</Text>
+                <Button
+                  size="small"
+                  type="link"
+                  onClick={() => {
+                    const currentProject = projects?.find(
+                      (p) => p.id === projectId
+                    );
+                    if (currentProject?.domain) {
+                      const domain = currentProject.domain;
+                      const url = domain.startsWith("http")
+                        ? domain
+                        : `https://${domain}`;
+                      setWebsiteUrl(url);
+                    }
+                  }}
+                >
+                  Use project domain (
+                  {projects?.find((p) => p.id === projectId)?.domain || "N/A"})
+                </Button>
+              </Space>
+            }
+          >
+            <Input
+              value={websiteUrl}
+              onChange={(e) => setWebsiteUrl(e.target.value)}
+              placeholder="https://example.com"
+              prefix={<GlobalOutlined />}
+            />
+          </Form.Item>
+
           <Form.Item name="include_mobile" valuePropName="checked">
             <Space>
               <Switch />
-              <Text>Include Mobile Analysis</Text>
+              <Text>Check Mobile Friendly</Text>
             </Space>
           </Form.Item>
 
           <Form.Item name="check_accessibility" valuePropName="checked">
             <Space>
               <Switch />
-              <Text>Check Accessibility Issues</Text>
+              <Text>Include Images Analysis</Text>
             </Space>
           </Form.Item>
 
           <Form.Item name="analyze_performance" valuePropName="checked">
             <Space>
               <Switch />
-              <Text>Analyze Performance Metrics</Text>
+              <Text>Analyze Page Speed</Text>
             </Space>
           </Form.Item>
 
@@ -484,6 +717,7 @@ const AuditManager: React.FC<AuditManagerProps> = ({
               <Button
                 onClick={() => {
                   setIsCreateModalVisible(false);
+                  setWebsiteUrl("");
                   form.resetFields();
                 }}
               >

@@ -111,6 +111,19 @@ export interface Project {
     settings?: {
         location?: string;
         language?: string;
+        // Tracking Settings
+        enableKeywordTracking?: boolean;
+        trackingFrequency?: 'daily' | 'weekly' | 'monthly';
+        enableEmailNotifications?: boolean;
+        enableSlackNotifications?: boolean;
+        // SEO Settings
+        targetSearchEngine?: 'google' | 'bing' | 'yahoo';
+        deviceType?: 'desktop' | 'mobile' | 'both';
+        maxCrawlDepth?: number;
+        // API Integrations
+        googleAnalyticsId?: string;
+        googleSearchConsoleUrl?: string;
+        slackWebhookUrl?: string;
     };
 }
 
@@ -120,6 +133,16 @@ export interface CreateProjectRequest {
     settings?: {
         location?: string;
         language?: string;
+        enableKeywordTracking?: boolean;
+        trackingFrequency?: 'daily' | 'weekly' | 'monthly';
+        enableEmailNotifications?: boolean;
+        enableSlackNotifications?: boolean;
+        targetSearchEngine?: 'google' | 'bing' | 'yahoo';
+        deviceType?: 'desktop' | 'mobile' | 'both';
+        maxCrawlDepth?: number;
+        googleAnalyticsId?: string;
+        googleSearchConsoleUrl?: string;
+        slackWebhookUrl?: string;
     };
 }
 
@@ -129,6 +152,16 @@ export interface UpdateProjectRequest {
     settings?: {
         location?: string;
         language?: string;
+        enableKeywordTracking?: boolean;
+        trackingFrequency?: 'daily' | 'weekly' | 'monthly';
+        enableEmailNotifications?: boolean;
+        enableSlackNotifications?: boolean;
+        targetSearchEngine?: 'google' | 'bing' | 'yahoo';
+        deviceType?: 'desktop' | 'mobile' | 'both';
+        maxCrawlDepth?: number;
+        googleAnalyticsId?: string;
+        googleSearchConsoleUrl?: string;
+        slackWebhookUrl?: string;
     };
 }
 
@@ -210,6 +243,7 @@ export interface Audit {
 }
 
 export interface CreateAuditRequest {
+    url?: string;
     settings?: {
         include_mobile?: boolean;
         check_accessibility?: boolean;

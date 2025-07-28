@@ -7,18 +7,15 @@ import {
   Typography,
   Button,
   List,
-  Progress,
   Tag,
   Space,
 } from "antd";
 import {
-  ProjectOutlined,
   SearchOutlined,
   FileSearchOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
   EyeOutlined,
-  PlusOutlined,
 } from "@ant-design/icons";
 import { useProject } from "@/stores/hooks/useProject";
 import { useKeyword } from "@/stores/hooks/useKeyword";
@@ -38,7 +35,7 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
 }) => {
   const { projectStats, fetchProjectStats } = useProject();
   const { keywords, fetchProjectKeywords } = useKeyword();
-  const { audits, auditSummary, fetchProjectAudits, fetchAuditSummary } =
+  const { audits, auditSummary, fetchProjectAudits, fetchAuditSummary }: any =
     useAudit();
 
   useEffect(() => {
@@ -221,7 +218,7 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
             <List
               size="small"
               dataSource={audits.slice(0, 3)}
-              renderItem={(audit) => (
+              renderItem={(audit: any) => (
                 <List.Item>
                   <div className={styles.auditItem}>
                     <div>
@@ -250,7 +247,7 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
         </Col>
 
         {/* Quick Actions */}
-        <Col xs={24}>
+        {/* <Col xs={24}>
           <Card title="Quick Actions">
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={8} md={6}>
@@ -280,7 +277,7 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
               </Col>
             </Row>
           </Card>
-        </Col>
+        </Col> */}
       </Row>
     </div>
   );

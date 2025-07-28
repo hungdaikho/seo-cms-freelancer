@@ -148,34 +148,71 @@ export class AuditService extends BaseService {
             analyzePageSpeed?: boolean;
         };
     }): Promise<RealAuditResult> {
+        // Validate input parameters
+        if (!projectId || !url) {
+            throw new Error("Missing required parameters: projectId and url are required");
+        }
+
+        // Validate URL format
+        try {
+            new URL(url);
+        } catch (urlError) {
+            throw new Error(`Invalid URL format: ${url}`);
+        }
+
+        // Format request body according to new API specification
         const auditData = {
             url,
-            audit_type: options?.auditType || "full",
-            settings: {
-                crawl_depth: options?.settings?.crawlDepth || 3,
-                include_images: options?.settings?.includeImages ?? true,
-                check_mobile_friendly: options?.settings?.checkMobileFriendly ?? true,
-                analyze_page_speed: options?.settings?.analyzePageSpeed ?? true,
+            options: {
+                auditType: options?.auditType || "full",
+                settings: {
+                    crawlDepth: options?.settings?.crawlDepth || 3,
+                    includeImages: options?.settings?.includeImages ?? true,
+                    checkMobileFriendly: options?.settings?.checkMobileFriendly ?? true,
+                    analyzePageSpeed: options?.settings?.analyzePageSpeed ?? true,
+                }
             }
         };
 
         console.log("🚀 Starting comprehensive audit for:", url);
-        console.log("Audit configuration:", auditData);
+        console.log("📋 Project ID:", projectId);
+        console.log("⚙️ Audit configuration:", auditData);
+        console.log("🌐 API Base URL:", this.axiosInstance.defaults.baseURL);
 
         try {
-            // Try to call real API first
-            return this.post<RealAuditResult>(`/projects/${projectId}/audits/comprehensive`, auditData);
-        } catch (error) {
-            console.log("API server not available, using mock audit engine for demo...");
+            const endpoint = `/projects/${projectId}/audits/comprehensive`;
+            console.log("📡 Calling endpoint:", `${this.axiosInstance.defaults.baseURL}${endpoint}`);
+
+            const result = await this.post<RealAuditResult>(endpoint, auditData);
+            console.log("✅ Real audit started successfully:", result);
+            return result;
+        } catch (error: any) {
+            console.log("⚠️ API server not available, using mock audit engine for demo...");
+            console.error("API Error details:", {
+                message: error?.message,
+                status: error?.status,
+                url: error?.config?.url,
+                method: error?.config?.method,
+                data: error?.config?.data
+            });
 
             // Simulate real audit with realistic data
             const auditId = Math.random().toString(36).substr(2, 9);
-
-            // Generate realistic mock data based on URL
             const domain = new URL(url).hostname;
+
+            // Add delay to simulate real audit processing
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
             const mockData = this.generateRealisticAuditData(auditId, projectId, url, domain, options);
 
             console.log("✅ Mock audit completed for:", url);
+            console.log("📊 Mock audit data:", {
+                id: mockData.id,
+                status: mockData.status,
+                score: mockData.overview.score,
+                issues: mockData.overview.total_issues
+            });
+
             return Promise.resolve(mockData);
         }
     }

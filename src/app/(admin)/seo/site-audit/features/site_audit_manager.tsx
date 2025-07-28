@@ -25,6 +25,7 @@ import {
   Form,
   Switch,
   Slider,
+  notification,
 } from "antd";
 import {
   SearchOutlined,
@@ -130,14 +131,18 @@ const SiteAuditManager: React.FC = () => {
 
   const startNewAudit = async () => {
     if (!selectedProject || !websiteUrl) {
-      message.error("Please select a project and enter website URL");
+      notification.error({
+        message: "Missing Information",
+        description: "Please select a project and enter website URL",
+      });
       return;
     }
-
     if (!websiteUrl.startsWith("http")) {
-      message.error(
-        "Please enter a valid URL starting with http:// or https://"
-      );
+      notification.error({
+        message: "Invalid URL",
+        description:
+          "Please enter a valid URL starting with http:// or https://",
+      });
       return;
     }
 

@@ -15,6 +15,7 @@ import {
   Badge,
   Tag,
   Drawer,
+  Checkbox,
 } from "antd";
 import {
   PlusOutlined,
@@ -32,6 +33,7 @@ import {
   UpdateProjectRequest,
 } from "@/types/api.type";
 import styles from "./project_manager.module.scss";
+import { COUNTRIES, LANGUAGES } from "@/utils/national";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -61,9 +63,12 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ onProjectSelect }) => {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isStatsDrawerVisible, setIsStatsDrawerVisible] = useState(false);
+  const [isSettingsDrawerVisible, setIsSettingsDrawerVisible] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [settingsProject, setSettingsProject] = useState<Project | null>(null);
   const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
+  const [settingsForm] = Form.useForm();
 
   useEffect(() => {
     loadProjects();
@@ -157,6 +162,63 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ onProjectSelect }) => {
     setIsEditModalVisible(true);
   };
 
+  const openSettingsDrawer = (project: Project) => {
+    setSettingsProject(project);
+    settingsForm.setFieldsValue({
+      // Project tracking settings
+      enableKeywordTracking: project.settings?.enableKeywordTracking ?? true,
+      trackingFrequency: project.settings?.trackingFrequency ?? "daily",
+      enableEmailNotifications:
+        project.settings?.enableEmailNotifications ?? true,
+      enableSlackNotifications:
+        project.settings?.enableSlackNotifications ?? false,
+
+      // SEO settings
+      targetSearchEngine: project.settings?.targetSearchEngine ?? "google",
+      deviceType: project.settings?.deviceType ?? "desktop",
+      maxCrawlDepth: project.settings?.maxCrawlDepth ?? 3,
+
+      // API integrations
+      googleAnalyticsId: project.settings?.googleAnalyticsId ?? "",
+      googleSearchConsoleUrl: project.settings?.googleSearchConsoleUrl ?? "",
+      slackWebhookUrl: project.settings?.slackWebhookUrl ?? "",
+    });
+    setIsSettingsDrawerVisible(true);
+  };
+
+  const handleUpdateSettings = async (values: any) => {
+    if (!settingsProject) return;
+
+    try {
+      const updatedSettings = {
+        ...settingsProject.settings,
+        enableKeywordTracking: values.enableKeywordTracking,
+        trackingFrequency: values.trackingFrequency,
+        enableEmailNotifications: values.enableEmailNotifications,
+        enableSlackNotifications: values.enableSlackNotifications,
+        targetSearchEngine: values.targetSearchEngine,
+        deviceType: values.deviceType,
+        maxCrawlDepth: values.maxCrawlDepth,
+        googleAnalyticsId: values.googleAnalyticsId,
+        googleSearchConsoleUrl: values.googleSearchConsoleUrl,
+        slackWebhookUrl: values.slackWebhookUrl,
+      };
+
+      await updateProject(settingsProject.id, {
+        name: settingsProject.name,
+        domain: settingsProject.domain,
+        settings: updatedSettings,
+      });
+
+      message.success("Project settings updated successfully!");
+      setIsSettingsDrawerVisible(false);
+      setSettingsProject(null);
+      loadProjects();
+    } catch (error) {
+      // Error handled by Redux slice
+    }
+  };
+
   const columns = [
     {
       title: "Project Name",
@@ -229,7 +291,11 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ onProjectSelect }) => {
             />
           </Tooltip>
           <Tooltip title="Settings">
-            <Button icon={<SettingOutlined />} size="small" />
+            <Button
+              icon={<SettingOutlined />}
+              size="small"
+              onClick={() => openSettingsDrawer(record)}
+            />
           </Tooltip>
           <Popconfirm
             title="Delete Project"
@@ -341,25 +407,29 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ onProjectSelect }) => {
           </Form.Item>
 
           <Form.Item name="location" label="Target Location">
-            <Select placeholder="Select target location">
-              <Option value="United States">United States</Option>
-              <Option value="United Kingdom">United Kingdom</Option>
-              <Option value="Canada">Canada</Option>
-              <Option value="Australia">Australia</Option>
-              <Option value="Germany">Germany</Option>
-              <Option value="France">France</Option>
-              <Option value="Vietnam">Vietnam</Option>
-            </Select>
+            <Select
+              placeholder="Select target location"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={COUNTRIES}
+            />
           </Form.Item>
 
           <Form.Item name="language" label="Target Language">
-            <Select placeholder="Select target language">
-              <Option value="en">English</Option>
-              <Option value="es">Spanish</Option>
-              <Option value="fr">French</Option>
-              <Option value="de">German</Option>
-              <Option value="vi">Vietnamese</Option>
-            </Select>
+            <Select
+              placeholder="Select target language"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={LANGUAGES}
+            />
           </Form.Item>
 
           <Form.Item>
@@ -420,25 +490,29 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ onProjectSelect }) => {
           </Form.Item>
 
           <Form.Item name="location" label="Target Location">
-            <Select placeholder="Select target location">
-              <Option value="United States">United States</Option>
-              <Option value="United Kingdom">United Kingdom</Option>
-              <Option value="Canada">Canada</Option>
-              <Option value="Australia">Australia</Option>
-              <Option value="Germany">Germany</Option>
-              <Option value="France">France</Option>
-              <Option value="Vietnam">Vietnam</Option>
-            </Select>
+            <Select
+              placeholder="Select target location"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={COUNTRIES}
+            />
           </Form.Item>
 
           <Form.Item name="language" label="Target Language">
-            <Select placeholder="Select target language">
-              <Option value="en">English</Option>
-              <Option value="es">Spanish</Option>
-              <Option value="fr">French</Option>
-              <Option value="de">German</Option>
-              <Option value="vi">Vietnamese</Option>
-            </Select>
+            <Select
+              placeholder="Select target language"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={LANGUAGES}
+            />
           </Form.Item>
 
           <Form.Item>
@@ -541,6 +615,151 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({ onProjectSelect }) => {
             </Card>
           </div>
         )}
+      </Drawer>
+
+      {/* Project Settings Drawer */}
+      <Drawer
+        title={`${settingsProject?.name} - Settings`}
+        placement="right"
+        width={700}
+        open={isSettingsDrawerVisible}
+        onClose={() => {
+          setIsSettingsDrawerVisible(false);
+          setSettingsProject(null);
+          settingsForm.resetFields();
+        }}
+        footer={
+          <div style={{ textAlign: "right" }}>
+            <Space>
+              <Button
+                onClick={() => {
+                  setIsSettingsDrawerVisible(false);
+                  setSettingsProject(null);
+                  settingsForm.resetFields();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                onClick={() => settingsForm.submit()}
+                loading={loading}
+              >
+                Save Settings
+              </Button>
+            </Space>
+          </div>
+        }
+      >
+        <Form
+          form={settingsForm}
+          layout="vertical"
+          onFinish={handleUpdateSettings}
+        >
+          {/* Tracking Settings */}
+          <Card title="Tracking Settings" style={{ marginBottom: 16 }}>
+            <Form.Item name="enableKeywordTracking" valuePropName="checked">
+              <Checkbox>Enable automatic keyword tracking</Checkbox>
+            </Form.Item>
+
+            <Form.Item
+              name="trackingFrequency"
+              label="Tracking Frequency"
+              rules={[
+                { required: true, message: "Please select tracking frequency" },
+              ]}
+            >
+              <Select placeholder="Select frequency">
+                <Option value="daily">Daily</Option>
+                <Option value="weekly">Weekly</Option>
+                <Option value="monthly">Monthly</Option>
+              </Select>
+            </Form.Item>
+          </Card>
+
+          {/* Notification Settings */}
+          <Card title="Notification Settings" style={{ marginBottom: 16 }}>
+            <Form.Item name="enableEmailNotifications" valuePropName="checked">
+              <Checkbox>Enable email notifications</Checkbox>
+            </Form.Item>
+
+            <Form.Item name="enableSlackNotifications" valuePropName="checked">
+              <Checkbox>Enable Slack notifications</Checkbox>
+            </Form.Item>
+
+            <Form.Item
+              name="slackWebhookUrl"
+              label="Slack Webhook URL"
+              help="Enter your Slack webhook URL for notifications"
+            >
+              <Input placeholder="https://hooks.slack.com/services/..." />
+            </Form.Item>
+          </Card>
+
+          {/* SEO Settings */}
+          <Card title="SEO Settings" style={{ marginBottom: 16 }}>
+            <Form.Item
+              name="targetSearchEngine"
+              label="Target Search Engine"
+              rules={[
+                { required: true, message: "Please select search engine" },
+              ]}
+            >
+              <Select placeholder="Select search engine">
+                <Option value="google">Google</Option>
+                <Option value="bing">Bing</Option>
+                <Option value="yahoo">Yahoo</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="deviceType"
+              label="Device Type"
+              rules={[{ required: true, message: "Please select device type" }]}
+            >
+              <Select placeholder="Select device type">
+                <Option value="desktop">Desktop</Option>
+                <Option value="mobile">Mobile</Option>
+                <Option value="both">Both</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="maxCrawlDepth"
+              label="Maximum Crawl Depth"
+              rules={[
+                { required: true, message: "Please enter max crawl depth" },
+              ]}
+            >
+              <Input
+                type="number"
+                min="1"
+                max="10"
+                placeholder="3"
+                addonAfter="levels"
+              />
+            </Form.Item>
+          </Card>
+
+          {/* API Integrations */}
+          <Card title="API Integrations">
+            <Form.Item
+              name="googleAnalyticsId"
+              label="Google Analytics ID"
+              help="Enter your Google Analytics tracking ID (e.g., GA4-XXXXXXXXXX)"
+            >
+              <Input placeholder="GA4-XXXXXXXXXX" />
+            </Form.Item>
+
+            <Form.Item
+              name="googleSearchConsoleUrl"
+              label="Google Search Console Property URL"
+              help="Enter your verified Search Console property URL"
+            >
+              <Input placeholder="https://example.com/" />
+            </Form.Item>
+          </Card>
+        </Form>
       </Drawer>
     </div>
   );
