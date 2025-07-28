@@ -172,10 +172,10 @@ const ContentManager: React.FC = () => {
       };
 
       await dispatch(
-        updateContentItem({ 
-          id: editingItem.id, 
+        updateContentItem({
+          id: editingItem.id,
           data: updateData,
-          projectId: selectedProject 
+          projectId: selectedProject,
         })
       ).unwrap();
       setIsEditModalVisible(false);
