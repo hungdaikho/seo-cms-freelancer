@@ -7,6 +7,9 @@
     z-index: 1;
   }
 
+  // Smooth scrolling for better UX
+  scroll-behavior: smooth;
+
   // Global responsive adjustments
   @media (max-width: 768px) {
     section {
@@ -14,7 +17,4 @@
       padding-right: 16px;
     }
   }
-
-  // Smooth scrolling for better UX
-  scroll-behavior: smooth;
 }

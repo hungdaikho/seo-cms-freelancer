@@ -121,7 +121,12 @@ const ContentManager: React.FC = () => {
 
   const handleCreateContent = async (values: any) => {
     try {
-      const createData: CreateContentRequest = {
+      if (!selectedProject) {
+        message.error("Please select a project first");
+        return;
+      }
+
+      const createData: CreateContentRequest & { projectId: string } = {
         title: values.title,
         content: values.content,
         excerpt: values.excerpt,
@@ -135,6 +140,7 @@ const ContentManager: React.FC = () => {
           focusKeyword: values.focusKeyword,
         },
         featuredImage: values.featuredImage,
+        projectId: selectedProject,
       };
 
       await dispatch(createContentItem(createData)).unwrap();
@@ -147,7 +153,7 @@ const ContentManager: React.FC = () => {
   };
 
   const handleEditContent = async (values: any) => {
-    if (!editingItem) return;
+    if (!editingItem || !selectedProject) return;
 
     try {
       const updateData: UpdateContentRequest = {
@@ -166,7 +172,11 @@ const ContentManager: React.FC = () => {
       };
 
       await dispatch(
-        updateContentItem({ id: editingItem.id, data: updateData })
+        updateContentItem({ 
+          id: editingItem.id, 
+          data: updateData,
+          projectId: selectedProject 
+        })
       ).unwrap();
       setIsEditModalVisible(false);
       setEditingItem(null);
