@@ -228,6 +228,84 @@ export interface KeywordRanking {
     };
 }
 
+// Position Tracking Types (from API documentation)
+export interface CreateRankingRequest {
+    position: number;
+    url?: string;
+    metadata?: {
+        search_engine?: string;
+        location?: string;
+        device?: string;
+        serp_features?: string[];
+    };
+}
+
+export interface RankingRecord {
+    id: string;
+    keywordId: string;
+    position: number;
+    url?: string;
+    date: string;
+    metadata?: {
+        search_engine?: string;
+        location?: string;
+        device?: string;
+        serp_features?: string[];
+    };
+    createdAt: string;
+}
+
+export interface RankingHistoryQueryParams {
+    days?: number;
+    startDate?: string;
+    endDate?: string;
+}
+
+export interface RankingHistoryResponse {
+    keyword: {
+        id: string;
+        keyword: string;
+        currentRanking: number;
+        project: string;
+    };
+    rankings: RankingRecord[];
+    trend: 'up' | 'down' | 'stable' | 'no-data';
+    summary: {
+        totalRecords: number;
+        bestPosition: number;
+        worstPosition: number;
+        averagePosition: number;
+    };
+}
+
+export interface ProjectRankingsOverview {
+    project: {
+        id: string;
+        name: string;
+        domain: string;
+    };
+    summary: {
+        totalKeywords: number;
+        trackedKeywords: number;
+        rankedKeywords: number;
+        avgPosition: number;
+    };
+    keywords: Array<{
+        id: string;
+        keyword: string;
+        currentRanking: number;
+        targetUrl: string;
+        isTracking: boolean;
+        searchVolume: number;
+        difficulty: number;
+        trend: 'up' | 'down' | 'stable' | 'no-data';
+        rankingHistory: Array<{
+            position: number;
+            date: string;
+        }>;
+    }>;
+}
+
 // Audit Types
 export interface Audit {
     id: string;
@@ -1212,4 +1290,95 @@ export interface ExportResponse {
     status: 'pending' | 'processing' | 'completed' | 'failed';
     downloadUrl?: string;
     expiresAt: string;
+}
+
+// Organic Research Types
+export interface OrganicDomainAnalysis {
+    domain: string;
+    organicKeywords: number;
+    organicTraffic: number;
+    organicCost: number;
+    avgPosition: number;
+    visibility: number;
+    lastUpdated: string;
+}
+
+export interface OrganicKeyword {
+    keyword: string;
+    position: number;
+    previousPosition: number;
+    searchVolume: number;
+    trafficShare: number;
+    cpc: number;
+    difficulty: number;
+    intent: 'Commercial' | 'Informational' | 'Navigational' | 'Transactional';
+    url: string;
+    features: string[];
+}
+
+export interface OrganicKeywordsResponse {
+    data: OrganicKeyword[];
+    total: number;
+    page: number;
+    limit: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+}
+
+export interface OrganicKeywordsParams {
+    country: string;
+    limit?: number;
+    offset?: number;
+    sortBy?: 'position' | 'traffic' | 'volume' | 'difficulty';
+    sortOrder?: 'asc' | 'desc';
+}
+
+export interface CompetitorDomain {
+    domain: string;
+    competitionLevel: number;
+    commonKeywords: number;
+    keywords: number;
+    traffic: number;
+    trafficValue: number;
+    topKeyword: string;
+}
+
+export interface CompetitorsResponse {
+    data: CompetitorDomain[];
+    total: number;
+    targetDomain: string;
+    country: string;
+}
+
+export interface CompetitorsParams {
+    country: string;
+    limit?: number;
+}
+
+export interface TopPage {
+    url: string;
+    traffic: number;
+    keywords: number;
+    trafficValue: number;
+    avgPosition: number;
+    topKeywords: string[];
+}
+
+export interface TopPagesResponse {
+    data: TopPage[];
+    total: number;
+    domain: string;
+    country: string;
+}
+
+export interface TopPagesParams {
+    country: string;
+    limit?: number;
+    sortBy?: 'traffic' | 'keywords' | 'value';
+}
+
+export interface ApiLimitsResponse {
+    semrush: number;
+    ahrefs: number;
+    moz: number;
 }

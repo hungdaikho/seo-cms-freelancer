@@ -10,6 +10,9 @@ import trafficSlice from './slices/traffic.slice';
 import contentSlice from './slices/content.slice';
 import aiSlice from './slices/ai.slice';
 import copilotAISlice from './slices/copilot_ai.slice';
+import domainSlice from './slices/domain.slice';
+import positionTrackingSlice from './slices/position-tracking.slice';
+import organicResearchSlice from './slices/organic-research.slice';
 
 const store = configureStore({
   reducer: {
@@ -23,6 +26,9 @@ const store = configureStore({
     content: contentSlice,
     ai: aiSlice,
     copilotAI: copilotAISlice,
+    domain: domainSlice,
+    positionTracking: positionTrackingSlice,
+    organicResearch: organicResearchSlice,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiEventMiddleware),
   // middleware mặc định đã hỗ trợ thunk, có thể custom thêm nếu cần

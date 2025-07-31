@@ -1,168 +1,357 @@
+// Position Tracking Card Styles
 .positionCard {
-  margin: 16px 24px;
+  margin-bottom: 24px;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   :global(.ant-card-body) {
-    padding: 20px;
-  }
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-}
-
-.headerLeft {
-  .cardTitle {
-    margin: 0 0 8px 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-
-    .infoIcon {
-      color: #bbb;
-      font-size: 14px;
-      margin-left: 4px;
-    }
+    padding: 24px;
   }
 
-  .locationSelector {
-    font-size: 13px;
-    color: #666;
-  }
-}
-
-.headerRight {
-  text-align: right;
-  font-size: 12px;
-  color: #999;
-
-  .updateTime,
-  .dateRange {
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  :global(.ant-select) {
-    margin-left: 8px;
-
-    .ant-select-selector {
-      border: none;
-      box-shadow: none;
-      font-size: 12px;
-    }
-  }
-}
-
-.visibilitySection {
-  display: flex;
-  gap: 24px;
-}
-
-.visibilityScore {
-  flex-shrink: 0;
-  text-align: center;
-
-  .visibilityLabel {
-    display: block;
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 8px;
-  }
-
-  .scoreValue {
-    font-size: 32px;
-    font-weight: 600;
-    color: #333;
-  }
-}
-
-.keywordStats {
-  flex: 1;
-}
-
-.statItem {
-  text-align: center;
-}
-
-.statLabel {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
-}
-
-.statSection {
-  .sectionTitle {
-    font-size: 12px;
-    color: #999;
-    margin-bottom: 4px;
-  }
-
-  .sectionValue {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 4px;
-  }
-
-  .changes {
-    font-size: 11px;
-    margin-bottom: 8px;
-
-    .new,
-    .lost {
-      display: block;
-      color: #999;
-    }
-  }
-
-  :global(.ant-progress) {
-    .ant-progress-bg {
-      height: 4px !important;
-    }
-  }
-}
-
-.topKeywords {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
-}
-
-.topKeywordsHeader {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 12px;
-}
-
-.keywordTable {
-  .tableHeader {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 16px;
-    padding: 8px 0;
-    font-size: 12px;
-    color: #999;
+  .cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
     border-bottom: 1px solid #f0f0f0;
+
+    .headerLeft {
+      .cardTitle {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #262626;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .infoIcon {
+          font-size: 16px;
+          color: #8c8c8c;
+          cursor: help;
+        }
+      }
+
+      .locationSelector {
+        font-size: 14px;
+        color: #595959;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    }
+
+    .headerRight {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+
+      .updateTime {
+        font-size: 12px;
+        color: #8c8c8c;
+      }
+
+      .dateRange {
+        font-size: 13px;
+        color: #595959;
+        font-weight: 500;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
   }
 
-  .tableRow {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 16px;
-    padding: 8px 0;
-    font-size: 13px;
+  .visibilitySection {
+    .visibilityScore {
+      margin-bottom: 24px;
+      text-align: center;
 
-    .keyword {
-      color: #1890ff;
+      .visibilityLabel {
+        font-size: 14px;
+        color: #8c8c8c;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .scoreValue {
+        font-size: 48px;
+        font-weight: 700;
+        color: #1890ff;
+        line-height: 1;
+      }
+    }
+
+    .keywordStats {
+      margin-bottom: 32px;
+
+      .statItem {
+        text-align: center;
+
+        .statLabel {
+          font-size: 14px;
+          color: #8c8c8c;
+          margin-bottom: 16px;
+          font-weight: 500;
+        }
+
+        .statSection {
+          .sectionTitle {
+            font-size: 13px;
+            color: #262626;
+            font-weight: 600;
+            margin-bottom: 8px;
+          }
+
+          .sectionValue {
+            font-size: 32px;
+            font-weight: 700;
+            color: #262626;
+            line-height: 1;
+            margin-bottom: 8px;
+          }
+
+          .changes {
+            margin-bottom: 12px;
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+
+            .new {
+              color: #52c41a;
+
+              &::before {
+                content: "↗ ";
+              }
+            }
+
+            .lost {
+              color: #ff4d4f;
+
+              &::before {
+                content: "↘ ";
+              }
+            }
+          }
+
+          .progressBar {
+            height: 4px;
+
+            :global(.ant-progress-bg) {
+              height: 4px !important;
+            }
+          }
+        }
+      }
+    }
+
+    .topKeywords {
+      border-top: 1px solid #f0f0f0;
+      padding-top: 24px;
+
+      .topKeywordsHeader {
+        font-size: 16px;
+        font-weight: 600;
+        color: #262626;
+        margin-bottom: 16px;
+      }
+
+      .keywordTable {
+        .tableHeader {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px 0;
+          font-size: 12px;
+          color: #8c8c8c;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          border-bottom: 1px solid #f0f0f0;
+          margin-bottom: 8px;
+        }
+
+        .tableRow {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 1px solid #f5f5f5;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #fafafa;
+          }
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .keyword {
+            font-size: 14px;
+            color: #262626;
+            font-weight: 500;
+            flex: 1;
+          }
+
+          .position {
+            font-size: 14px;
+            color: #1890ff;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+          }
+
+          .visibility {
+            font-size: 14px;
+            color: #52c41a;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: right;
+          }
+        }
+      }
+    }
+  }
+
+  .cardFooter {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+    text-align: center;
+  }
+
+  // Loading states
+  &.loading {
+    .visibilityScore .scoreValue,
+    .statSection .sectionValue {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e6e6e6 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      color: transparent;
+      border-radius: 4px;
+    }
+  }
+
+  // Error states
+  &.error {
+    border-color: #ff4d4f;
+
+    .cardTitle {
+      color: #ff4d4f;
+    }
+  }
+
+  // Empty states
+  .emptyState {
+    text-align: center;
+    padding: 40px;
+    color: #8c8c8c;
+
+    .emptyIcon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .emptyTitle {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #595959;
+    }
+
+    .emptyDescription {
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    .cardHeader {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+
+      .headerRight {
+        align-items: flex-start;
+      }
+    }
+
+    .keywordStats {
+      .statItem {
+        margin-bottom: 24px;
+      }
+    }
+
+    .visibilityScore .scoreValue {
+      font-size: 36px;
+    }
+
+    .statSection .sectionValue {
+      font-size: 24px;
     }
   }
 }
 
-.cardFooter {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
+// Animations
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Trend indicators
+.trendIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+
+  &.up {
+    color: #52c41a;
+    background-color: #f6ffed;
+  }
+
+  &.down {
+    color: #ff4d4f;
+    background-color: #fff2f0;
+  }
+
+  &.stable {
+    color: #faad14;
+    background-color: #fffbe6;
+  }
+
+  &.noData {
+    color: #8c8c8c;
+    background-color: #f5f5f5;
+  }
+}
+
+// Tooltip styles
+.rankingTooltip {
+  .tooltipContent {
+    font-size: 12px;
+
+    .tooltipTitle {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .tooltipDetails {
+      color: #8c8c8c;
+    }
+  }
 }

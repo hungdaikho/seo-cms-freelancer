@@ -22,7 +22,7 @@ const HeaderSite = () => {
   const [authModalTab, setAuthModalTab] = useState<"login" | "signup">("login");
   return (
     <header className={styles.headerSite}>
-      <div className={styles.logo}>SEO BOOST</div>
+      <div className={styles.logo}>✨ SEO BOOST</div>
       <nav className={styles.navMenu}>
         <ul className={styles.menu}>
           {menu.map((item) => (

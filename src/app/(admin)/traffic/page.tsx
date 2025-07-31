@@ -389,7 +389,7 @@ const TrafficPage: React.FC = () => {
               Please select a project to view traffic analytics
             </Text>
             <div style={{ marginTop: 16 }}>
-              <Button type="primary" href="/admin/projects">
+              <Button type="primary" href="/projects">
                 Go to Projects
               </Button>
             </div>

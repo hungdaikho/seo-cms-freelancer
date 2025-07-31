@@ -1,10 +1,10 @@
 // Utility functions for social page navigation
 
 export const socialNavigationConfig = {
-    "social-dashboard": "/admin/social",
-    "social-media-tracker": "/admin/social?media-tracker",
-    "social-media-poster": "/admin/social?media-poster",
-    "social-analytics": "/admin/social?analytics"
+    "social-dashboard": "/social",
+    "social-media-tracker": "/social?media-tracker",
+    "social-media-poster": "/social?media-poster",
+    "social-analytics": "/social?analytics"
 };
 
 export const navigateToSocialSection = (section: keyof typeof socialNavigationConfig) => {

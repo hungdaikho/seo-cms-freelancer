@@ -1,272 +1,330 @@
 .heroSection {
   position: relative;
-  width: 100%;
-  min-height: 720px;
-  background: #4b2490;
+  padding: 80px 20px 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-direction: column;
-  gap: 40px;
-  padding: 0 0 48px 0;
-  border-bottom-left-radius: 100px;
-  border-bottom-right-radius: 100px;
-  z-index: 1;
+  min-height: 100vh;
   .bgCircle1 {
     position: absolute;
-    left: -180px;
-    top: 0;
-    width: 400px;
-    height: 400px;
-    background: #2de3b6;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(
+      circle,
+      rgba(240, 147, 251, 0.3) 0%,
+      transparent 70%
+    );
     border-radius: 50%;
-    opacity: 0.8;
-    z-index: 1;
+    top: -300px;
+    right: -200px;
+    filter: blur(60px);
+    animation: float 20s ease-in-out infinite;
   }
   .bgCircle2 {
     position: absolute;
-    right: -160px;
-    top: 0;
-    width: 340px;
-    height: 340px;
-    background: #a88cf0;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(
+      circle,
+      rgba(254, 225, 64, 0.3) 0%,
+      transparent 70%
+    );
     border-radius: 50%;
-    opacity: 0.7;
-    z-index: 1;
+    bottom: -250px;
+    left: -150px;
+    filter: blur(80px);
+    animation: float 25s ease-in-out infinite reverse;
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(30px, -30px) scale(1.05);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.95);
+    }
   }
   .heroTitle {
-    width: 660px;
-    height: auto;
-    font-size: 48px;
-    color: #fff;
     text-align: center;
-    font-weight: 600;
-    letter-spacing: 2px;
-    margin-top: 60px;
-    span {
-      margin-right: 10px;
-    }
-    .gradientText {
-      background: linear-gradient(90deg, #ff6a2b 30%, #a88cf0 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-  }
-
-  .heroUrlSite {
-    width: 660px;
-    height: auto;
-    display: flex;
-    gap: 16px;
-    .heroSearch {
-      display: flex;
-      flex: 1;
-      .input {
-        height: 48px;
-      }
-    }
-    .btn {
-      Button {
-        height: 48px;
-        font-size: 24px;
-        font-weight: 600;
-        background: #ff622d;
-        border: none;
-        color: #fff;
-      }
-    }
-  }
-
-  .toolkit {
-    width: 500px;
-    height: auto;
+    margin-bottom: 50px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 10px;
+
+    span {
+      font-size: 48px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .gradientText {
+      background: linear-gradient(90deg, #f093fb, #f5576c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 56px;
+      animation: glow 3s ease-in-out infinite;
+    }
+  }
+  @keyframes glow {
+    0%,
+    100% {
+      filter: brightness(1);
+    }
+    50% {
+      filter: brightness(1.2);
+    }
+  }
+  .heroUrlSite {
+    display: flex;
+    gap: 16px;
+    max-width: 600px;
+    margin: 0 auto 60px;
+
+    .heroSearch {
+      flex: 1;
+
+      .input {
+        height: 56px;
+        border-radius: 12px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        padding: 0 20px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+
+        &:hover,
+        &:focus {
+          border-color: #f093fb;
+          background: #fff;
+          box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);
+        }
+      }
+    }
+
+    .btn button {
+      height: 56px;
+      padding: 0 40px;
+      font-size: 18px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(250, 112, 154, 0.4);
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(250, 112, 154, 0.6);
+      }
+    }
+  }
+  .toolkit {
+    margin-bottom: 40px;
+
     .toolkit_title {
       text-align: center;
-      width: 100%;
       font-size: 36px;
+      font-weight: 700;
       color: #fff;
-      font-weight: 600;
-      letter-spacing: 2px;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
+
     .toolkit_tab {
-      width: 100%;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+
       .tabItem {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
-        padding: 8px 24px;
-        font-size: 17px;
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 30px;
         color: #fff;
         font-weight: 600;
         cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+
         &:hover {
-          background-color: rgba(255, 255, 255, 0.582);
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
         }
+
         &.active {
-          background: rgba(255, 255, 255, 0.719);
+          background: linear-gradient(135deg, #f093fb, #f5576c);
+          border-color: transparent;
+          box-shadow: 0 6px 20px rgba(240, 147, 251, 0.5);
         }
       }
     }
   }
-
   .slide {
-    width: 900px;
-    margin: 0 auto;
-    position: relative;
+    margin-bottom: 60px;
 
     .mySwiper {
-      height: 460px;
+      padding: 20px 0 40px;
+    }
 
-      :global(.swiper-slide) {
-        .cardSlide {
-          height: 460px;
-          width: 100%;
-          background-color: #f0f0f0;
-          border-radius: 16px;
+    .cardSlide {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.3);
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+
+        .icon {
+          font-size: 32px;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        h3 {
+          font-size: 24px;
+          font-weight: 700;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin: 0;
+        }
+      }
+
+      .listText {
+        flex: 1;
+
+        .textItem {
           display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          flex-direction: column;
-          font-size: 20px;
+          align-items: flex-start;
+          gap: 10px;
+          margin-bottom: 15px;
+
+          .iconText {
+            color: #f093fb;
+            font-size: 16px;
+            margin-top: 2px;
+          }
+
+          .value {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 15px;
+          }
+        }
+      }
+
+      .img {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+
+        .cardIcon {
+          font-size: 80px;
+          background: linear-gradient(135deg, #fa709a, #fee140);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          filter: drop-shadow(0 4px 20px rgba(250, 112, 154, 0.3));
+        }
+      }
+
+      .btn {
+        text-align: center;
+
+        button {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          border: none;
+          color: #fff;
+          padding: 12px 32px;
+          border-radius: 8px;
           font-weight: 600;
-          transition: transform 0.3s ease, opacity 0.3s ease;
-          transform: scale(0.8);
-          opacity: 0.5;
-          .listText {
-            display: none;
-          }
-          .top {
-            display: flex;
-            gap: 10px;
-            padding: 8px 40px;
-            align-items: center;
-            justify-content: flex-start;
-            width: 100%;
-            .icon {
-              color: rgb(40, 134, 241);
-              font-size: 32px;
-              font-weight: 700;
-            }
-            h3 {
-              font-size: 28px;
-              font-weight: 700;
-              letter-spacing: 2px;
-            }
-          }
-          .img {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            .cardIcon {
-              font-size: 48px;
-              color: #cccccc;
-              opacity: 0.3;
-            }
-          }
-          .btn {
-            display: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
           }
         }
       }
-
-      :global(.swiper-slide-active) {
-        .cardSlide {
-          transform: scale(1);
-          opacity: 1;
-          .listText {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            .textItem {
-              display: flex;
-              font-size: 16px;
-              align-items: center;
-              font-weight: 500;
-            }
-          }
-
-          .img {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            .cardIcon {
-              font-size: 80px;
-              color: #ff622d;
-              opacity: 0.8;
-              transition: all 0.3s ease;
-              &:hover {
-                color: #4b2490;
-                transform: scale(1.1);
-              }
-            }
-          }
-
-          .btn {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            bottom: 4px;
-            z-index: 1;
-            Button {
-              background: #ff622d;
-              font-weight: 600;
-              padding: 20px 80px;
-              color: #fff;
-              font-size: 18px;
-              border: none;
-              letter-spacing: 2px;
-            }
-          }
-        }
-      }
-    }
-
-    .navBtn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 10;
-      background: white;
-      border-radius: 50%;
-      padding: 10px 15px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-      font-size: 18px;
-    }
-
-    :global(.swiper-button-prev) {
-      left: -30px;
-    }
-
-    :global(.swiper-button-next) {
-      right: -30px;
     }
   }
-
   .brands {
-    width: 660px;
+    text-align: center;
+
     .brandsTitle {
-      color: #ffffffa6;
-      width: 100%;
-      text-align: center;
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 30px;
+      font-weight: 600;
     }
+
     .brandsLogos {
-      width: 100%;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      padding: 12px 24px;
-      opacity: 0.8;
+      gap: 40px;
+      flex-wrap: wrap;
+
+      img {
+        height: 40px;
+        width: auto;
+        filter: brightness(0) invert(1);
+        opacity: 0.7;
+        transition: all 0.3s ease;
+
+        &:hover {
+          opacity: 1;
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+  @media (max-width: 768px) {
+    .heroTitle {
+      span {
+        font-size: 32px;
+      }
+      .gradientText {
+        font-size: 36px;
+      }
+    }
+
+    .heroUrlSite {
+      flex-direction: column;
+      padding: 0 20px;
+
+      .btn button {
+        width: 100%;
+      }
+    }
+
+    .toolkit_tab {
+      padding: 0 20px;
     }
   }
 }

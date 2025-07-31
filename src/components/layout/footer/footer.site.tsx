@@ -5,23 +5,71 @@ const FooterSite = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-[#1a1a1a] text-neutral-100 pt-10 pb-4 px-4 text-base">
-      <div className="max-w-[90rem] mx-auto">
+    <footer
+      className="relative pt-16 pb-6 px-4 text-base overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
+        color: "#fff",
+      }}
+    >
+      {/* Background decoration */}
+      <div
+        className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-10"
+        style={{
+          background: "radial-gradient(circle, #667eea 0%, transparent 70%)",
+          filter: "blur(100px)",
+          transform: "translate(50%, -50%)",
+        }}
+      />
+
+      <div className="max-w-[90rem] mx-auto relative z-10">
         {/* Top: Contact, Address, CTA */}
-        <div className="flex flex-col md:flex-row md:justify-between items-center mb-8 gap-4">
-          <button className="border border-neutral-700 rounded px-4 py-2 flex items-center gap-2 hover:bg-neutral-800">
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-12 gap-4">
+          <button
+            className="border-2 rounded-lg px-6 py-3 flex items-center gap-2 transition-all duration-300 hover:transform hover:-translate-y-1"
+            style={{
+              borderColor: "rgba(255, 255, 255, 0.2)",
+              background: "rgba(255, 255, 255, 0.05)",
+              backdropFilter: "blur(10px)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "#f093fb";
+              e.currentTarget.style.background = "rgba(240, 147, 251, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.2)";
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+            }}
+          >
             <span>📧</span> {t("contact_us")}
           </button>
-          {/* <span className="text-neutral-400 text-sm text-center">
-            {t("address")}
-          </span> */}
-          <div className="flex flex-col items-center gap-2">
-            <button className="bg-[#00b087] text-white font-bold px-6 py-2 rounded hover:bg-[#009e76] transition">
+
+          <div className="flex flex-col items-center gap-3">
+            <button
+              className="font-bold px-8 py-3 rounded-lg transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-lg"
+              style={{
+                background: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+                boxShadow: "0 4px 15px rgba(250, 112, 154, 0.4)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 8px 25px rgba(250, 112, 154, 0.6)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 4px 15px rgba(250, 112, 154, 0.4)";
+              }}
+            >
               {t("get_start")}
             </button>
             <a
               href="#"
-              className="text-neutral-400 text-sm underline hover:text-white"
+              className="text-sm transition-colors duration-300"
+              style={{ color: "rgba(255, 255, 255, 0.7)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#f093fb")}
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.color = "rgba(255, 255, 255, 0.7)")
+              }
             >
               {t("see_plans")}
             </a>
@@ -29,24 +77,58 @@ const FooterSite = () => {
         </div>
 
         {/* Middle: Menu columns */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 border-b border-neutral-800 pb-8">
+        <div
+          className="grid grid-cols-2 md:grid-cols-5 gap-8 pb-8 mb-8"
+          style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}
+        >
           {/* Semrush */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">
+            <div
+              className="font-bold text-lg mb-4 uppercase"
+              style={{
+                background: "linear-gradient(90deg, #667eea, #764ba2)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               {t("semrush")}
             </div>
-            <ul className="space-y-1 text-sm text-neutral-400">
+            <ul className="space-y-2 text-sm">
               {/* <li>
                 <a href="#">{t("features")}</a>
               </li> */}
               <li>
-                <a href="#">{t("pricing")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("pricing")}
+                </a>
               </li>
               {/* <li>
                 <a href="#">{t("free_trial")}</a>
               </li> */}
               <li>
-                <a href="#">{t("success_stories")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("success_stories")}
+                </a>
               </li>
               {/* <li>
                 <a href="#">{t("stats_and_facts")}</a>
@@ -65,77 +147,149 @@ const FooterSite = () => {
 
           {/* Community & Free Tools */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">
+            <div
+              className="font-bold text-lg mb-4 uppercase"
+              style={{
+                background: "linear-gradient(90deg, #667eea, #764ba2)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               {t("community")}
             </div>
-            <ul className="space-y-1 text-sm text-neutral-400">
+            <ul className="space-y-2 text-sm">
               <li>
-                <a href="#">{t("blog")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("blog")}
+                </a>
               </li>
               <li>
-                <a href="#">{t("webinars")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("webinars")}
+                </a>
               </li>
             </ul>
-            <div className="font-bold text-lg mt-4 mb-2 uppercase">
+            <div
+              className="font-bold text-lg mt-6 mb-4 uppercase"
+              style={{
+                background: "linear-gradient(90deg, #667eea, #764ba2)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               {t("free_tools")}
             </div>
-            <ul className="space-y-1 text-sm text-neutral-400">
+            <ul className="space-y-2 text-sm">
               <li>
-                <a href="#">{t("top_websites")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("top_websites")}
+                </a>
               </li>
               <li>
-                <a href="#">{t("seo_tools")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("seo_tools")}
+                </a>
               </li>
               <li>
-                <a href="#">{t("seoquake")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("seoquake")}
+                </a>
               </li>
               <li>
-                <a href="#">{t("sensor")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("sensor")}
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* More Tools */}
-          {/* <div>
-            <div className="font-bold text-lg mb-2 uppercase">
-              {t("more_tools")}
-            </div>
-            <ul className="space-y-1 text-sm text-neutral-400">
-              <li>
-                <a href="#">{t("enterprise_seo")}</a>
-              </li>
-              <li>
-                <a href="#">{t("enterprise_crawler")}</a>
-              </li>
-              <li>
-                <a href="#">{t("insights24")}</a>
-              </li>
-              <li>
-                <a href="#">{t("mfour")}</a>
-              </li>
-              <li>
-                <a href="#">{t("prowly")}</a>
-              </li>
-              <li>
-                <a href="#">{t("app_center")}</a>
-              </li>
-              <li>
-                <a href="#">{t("agency_partners")}</a>
-              </li>
-              <li>
-                <a href="#">{t("splitsignal")}</a>
-              </li>
-            </ul>
-          </div> */}
-
           {/* Company */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">
+            <div
+              className="font-bold text-lg mb-4 uppercase"
+              style={{
+                background: "linear-gradient(90deg, #667eea, #764ba2)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               {t("company")}
             </div>
-            <ul className="space-y-1 text-sm text-neutral-400">
+            <ul className="space-y-2 text-sm">
               <li>
-                <a href="#">{t("about_us")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("about_us")}
+                </a>
               </li>
               {/* <li>
                 <a href="#">{t("newsroom")}</a>
@@ -150,88 +304,149 @@ const FooterSite = () => {
                 <a href="#">{t("legal_info")}</a>
               </li> */}
               <li>
-                <a href="#">{t("privacy_policy")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("privacy_policy")}
+                </a>
               </li>
               <li>
-                <a href="#">{t("cookie_settings")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("cookie_settings")}
+                </a>
               </li>
-              {/* <li>
-                <a href="#">{t("do_not_sell")}</a>
-              </li> */}
               <li>
-                <a href="#">{t("security_info")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("security_info")}
+                </a>
               </li>
-              {/* <li>
-                <a href="#">{t("investors")}</a>
-              </li> */}
-              {/* <li>
-                <a href="#">{t("semrush_select")}</a>
-              </li>
               <li>
-                <a href="#">{t("global_issues")}</a>
-              </li> */}
-              <li>
-                <a href="#">{t("contact_us")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("contact_us")}
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Follow Us & Language */}
-          {/* <div>
-            <div className="font-bold text-lg mb-2 uppercase">
-              {t("follow_us")}
-            </div>
-            <ul className="space-y-1 text-sm text-neutral-400">
-              <li>
-                <a href="#">X (Twitter)</a>
-              </li>
-              <li>
-                <a href="#">Facebook</a>
-              </li>
-              <li>
-                <a href="#">LinkedIn</a>
-              </li>
-              <li>
-                <a href="#">Instagram</a>
-              </li>
-              <li>
-                <a href="#">YouTube</a>
-              </li>
-              <li>
-                <a href="#">Pinterest</a>
-              </li>
-            </ul>
-            <div className="font-bold text-lg mt-4 mb-2 uppercase">
-              {t("language")}
-            </div>
-            <div className="text-sm text-neutral-400">English ▼</div>
-          </div> */}
-
           {/* Help */}
           <div>
-            <div className="font-bold text-lg mb-2 uppercase">{t("help")}</div>
-            <ul className="space-y-1 text-sm text-neutral-400">
+            <div
+              className="font-bold text-lg mb-4 uppercase"
+              style={{
+                background: "linear-gradient(90deg, #667eea, #764ba2)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              {t("help")}
+            </div>
+            <ul className="space-y-2 text-sm">
               <li>
-                <a href="#">{t("knowledge_base")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("knowledge_base")}
+                </a>
               </li>
               <li>
-                <a href="#">{t("academy")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("academy")}
+                </a>
               </li>
               <li>
-                <a href="#">{t("semrush_api")}</a>
+                <a
+                  href="#"
+                  className="transition-all duration-300 hover:translate-x-1 inline-block"
+                  style={{ color: "rgba(255, 255, 255, 0.6)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#f093fb")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")
+                  }
+                >
+                  {t("semrush_api")}
+                </a>
               </li>
             </ul>
           </div>
         </div>
 
         {/* Bottom: Logo & Copyright */}
-        <div className="flex flex-col md:flex-row justify-between items-center mt-8 gap-4">
-          <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="SEMRUSH Logo" className="h-6" />
-            <span className="font-bold text-lg">SEMRUSH</span>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div
+              className="font-bold text-2xl"
+              style={{
+                background: "linear-gradient(90deg, #f093fb, #f5576c)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              ✨ SEO BOOST
+            </div>
           </div>
-          <div className="text-sm text-neutral-500">
-            © 2008 - 2025 Semrush. {t("all_rights_reserved")}
+          <div
+            className="text-sm"
+            style={{ color: "rgba(255, 255, 255, 0.5)" }}
+          >
+            © 2008 - 2025 SEO Boost. {t("all_rights_reserved")}
           </div>
         </div>
       </div>

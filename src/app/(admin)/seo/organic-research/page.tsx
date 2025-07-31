@@ -18,6 +18,8 @@ import {
   Tabs,
   Form,
   message,
+  Alert,
+  Spin,
 } from "antd";
 import {
   SearchOutlined,
@@ -26,128 +28,85 @@ import {
   TrophyOutlined,
   RiseOutlined,
   FallOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { useSearchParams } from "next/navigation";
-import { seoService } from "@/services/seo.service";
+import { useOrganicResearch } from "@/stores/hooks/useOrganicResearch";
+import { OrganicKeyword, CompetitorDomain, TopPage } from "@/types/api.type";
 import styles from "./page.module.scss";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-interface OrganicKeyword {
-  keyword: string;
-  position: number;
-  previousPosition: number;
-  searchVolume: number;
-  trafficShare: number;
-  cpc: number;
-  difficulty: number;
-  intent: string;
-  url: string;
-  features: string[];
-}
-
-interface CompetitorData {
-  domain: string;
-  organicKeywords: number;
-  organicTraffic: number;
-  avgPosition: number;
-  visibility: number;
-}
-
-interface TopPage {
-  url: string;
-  keywords: number;
-  traffic: number;
-  trafficValue: number;
-  topKeyword: string;
-}
-
 const OrganicResearchPage: React.FC = () => {
   const searchParams = useSearchParams();
   const projectId = searchParams.get("projectId");
 
-  const [loading, setLoading] = useState(false);
+  // Redux hooks
+  const {
+    domainAnalysis,
+    organicKeywords,
+    competitors,
+    topPages,
+    loading,
+    keywordsLoading,
+    competitorsLoading,
+    topPagesLoading,
+    error,
+    currentDomain,
+    performDomainAnalysis,
+    getOrganicKeywords,
+    getCompetitors,
+    getTopPages,
+    clearErrors,
+  } = useOrganicResearch();
+
+  // Local state
   const [searchDomain, setSearchDomain] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("US");
   const [activeTab, setActiveTab] = useState("keywords");
-  const [keywordData, setKeywordData] = useState<OrganicKeyword[]>([]);
-  const [competitorData, setCompetitorData] = useState<CompetitorData[]>([]);
-  const [topPages, setTopPages] = useState<TopPage[]>([]);
-  const [domainOverview, setDomainOverview] = useState({
-    organicKeywords: 0,
-    organicTraffic: 0,
-    organicCost: 0,
-    avgPosition: 0,
-    visibility: 0,
-  });
 
-  // Fetch domain analysis from API
+  // Analyze domain with Redux
   const analyzeDomain = async (domain: string) => {
     if (!domain.trim()) {
       message.warning("Please enter a valid domain");
       return;
     }
 
-    setLoading(true);
     try {
-      // Domain overview API call
-      const overviewResponse = await seoService.analyzeDomain(
-        domain,
-        selectedCountry
-      );
-      setDomainOverview(overviewResponse);
+      // Clear previous errors
+      clearErrors();
 
-      // Organic keywords API call
-      const keywordsResponse = await seoService.getOrganicKeywords(domain, {
+      // Perform domain analysis
+      await performDomainAnalysis(domain, selectedCountry);
+
+      // Fetch keywords
+      await getOrganicKeywords(domain, {
         country: selectedCountry,
         limit: 100,
         sortBy: "traffic",
         sortOrder: "desc",
       });
-      setKeywordData(keywordsResponse);
 
-      // Competitors API call
-      const competitorsResponse = await seoService.getDomainCompetitors(
-        domain,
-        {
-          country: selectedCountry,
-          limit: 20,
-        }
-      );
-      setCompetitorData(competitorsResponse);
+      // Fetch competitors
+      await getCompetitors(domain, {
+        country: selectedCountry,
+        limit: 20,
+      });
 
-      // Top pages API call
-      const topPagesResponse = await seoService.getDomainTopPages(domain, {
+      // Fetch top pages
+      await getTopPages(domain, {
         country: selectedCountry,
         limit: 50,
         sortBy: "traffic",
       });
-      setTopPages(topPagesResponse);
 
       message.success(`Analysis completed for ${domain}`);
     } catch (error) {
       console.error("Error analyzing domain:", error);
       message.error("Failed to analyze domain. Please try again.");
-      // Keep empty arrays if API fails
-      setKeywordData([]);
-      setCompetitorData([]);
-      setTopPages([]);
-    } finally {
-      setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    if (projectId) {
-      // Auto-load data when project is selected
-      // This could be enhanced to remember last analyzed domain
-    }
-  }, [projectId]);
-
-  const handleSearch = () => {
-    analyzeDomain(searchDomain);
   };
 
   const getPositionChange = (current: number, previous: number) => {
@@ -167,6 +126,49 @@ const OrganicResearchPage: React.FC = () => {
       Transactional: "red",
     };
     return colors[intent as keyof typeof colors] || "default";
+  };
+
+  // Handle search button click
+  const handleSearch = () => {
+    analyzeDomain(searchDomain);
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    if (currentDomain) {
+      analyzeDomain(currentDomain);
+    }
+  };
+
+  // Auto-load data when project is selected
+  useEffect(() => {
+    if (projectId) {
+      // Auto-load data when project is selected
+      // This could be enhanced to remember last analyzed domain
+    }
+  }, [projectId]);
+
+  // Show error alert if there's an error
+  const renderErrorAlert = () => {
+    if (error) {
+      return (
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          closable
+          onClose={clearErrors}
+          style={{ marginBottom: 16 }}
+          action={
+            <Button size="small" onClick={handleRefresh}>
+              Retry
+            </Button>
+          }
+        />
+      );
+    }
+    return null;
   };
 
   const keywordColumns = [
@@ -354,6 +356,9 @@ const OrganicResearchPage: React.FC = () => {
         </Text>
       </div>
 
+      {/* Error Alert */}
+      {renderErrorAlert()}
+
       {/* Search Section */}
       <Card className={styles.searchCard}>
         <Form layout="inline" onFinish={handleSearch}>
@@ -389,6 +394,15 @@ const OrganicResearchPage: React.FC = () => {
             </Button>
           </Form.Item>
           <Form.Item>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={handleRefresh}
+              disabled={!currentDomain}
+            >
+              Refresh
+            </Button>
+          </Form.Item>
+          <Form.Item>
             <Button icon={<ExportOutlined />}>Export</Button>
           </Form.Item>
         </Form>
@@ -400,7 +414,7 @@ const OrganicResearchPage: React.FC = () => {
           <Card>
             <Statistic
               title="Organic Keywords"
-              value={domainOverview.organicKeywords}
+              value={domainAnalysis?.organicKeywords || 0}
               formatter={(value) => value?.toLocaleString()}
               prefix={<SearchOutlined />}
             />
@@ -410,7 +424,7 @@ const OrganicResearchPage: React.FC = () => {
           <Card>
             <Statistic
               title="Organic Traffic"
-              value={domainOverview.organicTraffic}
+              value={domainAnalysis?.organicTraffic || 0}
               formatter={(value) => value?.toLocaleString()}
               prefix={<TrophyOutlined />}
             />
@@ -420,7 +434,7 @@ const OrganicResearchPage: React.FC = () => {
           <Card>
             <Statistic
               title="Traffic Cost"
-              value={domainOverview.organicCost}
+              value={domainAnalysis?.organicCost || 0}
               formatter={(value) => `$${value?.toLocaleString()}`}
               prefix="$"
             />
@@ -430,7 +444,7 @@ const OrganicResearchPage: React.FC = () => {
           <Card>
             <Statistic
               title="Avg Position"
-              value={domainOverview.avgPosition}
+              value={domainAnalysis?.avgPosition || 0}
               precision={1}
               prefix={<InfoCircleOutlined />}
             />
@@ -440,7 +454,7 @@ const OrganicResearchPage: React.FC = () => {
           <Card>
             <Statistic
               title="Visibility"
-              value={domainOverview.visibility}
+              value={domainAnalysis?.visibility || 0}
               suffix="%"
               prefix={<TrophyOutlined />}
             />
@@ -452,45 +466,54 @@ const OrganicResearchPage: React.FC = () => {
       <Card className={styles.mainContent}>
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
           <TabPane tab="Organic Keywords" key="keywords">
-            <Table
-              dataSource={keywordData}
-              columns={keywordColumns}
-              loading={loading}
-              rowKey="keyword"
-              pagination={{
-                pageSize: 20,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                showTotal: (total) => `Total ${total} keywords`,
-              }}
-              scroll={{ x: 1200 }}
-            />
+            <Spin spinning={keywordsLoading}>
+              <Table
+                dataSource={organicKeywords?.data || []}
+                columns={keywordColumns}
+                loading={keywordsLoading}
+                rowKey="keyword"
+                pagination={{
+                  pageSize: 20,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  showTotal: (total) => `Total ${total} keywords`,
+                  total: organicKeywords?.total || 0,
+                }}
+                scroll={{ x: 1200 }}
+              />
+            </Spin>
           </TabPane>
 
           <TabPane tab="Competitors" key="competitors">
-            <Table
-              dataSource={competitorData}
-              columns={competitorColumns}
-              loading={loading}
-              rowKey="domain"
-              pagination={{
-                pageSize: 10,
-                showTotal: (total) => `Total ${total} competitors`,
-              }}
-            />
+            <Spin spinning={competitorsLoading}>
+              <Table
+                dataSource={competitors?.data || []}
+                columns={competitorColumns}
+                loading={competitorsLoading}
+                rowKey="domain"
+                pagination={{
+                  pageSize: 10,
+                  showTotal: (total) => `Total ${total} competitors`,
+                  total: competitors?.total || 0,
+                }}
+              />
+            </Spin>
           </TabPane>
 
           <TabPane tab="Top Pages" key="pages">
-            <Table
-              dataSource={topPages}
-              columns={topPagesColumns}
-              loading={loading}
-              rowKey="url"
-              pagination={{
-                pageSize: 20,
-                showTotal: (total) => `Total ${total} pages`,
-              }}
-            />
+            <Spin spinning={topPagesLoading}>
+              <Table
+                dataSource={topPages?.data || []}
+                columns={topPagesColumns}
+                loading={topPagesLoading}
+                rowKey="url"
+                pagination={{
+                  pageSize: 20,
+                  showTotal: (total) => `Total ${total} pages`,
+                  total: topPages?.total || 0,
+                }}
+              />
+            </Spin>
           </TabPane>
         </Tabs>
       </Card>

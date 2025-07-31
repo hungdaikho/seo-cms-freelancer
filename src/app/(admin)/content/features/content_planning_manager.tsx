@@ -722,7 +722,7 @@ const ContentPlanningManager: React.FC = () => {
                 <p style={{ color: "#666", marginBottom: "16px" }}>
                   No projects available. Please create a project first.
                 </p>
-                <Button type="primary" href="/admin/projects">
+                <Button type="primary" href="/projects">
                   Go to Projects
                 </Button>
               </div>

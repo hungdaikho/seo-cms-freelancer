@@ -14,7 +14,9 @@ const Enterprise = ({}: Props) => {
           <div className={styles.logo}>
             <img src="/enterprise-logo.svg" alt="" />
           </div>
-          <div className={styles.title}>{t("enterprise_title")}</div>
+          <div className={styles.title}>
+            {t("enterprise_title")} <span>Enterprise</span>
+          </div>
           <div className={styles.btn}>
             <Button>{t("enterprise-btn")}</Button>
           </div>
@@ -36,7 +38,7 @@ const Enterprise = ({}: Props) => {
             <span className={styles.icon}>
               <GoDotFill />
             </span>
-            <span className={styles.text}>{t("enterprise-2")}</span>
+            <span className={styles.text}>{t("enterprise-3")}</span>
           </div>
         </div>
       </div>

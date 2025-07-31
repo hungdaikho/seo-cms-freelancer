@@ -27,6 +27,8 @@ import OrganicResearchPage from "./organic-research/page";
 import DomainOverviewPage from "./domain-overview/page";
 import TopicResearchPage from "./topic-research/page";
 import styles from "./page.module.scss";
+import PositionTracking from "./features/position-tracking";
+import OrganicResearchWidget from "./features/organic-research-widget";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -100,7 +102,9 @@ const SeoPage: React.FC = () => {
                   Position Tracking
                 </span>
               ),
-              children: <PositionTrackingManager />,
+              children: (
+                <PositionTracking selectedProjectId={selectedProject} />
+              ),
             },
             {
               key: "organic-research",
@@ -110,7 +114,9 @@ const SeoPage: React.FC = () => {
                   Organic Research
                 </span>
               ),
-              children: <OrganicResearchPage />,
+              children: (
+                <OrganicResearchWidget selectedProjectId={selectedProject} />
+              ),
             },
             {
               key: "audit",

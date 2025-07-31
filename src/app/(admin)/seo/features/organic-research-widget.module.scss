@@ -1,0 +1,102 @@
+.organicResearchWidget {
+  .header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    .domainSelector,
+    .countrySelector {
+      flex: 1;
+
+      > span {
+        display: block;
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  .metricsRow {
+    margin-bottom: 16px;
+
+    .metricCard {
+      text-align: center;
+      padding: 8px 4px;
+      border: 1px solid #f0f0f0;
+      border-radius: 4px;
+      background: #fafafa;
+
+      .metricValue {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1890ff;
+        line-height: 1.2;
+      }
+
+      .metricLabel {
+        font-size: 11px;
+        color: #666;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+
+  .positionCard {
+    text-align: center;
+    padding: 12px;
+    background: linear-gradient(135deg, #1890ff 0%, #722ed1 100%);
+    border-radius: 8px;
+    color: white;
+    margin-bottom: 12px;
+
+    .positionValue {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .positionLabel {
+      font-size: 12px;
+      opacity: 0.9;
+      margin: 4px 0;
+    }
+
+    .positionTrend {
+      margin-top: 8px;
+    }
+  }
+
+  .lastUpdated {
+    text-align: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .cardFooter {
+    text-align: center;
+    padding-top: 8px;
+
+    button {
+      padding: 0;
+      height: auto;
+      font-size: 13px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .organicResearchWidget {
+    .header {
+      flex-direction: column;
+    }
+
+    .metricsRow {
+      .metricCard {
+        margin-bottom: 8px;
+      }
+    }
+  }
+}
