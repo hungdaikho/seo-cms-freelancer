@@ -22,9 +22,7 @@ const HeaderSite = () => {
   const [authModalTab, setAuthModalTab] = useState<"login" | "signup">("login");
   return (
     <header className={styles.headerSite}>
-      <div className={styles.logo}>
-        <Image src="/next.svg" alt="Logo" width={120} height={32} priority />
-      </div>
+      <div className={styles.logo}>SEO BOOST</div>
       <nav className={styles.navMenu}>
         <ul className={styles.menu}>
           {menu.map((item) => (
