@@ -90,7 +90,7 @@ const DomainOverviewPage: React.FC = () => {
   });
 
   const [topKeywords, setTopKeywords] = useState<TopKeyword[]>([]);
-  const [competitors, setCompetitors] = useState<Competitor[]>([]);
+  const [competitors, setCompetitors] = useState<Competitor[] | any>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
 
   // Analyze domain function
