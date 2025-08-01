@@ -27,7 +27,6 @@ const CopilotAI = (props: Props) => {
     getTechnicalAudit,
     getAIRecommendations,
   } = useCopilotAI();
-
   const handleProjectChange = (projectId: string) => {
     const selectedProject = projects.find((p) => p.id === projectId);
     if (selectedProject) {
@@ -117,7 +116,9 @@ const CopilotAI = (props: Props) => {
           <div className={styles.content}>
             <div className={styles.contentLeft}>
               <div className={styles.title}>Competitor Rankings</div>
-              <div className={styles.domain}>vanhungtran.com</div>
+              <div className={styles.domain}>
+                {currentProject?.domain || "vanhungtran.com"}
+              </div>
             </div>
             <div className={styles.contentCenter}>
               {loading ? (
@@ -125,11 +126,52 @@ const CopilotAI = (props: Props) => {
               ) : error ? (
                 <p style={{ color: "red" }}>{error}</p>
               ) : competitorRankings ? (
-                <pre
-                  style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-                >
-                  {JSON.stringify(competitorRankings, null, 2)}
-                </pre>
+                <div>
+                  {competitorRankings.opportunities?.length > 0 ? (
+                    <div>
+                      <h4>Opportunities:</h4>
+                      <ul>
+                        {competitorRankings.opportunities.map(
+                          (item: string, index: number) => (
+                            <li key={index}>{item}</li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  ) : null}
+
+                  {competitorRankings.strengths?.length > 0 ? (
+                    <div>
+                      <h4>Strengths:</h4>
+                      <ul>
+                        {competitorRankings.strengths.map(
+                          (item: string, index: number) => (
+                            <li key={index}>{item}</li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  ) : null}
+
+                  {competitorRankings.weaknesses?.length > 0 ? (
+                    <div>
+                      <h4>Weaknesses:</h4>
+                      <ul>
+                        {competitorRankings.weaknesses.map(
+                          (item: string, index: number) => (
+                            <li key={index}>{item}</li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  ) : null}
+
+                  {!competitorRankings.opportunities?.length &&
+                    !competitorRankings.strengths?.length &&
+                    !competitorRankings.weaknesses?.length && (
+                      <p>No competitor ranking data available at the moment.</p>
+                    )}
+                </div>
               ) : (
                 <p>No competitor data.</p>
               )}
@@ -149,7 +191,9 @@ const CopilotAI = (props: Props) => {
           <div className={styles.content}>
             <div className={styles.contentLeft}>
               <div className={styles.title}>Technical Audit</div>
-              <div className={styles.domain}>vanhungtran.com</div>
+              <div className={styles.domain}>
+                {currentProject?.domain || "vanhungtran.com"}
+              </div>
             </div>
             <div className={styles.contentCenter}>
               {loading ? (
@@ -157,11 +201,146 @@ const CopilotAI = (props: Props) => {
               ) : error ? (
                 <p style={{ color: "red" }}>{error}</p>
               ) : technicalAudit ? (
-                <pre
-                  style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-                >
-                  {JSON.stringify(technicalAudit, null, 2)}
-                </pre>
+                <div>
+                  {technicalAudit.overallScore && (
+                    <div style={{ marginBottom: "16px" }}>
+                      <h4>
+                        Overall Score:{" "}
+                        <span
+                          style={{
+                            color:
+                              technicalAudit.overallScore >= 70
+                                ? "#52c41a"
+                                : technicalAudit.overallScore >= 50
+                                ? "#faad14"
+                                : "#f5222d",
+                          }}
+                        >
+                          {technicalAudit.overallScore}/100
+                        </span>
+                      </h4>
+                    </div>
+                  )}
+
+                  {technicalAudit.issues?.length > 0 ? (
+                    <div style={{ marginBottom: "12px" }}>
+                      <h4>Issues Found:</h4>
+                      <div>
+                        {technicalAudit.issues.map(
+                          (issue: any, index: number) => (
+                            <div
+                              key={index}
+                              style={{
+                                marginBottom: "8px",
+                                padding: "8px",
+                                backgroundColor: "#fff2f0",
+                                borderLeft: "3px solid #f5222d",
+                                borderRadius: "4px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  fontWeight: "500",
+                                  color: "#f5222d",
+                                  marginBottom: "4px",
+                                }}
+                              >
+                                {typeof issue === "string"
+                                  ? issue
+                                  : issue.category ||
+                                    issue.issue ||
+                                    "Technical Issue"}
+                              </div>
+                              {issue.severity_level && (
+                                <div
+                                  style={{
+                                    fontSize: "12px",
+                                    color: "#666",
+                                    marginBottom: "2px",
+                                  }}
+                                >
+                                  Severity:{" "}
+                                  <span style={{ fontWeight: "500" }}>
+                                    {issue.severity_level}
+                                  </span>
+                                </div>
+                              )}
+                              {issue.impact_on_seo && (
+                                <div
+                                  style={{
+                                    fontSize: "12px",
+                                    color: "#666",
+                                    marginBottom: "2px",
+                                  }}
+                                >
+                                  SEO Impact: {issue.impact_on_seo}
+                                </div>
+                              )}
+                              {issue.recommendations && (
+                                <div
+                                  style={{ fontSize: "12px", color: "#1890ff" }}
+                                >
+                                  Recommendation: {issue.recommendations}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {technicalAudit.recommendations?.length > 0 ? (
+                    <div style={{ marginBottom: "12px" }}>
+                      <h4>Recommendations:</h4>
+                      <ul>
+                        {technicalAudit.recommendations.map(
+                          (rec: any, index: number) => (
+                            <li
+                              key={index}
+                              style={{ color: "#1890ff", marginBottom: "4px" }}
+                            >
+                              {typeof rec === "string"
+                                ? rec
+                                : rec.recommendation ||
+                                  rec.description ||
+                                  JSON.stringify(rec)}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  ) : null}
+
+                  {technicalAudit.technicalIssues?.length > 0 ? (
+                    <div>
+                      <h4>Technical Issues:</h4>
+                      <ul>
+                        {technicalAudit.technicalIssues.map(
+                          (issue: any, index: number) => (
+                            <li
+                              key={index}
+                              style={{ color: "#fa8c16", marginBottom: "4px" }}
+                            >
+                              {typeof issue === "string"
+                                ? issue
+                                : issue.issue ||
+                                  issue.description ||
+                                  JSON.stringify(issue)}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  ) : null}
+
+                  {!technicalAudit.issues?.length &&
+                    !technicalAudit.recommendations?.length &&
+                    !technicalAudit.technicalIssues?.length &&
+                    !technicalAudit.overallScore && (
+                      <p>No technical audit data available at the moment.</p>
+                    )}
+                </div>
               ) : (
                 <p>No audit data.</p>
               )}
@@ -181,7 +360,9 @@ const CopilotAI = (props: Props) => {
           <div className={styles.content}>
             <div className={styles.contentLeft}>
               <div className={styles.title}>AI Recommendations</div>
-              <div className={styles.domain}>vanhungtran.com</div>
+              <div className={styles.domain}>
+                {currentProject?.domain || "vanhungtran.com"}
+              </div>
             </div>
             <div className={styles.contentCenter}>
               {loading ? (
@@ -189,11 +370,275 @@ const CopilotAI = (props: Props) => {
               ) : error ? (
                 <p style={{ color: "red" }}>{error}</p>
               ) : aiRecommendations ? (
-                <pre
-                  style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-                >
-                  {JSON.stringify(aiRecommendations, null, 2)}
-                </pre>
+                <div>
+                  {/* Render recommendations in a clean, compact format */}
+                  {aiRecommendations.internalLinkSuggestions && (
+                    <div style={{ marginBottom: "16px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <span style={{ fontSize: "16px" }}>🔗</span>
+                        <strong style={{ color: "#1890ff" }}>
+                          Internal Link Suggestions
+                        </strong>
+                        <span
+                          style={{
+                            fontSize: "10px",
+                            backgroundColor:
+                              aiRecommendations.internalLinkSuggestions
+                                .implementation_priority === "High"
+                                ? "#ff4d4f"
+                                : aiRecommendations.internalLinkSuggestions
+                                    .implementation_priority === "Medium"
+                                ? "#faad14"
+                                : "#52c41a",
+                            color: "white",
+                            padding: "2px 6px",
+                            borderRadius: "10px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {
+                            aiRecommendations.internalLinkSuggestions
+                              .implementation_priority
+                          }
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          lineHeight: "1.4",
+                          color: "#666",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        {
+                          aiRecommendations.internalLinkSuggestions
+                            .recommended_improvements
+                        }
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#999",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        Impact:{" "}
+                        {
+                          aiRecommendations.internalLinkSuggestions
+                            .expected_impact
+                        }
+                      </div>
+                    </div>
+                  )}
+
+                  {aiRecommendations.keywordDensity && (
+                    <div style={{ marginBottom: "16px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <span style={{ fontSize: "16px" }}>🎯</span>
+                        <strong style={{ color: "#1890ff" }}>
+                          Keyword Density
+                        </strong>
+                        <span
+                          style={{
+                            fontSize: "10px",
+                            backgroundColor:
+                              aiRecommendations.keywordDensity
+                                .implementation_priority === "High"
+                                ? "#ff4d4f"
+                                : aiRecommendations.keywordDensity
+                                    .implementation_priority === "Medium"
+                                ? "#faad14"
+                                : "#52c41a",
+                            color: "white",
+                            padding: "2px 6px",
+                            borderRadius: "10px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {
+                            aiRecommendations.keywordDensity
+                              .implementation_priority
+                          }
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          lineHeight: "1.4",
+                          color: "#666",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        {
+                          aiRecommendations.keywordDensity
+                            .recommended_improvements
+                        }
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#999",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        Impact:{" "}
+                        {aiRecommendations.keywordDensity.expected_impact}
+                      </div>
+                    </div>
+                  )}
+
+                  {aiRecommendations.readabilityIssues && (
+                    <div style={{ marginBottom: "16px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <span style={{ fontSize: "16px" }}>📖</span>
+                        <strong style={{ color: "#1890ff" }}>
+                          Readability
+                        </strong>
+                        <span
+                          style={{
+                            fontSize: "10px",
+                            backgroundColor:
+                              aiRecommendations.readabilityIssues
+                                .implementation_priority === "High"
+                                ? "#ff4d4f"
+                                : aiRecommendations.readabilityIssues
+                                    .implementation_priority === "Medium"
+                                ? "#faad14"
+                                : "#52c41a",
+                            color: "white",
+                            padding: "2px 6px",
+                            borderRadius: "10px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {
+                            aiRecommendations.readabilityIssues
+                              .implementation_priority
+                          }
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          lineHeight: "1.4",
+                          color: "#666",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        {
+                          aiRecommendations.readabilityIssues
+                            .recommended_improvements
+                        }
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#999",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        Impact:{" "}
+                        {aiRecommendations.readabilityIssues.expected_impact}
+                      </div>
+                    </div>
+                  )}
+
+                  {aiRecommendations.structureImprovements && (
+                    <div style={{ marginBottom: "16px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <span style={{ fontSize: "16px" }}>🏗️</span>
+                        <strong style={{ color: "#1890ff" }}>
+                          Content Structure
+                        </strong>
+                        <span
+                          style={{
+                            fontSize: "10px",
+                            backgroundColor:
+                              aiRecommendations.structureImprovements
+                                .implementation_priority === "High"
+                                ? "#ff4d4f"
+                                : aiRecommendations.structureImprovements
+                                    .implementation_priority === "Medium"
+                                ? "#faad14"
+                                : "#52c41a",
+                            color: "white",
+                            padding: "2px 6px",
+                            borderRadius: "10px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {
+                            aiRecommendations.structureImprovements
+                              .implementation_priority
+                          }
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          lineHeight: "1.4",
+                          color: "#666",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        {
+                          aiRecommendations.structureImprovements
+                            .recommended_improvements
+                        }
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#999",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        Impact:{" "}
+                        {
+                          aiRecommendations.structureImprovements
+                            .expected_impact
+                        }
+                      </div>
+                    </div>
+                  )}
+
+                  {!aiRecommendations.internalLinkSuggestions &&
+                    !aiRecommendations.keywordDensity &&
+                    !aiRecommendations.readabilityIssues &&
+                    !aiRecommendations.structureImprovements && (
+                      <p style={{ color: "#999", fontStyle: "italic" }}>
+                        No AI recommendations available at the moment.
+                      </p>
+                    )}
+                </div>
               ) : (
                 <p>No AI recommendations available.</p>
               )}

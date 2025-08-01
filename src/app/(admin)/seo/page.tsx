@@ -136,7 +136,9 @@ const SeoPage: React.FC = () => {
                   Keyword Magic Tool
                 </span>
               ),
-              children: <KeywordMagicTool />,
+              children: (
+                <KeywordMagicTool selectedProjectId={selectedProject} />
+              ),
             },
             {
               key: "domain-overview",

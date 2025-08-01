@@ -1181,7 +1181,7 @@ export class SeoService extends BaseService {
    * AI keyword suggestions
    */
   aiKeywordSuggestions(data: { seedKeyword: string; industry?: string; location?: string }): Promise<any[]> {
-    return this.post<any[]>("/ai/seo/keyword-suggestions", data);
+    return this.post<any[]>("/api/v1/ai/seo/keyword-suggestions", data);
   }
 
   /**

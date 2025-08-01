@@ -20,6 +20,7 @@ import {
   Checkbox,
   Tooltip,
   Alert,
+  message,
 } from "antd";
 import {
   SearchOutlined,
@@ -37,19 +38,21 @@ import {
 } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { RootState } from "@/stores/store";
+import { useOrganicResearch } from "@/stores/hooks/useOrganicResearch";
+import { useKeyword } from "@/stores/hooks/useKeyword";
+import { useKeywordMagic } from "@/stores/hooks/useKeywordMagic";
+import { seoService } from "@/services/seo.service";
+import { OrganicKeyword, OrganicKeywordsParams } from "@/types/api.type";
 import styles from "./keyword_magic_tool.module.scss";
 
 const { Option } = Select;
 const { Search } = Input;
 
-interface KeywordData {
+// Enhanced interface for keyword data that extends OrganicKeyword
+interface KeywordData extends OrganicKeyword {
   id: string;
-  keyword: string;
-  searchVolume: number;
-  keywordDifficulty: number;
-  cpc: number;
+  keywordDifficulty: number; // alias for difficulty
   competitiveDensity: number;
-  intent: "Informational" | "Commercial" | "Navigational" | "Transactional";
   trend: number[];
   results: number;
   serp: {
@@ -69,151 +72,259 @@ interface KeywordCluster {
   avgDifficulty: number;
 }
 
-const KeywordMagicTool: React.FC = () => {
-  const selectedProject = useSelector(
-    (state: RootState) => state.project.currentProject
-  );
+interface KeywordMagicFilters {
+  volumeRange: [number, number];
+  difficultyRange: [number, number];
+  intent: string[];
+  serpFeatures: string[];
+  country: string;
+  searchEngine: string;
+}
+
+interface KeywordMagicToolProps {
+  selectedProjectId?: string;
+}
+
+const KeywordMagicTool: React.FC<KeywordMagicToolProps> = ({
+  selectedProjectId,
+}) => {
+  const { projects } = useSelector((state: RootState) => state.project);
+
+  // Find the selected project from projects array
+  const selectedProject = selectedProjectId
+    ? projects.find((p) => p.id === selectedProjectId)
+    : useSelector((state: RootState) => state.project.currentProject);
+
+  // Use existing hooks
+  const {
+    organicKeywords,
+    loading: organicLoading,
+    error: organicError,
+    getOrganicKeywords,
+  } = useOrganicResearch();
+
+  const { bulkAddKeywords } = useKeyword();
+
+  const {
+    suggestions: magicSuggestions,
+    loading: magicLoading,
+    searchKeywords: searchMagicKeywords,
+    getRelatedTopics,
+    getTopicQuestions,
+  } = useKeywordMagic();
+
+  // Component state
   const [keywords, setKeywords] = useState<KeywordData[]>([]);
   const [clusters, setClusters] = useState<KeywordCluster[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all-keywords");
-  const [filters, setFilters] = useState({
-    volumeRange: [100, 100000] as [number, number],
-    difficultyRange: [0, 100] as [number, number],
-    intent: [] as string[],
-    serpFeatures: [] as string[],
+  const [filters, setFilters] = useState<KeywordMagicFilters>({
+    volumeRange: [100, 100000],
+    difficultyRange: [0, 100],
+    intent: [],
+    serpFeatures: [],
+    country: "US",
+    searchEngine: "google",
   });
   const [favorites, setFavorites] = useState<string[]>([]);
   const [showExportModal, setShowExportModal] = useState(false);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
 
-  // Mock data for keyword research
-  const mockKeywords: KeywordData[] = [
-    {
-      id: "1",
-      keyword: "seo tools",
-      searchVolume: 22000,
-      keywordDifficulty: 68,
-      cpc: 4.25,
-      competitiveDensity: 0.87,
-      intent: "Commercial",
-      trend: [15000, 18000, 20000, 22000, 24000, 22000],
-      results: 125000000,
+  // Transform OrganicKeyword to KeywordData
+  const transformOrganicKeyword = (
+    organic: OrganicKeyword,
+    index: number
+  ): KeywordData => {
+    return {
+      ...organic,
+      id: `keyword-${index}`,
+      keywordDifficulty: organic.difficulty,
+      competitiveDensity: Math.random() * 1, // Mock for now
+      trend: generateMockTrend(organic.searchVolume),
+      results: Math.floor(Math.random() * 100000000) + 1000000,
       serp: {
-        features: ["Featured Snippet", "People Also Ask", "Shopping Results"],
-        position: 3,
+        features: organic.features,
+        position: organic.position > 0 ? organic.position : undefined,
       },
-      relatedKeywords: ["best seo tools", "free seo tools", "seo software"],
-      questions: ["What are the best seo tools?", "How to use seo tools?"],
-      isFavorite: false,
-      volumeTrend: "up",
-    },
-    {
-      id: "2",
-      keyword: "keyword research",
-      searchVolume: 14500,
-      keywordDifficulty: 72,
-      cpc: 3.8,
-      competitiveDensity: 0.65,
-      intent: "Informational",
-      trend: [12000, 13000, 14000, 14500, 15000, 14500],
-      results: 89000000,
-      serp: {
-        features: ["Video Results", "Related Searches"],
-      },
-      relatedKeywords: ["keyword research tool", "how to do keyword research"],
-      questions: ["How to do keyword research?", "What is keyword research?"],
-      isFavorite: true,
-      volumeTrend: "stable",
-    },
-    {
-      id: "3",
-      keyword: "backlink checker",
-      searchVolume: 8900,
-      keywordDifficulty: 58,
-      cpc: 5.1,
-      competitiveDensity: 0.54,
-      intent: "Commercial",
-      trend: [7000, 7500, 8000, 8500, 9000, 8900],
-      results: 45000000,
-      serp: {
-        features: ["Reviews", "Knowledge Panel"],
-      },
-      relatedKeywords: ["free backlink checker", "backlink analysis tool"],
+      relatedKeywords: [
+        `related ${organic.keyword}`,
+        `${organic.keyword} tool`,
+      ],
       questions: [
-        "How to check backlinks?",
-        "What is a good backlink checker?",
+        `What is ${organic.keyword}?`,
+        `How to use ${organic.keyword}?`,
       ],
       isFavorite: false,
-      volumeTrend: "up",
-    },
-    {
-      id: "4",
-      keyword: "rank tracker",
-      searchVolume: 6700,
-      keywordDifficulty: 45,
-      cpc: 4.65,
-      competitiveDensity: 0.42,
-      intent: "Commercial",
-      trend: [6000, 6200, 6500, 6700, 6800, 6700],
-      results: 32000000,
+      volumeTrend:
+        organic.position < organic.previousPosition
+          ? "up"
+          : organic.position > organic.previousPosition
+          ? "down"
+          : "stable",
+    };
+  };
+
+  // Transform AI suggestion to KeywordData
+  const transformAiSuggestion = (
+    aiSuggestion: any,
+    index: number
+  ): KeywordData => {
+    return {
+      id: `ai-keyword-${index}`,
+      keyword: aiSuggestion.keyword,
+      searchVolume: aiSuggestion.searchVolume || 0,
+      difficulty: aiSuggestion.difficulty || 0,
+      keywordDifficulty: aiSuggestion.difficulty || 0,
+      cpc: 0, // AI suggestions typically don't have CPC data
+      intent: aiSuggestion.intent || "Informational",
+      position: 0,
+      previousPosition: 0,
+      url: "",
+      trafficShare: 0,
+      features: [],
+      competitiveDensity: Math.random() * 1,
+      trend: generateMockTrend(aiSuggestion.searchVolume || 100),
+      results: Math.floor(Math.random() * 100000000) + 1000000,
       serp: {
-        features: ["Local Pack"],
+        features: [],
+        position: undefined,
       },
-      relatedKeywords: ["google rank tracker", "keyword rank tracker"],
+      relatedKeywords: [
+        `related ${aiSuggestion.keyword}`,
+        `${aiSuggestion.keyword} tips`,
+      ],
       questions: [
-        "How to track keyword rankings?",
-        "Best rank tracking tools?",
+        `What is ${aiSuggestion.keyword}?`,
+        `How to use ${aiSuggestion.keyword}?`,
       ],
       isFavorite: false,
-      volumeTrend: "stable",
-    },
-  ];
+      volumeTrend: "stable" as const,
+    };
+  };
 
-  const mockClusters: KeywordCluster[] = [
-    {
-      name: "SEO Tools",
-      keywords: mockKeywords.filter(
-        (k) => k.keyword.includes("seo") || k.keyword.includes("tools")
-      ),
-      totalVolume: 30900,
-      avgDifficulty: 63,
-    },
-    {
-      name: "Keyword Research",
-      keywords: mockKeywords.filter((k) => k.keyword.includes("keyword")),
-      totalVolume: 21200,
-      avgDifficulty: 58,
-    },
-    {
-      name: "Link Analysis",
-      keywords: mockKeywords.filter((k) => k.keyword.includes("backlink")),
-      totalVolume: 8900,
-      avgDifficulty: 58,
-    },
-  ];
-
-  useEffect(() => {
-    if (selectedProject) {
-      setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setKeywords(mockKeywords);
-        setClusters(mockClusters);
-        setLoading(false);
-      }, 1000);
+  // Generate mock trend data
+  const generateMockTrend = (volume: number): number[] => {
+    const trend = [];
+    let current = volume;
+    for (let i = 0; i < 6; i++) {
+      current = current + (Math.random() - 0.5) * volume * 0.2;
+      trend.push(Math.max(0, Math.floor(current)));
     }
-  }, [selectedProject]);
+    return trend;
+  };
+
+  // Load organic keywords when component mounts or project changes
+  useEffect(() => {
+    if (selectedProject && searchTerm) {
+      loadKeywordsData();
+    }
+  }, [selectedProject, searchTerm, selectedProjectId]);
+
+  // Handle organic research errors
+  useEffect(() => {
+    if (organicError) {
+      message.error(`Failed to load organic data: ${organicError}`);
+    }
+  }, [organicError]);
+  // Update keywords when organic data or AI suggestions change
+  useEffect(() => {
+    let allKeywords: KeywordData[] = [];
+    // Add AI suggestions
+    if (aiSuggestions?.length > 0) {
+      const transformedAiKeywords = aiSuggestions.map(transformAiSuggestion);
+      allKeywords = [...allKeywords, ...transformedAiKeywords];
+    }
+    setKeywords(allKeywords);
+    generateClusters(allKeywords);
+  }, [organicKeywords, aiSuggestions]);
+
+  const loadKeywordsData = async () => {
+    if (!searchTerm.trim()) return;
+
+    setLoading(true);
+    try {
+      // Use domain from search term or selected project
+      const domain = searchTerm.includes(".")
+        ? searchTerm
+        : selectedProject?.domain || "example.com";
+
+      const params: OrganicKeywordsParams = {
+        country: filters.country,
+        limit: 100,
+        sortBy: "volume",
+        sortOrder: "desc",
+      };
+
+      await getOrganicKeywords(domain, params);
+
+      // Also get AI suggestions if available
+      if (searchTerm && !searchTerm.includes(".")) {
+        try {
+          console.log("🔍 Searching AI suggestions for:", searchTerm);
+          const suggestions = await searchMagicKeywords(searchTerm, {
+            country: filters.country,
+            searchEngine: filters.searchEngine,
+          });
+          console.log("🤖 AI suggestions received:", suggestions);
+          setAiSuggestions(suggestions || []);
+        } catch (error) {
+          console.warn("AI suggestions not available:", error);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load keywords:", error);
+      message.error("Failed to load keyword data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (value: string) => {
-    if (!value.trim()) return;
-    setLoading(true);
-    // Simulate API search
-    setTimeout(() => {
-      setKeywords(mockKeywords);
-      setLoading(false);
-    }, 1000);
+    if (!value.trim()) {
+      message.warning("Please enter a keyword or domain");
+      return;
+    }
+    setSearchTerm(value);
+  };
+
+  const generateClusters = (keywordList: KeywordData[]) => {
+    // Simple clustering logic based on common words
+    const clusterMap = new Map<string, KeywordData[]>();
+
+    keywordList.forEach((keyword) => {
+      const words = keyword.keyword.toLowerCase().split(" ");
+      let clusterKey = "other";
+
+      // Find the most relevant cluster
+      for (const word of words) {
+        if (word.length > 3) {
+          // Only use meaningful words
+          clusterKey = word;
+          break;
+        }
+      }
+
+      if (!clusterMap.has(clusterKey)) {
+        clusterMap.set(clusterKey, []);
+      }
+      clusterMap.get(clusterKey)!.push(keyword);
+    });
+
+    const newClusters: KeywordCluster[] = Array.from(clusterMap.entries())
+      .filter(([, keywords]) => keywords.length > 1) // Only clusters with multiple keywords
+      .map(([name, keywords]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        keywords,
+        totalVolume: keywords.reduce((sum, k) => sum + k.searchVolume, 0),
+        avgDifficulty:
+          keywords.reduce((sum, k) => sum + k.keywordDifficulty, 0) /
+          keywords.length,
+      }))
+      .sort((a, b) => b.totalVolume - a.totalVolume);
+
+    setClusters(newClusters);
   };
 
   const toggleFavorite = (keywordId: string) => {
@@ -228,6 +339,97 @@ const KeywordMagicTool: React.FC = () => {
         k.id === keywordId ? { ...k, isFavorite: !k.isFavorite } : k
       )
     );
+  };
+
+  const handleAddToProject = async (keyword: KeywordData) => {
+    if (!selectedProject) {
+      message.error("Please select a project first");
+      return;
+    }
+
+    try {
+      const keywordData = {
+        keyword: keyword.keyword,
+        searchVolume: keyword.searchVolume,
+        difficulty: keyword.keywordDifficulty,
+        cpc: keyword.cpc,
+        targetUrl: "", // User can set this later
+      };
+
+      await bulkAddKeywords(selectedProject.id, { keywords: [keywordData] });
+      message.success(`"${keyword.keyword}" added to project`);
+    } catch (error) {
+      console.error("Failed to add keyword:", error);
+      message.error("Failed to add keyword to project");
+    }
+  };
+
+  const handleBulkAddToProject = async () => {
+    if (!selectedProject) {
+      message.error("Please select a project first");
+      return;
+    }
+
+    if (selectedKeywords.length === 0) {
+      message.error("Please select keywords to add");
+      return;
+    }
+
+    try {
+      const keywordsData = keywords
+        .filter((k) => selectedKeywords.includes(k.id))
+        .map((keyword) => ({
+          keyword: keyword.keyword,
+          searchVolume: keyword.searchVolume,
+          difficulty: keyword.keywordDifficulty,
+          cpc: keyword.cpc,
+          targetUrl: "",
+        }));
+
+      await bulkAddKeywords(selectedProject.id, { keywords: keywordsData });
+      message.success(`${keywordsData.length} keywords added to project`);
+      setSelectedKeywords([]);
+    } catch (error) {
+      console.error("Failed to bulk add keywords:", error);
+      message.error("Failed to add keywords to project");
+    }
+  };
+
+  const handleExportKeywords = () => {
+    const exportData = keywords
+      .filter((k) => selectedKeywords.includes(k.id))
+      .map((k) => ({
+        keyword: k.keyword,
+        volume: k.searchVolume,
+        difficulty: k.keywordDifficulty,
+        cpc: k.cpc,
+        intent: k.intent,
+        position: k.position,
+      }));
+
+    const csvContent = [
+      ["Keyword", "Volume", "Difficulty", "CPC", "Intent", "Position"],
+      ...exportData.map((k) => [
+        k.keyword,
+        k.volume,
+        k.difficulty,
+        k.cpc,
+        k.intent,
+        k.position || "",
+      ]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `keywords-${Date.now()}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    setShowExportModal(false);
   };
 
   const getIntentColor = (intent: string) => {
@@ -261,9 +463,26 @@ const KeywordMagicTool: React.FC = () => {
       keyword.keywordDifficulty <= filters.difficultyRange[1];
     const matchesIntent =
       filters.intent.length === 0 || filters.intent.includes(keyword.intent);
+    const matchesSerp =
+      filters.serpFeatures.length === 0 ||
+      filters.serpFeatures.some((feature) =>
+        keyword.serp.features.includes(feature)
+      );
 
-    return matchesVolume && matchesDifficulty && matchesIntent;
+    return matchesVolume && matchesDifficulty && matchesIntent && matchesSerp;
   });
+
+  const handleCountryChange = (country: string) => {
+    setFilters((prev) => ({ ...prev, country }));
+    if (searchTerm) {
+      // Reload data with new country
+      loadKeywordsData();
+    }
+  };
+
+  const handleSearchEngineChange = (searchEngine: string) => {
+    setFilters((prev) => ({ ...prev, searchEngine }));
+  };
 
   const keywordColumns = [
     {
@@ -295,6 +514,13 @@ const KeywordMagicTool: React.FC = () => {
         <div className={styles.keywordCell}>
           <div className={styles.keywordText}>{text}</div>
           <div className={styles.keywordMeta}>
+            {/* Show AI badge for AI-generated keywords */}
+            {record.id.startsWith("ai-keyword-") && (
+              <Tag color="purple" style={{ marginRight: 4 }}>
+                <BulbOutlined style={{ marginRight: 2 }} />
+                AI
+              </Tag>
+            )}
             {record.serp.position && (
               <Tag color="blue">#{record.serp.position}</Tag>
             )}
@@ -431,9 +657,31 @@ const KeywordMagicTool: React.FC = () => {
         <Dropdown
           menu={{
             items: [
-              { key: "1", label: "View SERP", icon: <SearchOutlined /> },
-              { key: "2", label: "Add to List", icon: <PlusOutlined /> },
-              { key: "3", label: "Export Data", icon: <ExportOutlined /> },
+              {
+                key: "1",
+                label: "View SERP",
+                icon: <SearchOutlined />,
+                onClick: () =>
+                  window.open(
+                    `https://www.google.com/search?q=${encodeURIComponent(
+                      record.keyword
+                    )}`,
+                    "_blank"
+                  ),
+              },
+              {
+                key: "2",
+                label: "Add to Project",
+                icon: <PlusOutlined />,
+                onClick: () => handleAddToProject(record),
+              },
+              {
+                key: "3",
+                label: "View Related",
+                icon: <BulbOutlined />,
+                onClick: () =>
+                  handleSearch(record.relatedKeywords[0] || record.keyword),
+              },
             ],
           }}
           trigger={["click"]}
@@ -450,6 +698,14 @@ const KeywordMagicTool: React.FC = () => {
       value: filteredKeywords.length,
       prefix: <SearchOutlined />,
       suffix: "keywords",
+    },
+    {
+      title: "AI Suggestions",
+      value: filteredKeywords.filter((k) => k.id.startsWith("ai-keyword-"))
+        .length,
+      prefix: <BulbOutlined />,
+      suffix: "AI-generated",
+      valueStyle: { color: "#722ed1" },
     },
     {
       title: "Total Volume",
@@ -469,13 +725,6 @@ const KeywordMagicTool: React.FC = () => {
       suffix: "%",
       valueStyle: { color: "#faad14" },
     },
-    {
-      title: "Commercial Intent",
-      value: filteredKeywords.filter((k) => k.intent === "Commercial").length,
-      suffix: `of ${filteredKeywords.length}`,
-      prefix: <BulbOutlined />,
-      valueStyle: { color: "#52c41a" },
-    },
   ];
 
   const tabItems = [
@@ -488,7 +737,7 @@ const KeywordMagicTool: React.FC = () => {
             columns={keywordColumns}
             dataSource={filteredKeywords}
             rowKey="id"
-            loading={loading}
+            loading={loading || organicLoading || magicLoading}
             rowSelection={{
               selectedRowKeys: selectedKeywords,
               onChange: (keys) => setSelectedKeywords(keys as string[]),
@@ -580,6 +829,163 @@ const KeywordMagicTool: React.FC = () => {
       ),
     },
     {
+      key: "ai-suggestions",
+      label: `AI Suggestions (${aiSuggestions.length})`,
+      children: (
+        <div className={styles.aiSuggestionsTab}>
+          {aiSuggestions.length > 0 ? (
+            <div>
+              <Alert
+                message="AI-Powered Keyword Suggestions"
+                description="These keyword suggestions are generated using AI based on your seed keyword"
+                type="success"
+                showIcon
+                style={{ marginBottom: 16 }}
+              />
+              <div className={styles.suggestionsList}>
+                {aiSuggestions.map((suggestion, index) => (
+                  <Card key={index} size="small" style={{ marginBottom: 12 }}>
+                    <div className={styles.suggestionItem}>
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          <BulbOutlined
+                            style={{ marginRight: 8, color: "#1890ff" }}
+                          />
+                          <span style={{ fontWeight: 600, fontSize: "14px" }}>
+                            {suggestion.keyword || suggestion}
+                          </span>
+                          {suggestion.intent && (
+                            <Tag
+                              color={getIntentColor(suggestion.intent)}
+                              style={{ marginLeft: "8px" }}
+                            >
+                              {suggestion.intent}
+                            </Tag>
+                          )}
+                          {suggestion.category && (
+                            <Tag color="blue" style={{ marginLeft: "4px" }}>
+                              {suggestion.category}
+                            </Tag>
+                          )}
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "16px",
+                            alignItems: "center",
+                            fontSize: "12px",
+                            color: "#666",
+                          }}
+                        >
+                          {suggestion.searchVolume && (
+                            <span>
+                              📊 Volume:{" "}
+                              <strong
+                                style={{
+                                  color: getVolumeColor(
+                                    suggestion.searchVolume
+                                  ),
+                                }}
+                              >
+                                {suggestion.searchVolume.toLocaleString()}
+                              </strong>
+                            </span>
+                          )}
+                          {suggestion.difficulty && (
+                            <span>
+                              🎯 Difficulty:{" "}
+                              <strong
+                                style={{
+                                  color: getDifficultyColor(
+                                    suggestion.difficulty
+                                  ),
+                                }}
+                              >
+                                {suggestion.difficulty}%
+                              </strong>
+                            </span>
+                          )}
+                          {suggestion.relevanceScore && (
+                            <span>
+                              ⚡ Relevance:{" "}
+                              <strong style={{ color: "#52c41a" }}>
+                                {Math.round(suggestion.relevanceScore * 100)}%
+                              </strong>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Button
+                          size="small"
+                          icon={<PlusOutlined />}
+                          onClick={() => {
+                            // Convert AI suggestion to KeywordData format and add to project
+                            const keywordData = {
+                              keyword: suggestion.keyword,
+                              searchVolume: suggestion.searchVolume || 0,
+                              difficulty: suggestion.difficulty || 0,
+                              cpc: 0, // AI suggestions don't have CPC data
+                              targetUrl: "",
+                            };
+                            if (selectedProject) {
+                              bulkAddKeywords(selectedProject.id, {
+                                keywords: [keywordData],
+                              })
+                                .then(() =>
+                                  message.success(
+                                    `"${suggestion.keyword}" added to project`
+                                  )
+                                )
+                                .catch(() =>
+                                  message.error("Failed to add keyword")
+                                );
+                            }
+                          }}
+                          disabled={!selectedProject}
+                        >
+                          Add
+                        </Button>
+                        <Button
+                          size="small"
+                          type="link"
+                          onClick={() =>
+                            handleSearch(suggestion.keyword || suggestion)
+                          }
+                        >
+                          Research
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "40px 0" }}>
+              <BulbOutlined style={{ fontSize: "48px", color: "#d9d9d9" }} />
+              <h3>No AI Suggestions Available</h3>
+              <p>Search for a keyword to get AI-powered suggestions</p>
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
       key: "favorites",
       label: `Favorites (${favorites.length})`,
       children: (
@@ -588,7 +994,7 @@ const KeywordMagicTool: React.FC = () => {
             columns={keywordColumns}
             dataSource={keywords.filter((k) => k.isFavorite)}
             rowKey="id"
-            loading={loading}
+            loading={loading || organicLoading || magicLoading}
             pagination={false}
           />
         </div>
@@ -603,7 +1009,17 @@ const KeywordMagicTool: React.FC = () => {
           <div style={{ textAlign: "center", padding: "40px 0" }}>
             <SearchOutlined style={{ fontSize: "48px", color: "#d9d9d9" }} />
             <h3>No Project Selected</h3>
-            <p>Please select a project to start keyword research.</p>
+            <p>
+              Please select a project from the dropdown above to start keyword
+              research.
+            </p>
+            {projects.length === 0 && (
+              <div style={{ marginTop: "16px" }}>
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Create New Project
+                </Button>
+              </div>
+            )}
           </div>
         </Card>
       </div>
@@ -615,7 +1031,14 @@ const KeywordMagicTool: React.FC = () => {
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <h1>Keyword Magic Tool</h1>
-          <p>Discover millions of keywords and build your content strategy</p>
+          <p>
+            Discover millions of keywords and build your content strategy
+            {selectedProject && (
+              <span style={{ marginLeft: "8px", color: "#1890ff" }}>
+                • {selectedProject.name} ({selectedProject.domain})
+              </span>
+            )}
+          </p>
         </div>
       </div>
 
@@ -623,7 +1046,7 @@ const KeywordMagicTool: React.FC = () => {
         <div className={styles.searchRow}>
           <div className={styles.searchInput}>
             <Search
-              placeholder="Enter a keyword (e.g., seo tools, digital marketing)"
+              placeholder="Enter a keyword or domain (e.g., seo tools, example.com)"
               size="large"
               onSearch={handleSearch}
               enterButton={
@@ -631,24 +1054,141 @@ const KeywordMagicTool: React.FC = () => {
                   Analyze
                 </Button>
               }
+              loading={loading || organicLoading || magicLoading}
             />
           </div>
           <div className={styles.searchOptions}>
-            <Select defaultValue="US" style={{ width: 120 }}>
-              <Option value="US">🇺🇸 US</Option>
-              <Option value="UK">🇬🇧 UK</Option>
+            <Select
+              value={filters.country}
+              style={{ width: 120 }}
+              onChange={handleCountryChange}
+              showSearch
+              placeholder="Select country"
+            >
+              <Option value="US">🇺🇸 United States</Option>
+              <Option value="UK">🇬🇧 United Kingdom</Option>
               <Option value="CA">🇨🇦 Canada</Option>
+              <Option value="AU">🇦🇺 Australia</Option>
+              <Option value="DE">🇩🇪 Germany</Option>
+              <Option value="FR">🇫🇷 France</Option>
+              <Option value="ES">🇪🇸 Spain</Option>
+              <Option value="IT">🇮🇹 Italy</Option>
+              <Option value="NL">🇳🇱 Netherlands</Option>
+              <Option value="BR">🇧🇷 Brazil</Option>
+              <Option value="JP">🇯🇵 Japan</Option>
+              <Option value="KR">🇰🇷 South Korea</Option>
+              <Option value="CN">🇨🇳 China</Option>
+              <Option value="IN">🇮🇳 India</Option>
+              <Option value="MX">🇲🇽 Mexico</Option>
+              <Option value="AR">🇦🇷 Argentina</Option>
+              <Option value="CL">🇨🇱 Chile</Option>
+              <Option value="CO">🇨🇴 Colombia</Option>
+              <Option value="PE">🇵🇪 Peru</Option>
+              <Option value="VE">🇻🇪 Venezuela</Option>
+              <Option value="RU">🇷🇺 Russia</Option>
+              <Option value="PL">🇵🇱 Poland</Option>
+              <Option value="CZ">🇨🇿 Czech Republic</Option>
+              <Option value="SE">🇸🇪 Sweden</Option>
+              <Option value="NO">🇳🇴 Norway</Option>
+              <Option value="DK">🇩🇰 Denmark</Option>
+              <Option value="FI">🇫🇮 Finland</Option>
+              <Option value="BE">🇧🇪 Belgium</Option>
+              <Option value="CH">🇨🇭 Switzerland</Option>
+              <Option value="AT">🇦🇹 Austria</Option>
+              <Option value="PT">🇵🇹 Portugal</Option>
+              <Option value="GR">🇬🇷 Greece</Option>
+              <Option value="TR">🇹🇷 Turkey</Option>
+              <Option value="IL">🇮🇱 Israel</Option>
+              <Option value="AE">🇦🇪 UAE</Option>
+              <Option value="SA">🇸🇦 Saudi Arabia</Option>
+              <Option value="EG">🇪🇬 Egypt</Option>
+              <Option value="ZA">🇿🇦 South Africa</Option>
+              <Option value="NG">🇳🇬 Nigeria</Option>
+              <Option value="TH">🇹🇭 Thailand</Option>
+              <Option value="VN">🇻🇳 Vietnam</Option>
+              <Option value="SG">🇸🇬 Singapore</Option>
+              <Option value="MY">🇲🇾 Malaysia</Option>
+              <Option value="ID">🇮🇩 Indonesia</Option>
+              <Option value="PH">🇵🇭 Philippines</Option>
+              <Option value="NZ">🇳🇿 New Zealand</Option>
+              <Option value="IE">🇮🇪 Ireland</Option>
+              <Option value="HU">🇭🇺 Hungary</Option>
+              <Option value="RO">🇷🇴 Romania</Option>
+              <Option value="BG">🇧🇬 Bulgaria</Option>
+              <Option value="HR">🇭🇷 Croatia</Option>
+              <Option value="SI">🇸🇮 Slovenia</Option>
+              <Option value="SK">🇸🇰 Slovakia</Option>
+              <Option value="LT">🇱🇹 Lithuania</Option>
+              <Option value="LV">🇱🇻 Latvia</Option>
+              <Option value="EE">🇪🇪 Estonia</Option>
+              <Option value="UA">🇺🇦 Ukraine</Option>
+              <Option value="BY">🇧🇾 Belarus</Option>
+              <Option value="KZ">🇰🇿 Kazakhstan</Option>
+              <Option value="UZ">🇺🇿 Uzbekistan</Option>
+              <Option value="BD">🇧🇩 Bangladesh</Option>
+              <Option value="PK">🇵🇰 Pakistan</Option>
+              <Option value="LK">🇱🇰 Sri Lanka</Option>
+              <Option value="MM">🇲🇲 Myanmar</Option>
+              <Option value="KH">🇰🇭 Cambodia</Option>
+              <Option value="LA">🇱🇦 Laos</Option>
+              <Option value="HK">🇭🇰 Hong Kong</Option>
+              <Option value="TW">🇹🇼 Taiwan</Option>
+              <Option value="MO">🇲🇴 Macau</Option>
             </Select>
-            <Select defaultValue="google" style={{ width: 120 }}>
+            <Select
+              value={filters.searchEngine}
+              style={{ width: 120 }}
+              onChange={handleSearchEngineChange}
+            >
               <Option value="google">Google</Option>
               <Option value="bing">Bing</Option>
               <Option value="youtube">YouTube</Option>
             </Select>
           </div>
         </div>
+        {searchTerm && (
+          <div style={{ marginTop: 16 }}>
+            <Alert
+              message={`Analyzing "${searchTerm}" in ${filters.country}`}
+              type="info"
+              showIcon
+              closable
+            />
+          </div>
+        )}
       </Card>
 
-      {keywords.length > 0 && (
+      {keywords.length === 0 && !loading && !organicLoading && !magicLoading ? (
+        <Card style={{ textAlign: "center", padding: "60px 20px" }}>
+          <SearchOutlined
+            style={{ fontSize: "64px", color: "#d9d9d9", marginBottom: "16px" }}
+          />
+          <h2>Start Your Keyword Research</h2>
+          <p style={{ fontSize: "16px", color: "#666", marginBottom: "24px" }}>
+            Enter a keyword or domain above to discover thousands of keyword
+            opportunities
+          </p>
+          <div style={{ marginBottom: "20px" }}>
+            <Space size="middle">
+              <Button type="link" onClick={() => handleSearch("seo tools")}>
+                Try "seo tools"
+              </Button>
+              <Button
+                type="link"
+                onClick={() => handleSearch("digital marketing")}
+              >
+                Try "digital marketing"
+              </Button>
+              <Button
+                type="link"
+                onClick={() => handleSearch("content marketing")}
+              >
+                Try "content marketing"
+              </Button>
+            </Space>
+          </div>
+        </Card>
+      ) : (
         <>
           <Row gutter={[16, 16]} className={styles.statsRow}>
             {overviewStats.map((stat, index) => (
@@ -711,7 +1251,7 @@ const KeywordMagicTool: React.FC = () => {
                   </div>
                 </div>
               </Col>
-              <Col xs={24} md={8}>
+              <Col xs={24} md={6}>
                 <div className={styles.filterGroup}>
                   <label>Search Intent</label>
                   <Checkbox.Group
@@ -732,6 +1272,32 @@ const KeywordMagicTool: React.FC = () => {
                   </Checkbox.Group>
                 </div>
               </Col>
+              <Col xs={24} md={6}>
+                <div className={styles.filterGroup}>
+                  <label>SERP Features</label>
+                  <Checkbox.Group
+                    value={filters.serpFeatures}
+                    onChange={(value) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        serpFeatures: value as string[],
+                      }))
+                    }
+                  >
+                    <Space direction="vertical" size={4}>
+                      <Checkbox value="featured_snippet">
+                        Featured Snippet
+                      </Checkbox>
+                      <Checkbox value="people_also_ask">
+                        People Also Ask
+                      </Checkbox>
+                      <Checkbox value="images">Images</Checkbox>
+                      <Checkbox value="videos">Videos</Checkbox>
+                      <Checkbox value="shopping">Shopping</Checkbox>
+                    </Space>
+                  </Checkbox.Group>
+                </div>
+              </Col>
             </Row>
           </Card>
 
@@ -739,13 +1305,19 @@ const KeywordMagicTool: React.FC = () => {
             <Space>
               <Button
                 type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleBulkAddToProject}
+                disabled={selectedKeywords.length === 0 || !selectedProject}
+              >
+                Add to Project ({selectedKeywords.length})
+              </Button>
+              <Button
                 icon={<ExportOutlined />}
                 onClick={() => setShowExportModal(true)}
                 disabled={selectedKeywords.length === 0}
               >
                 Export Selected ({selectedKeywords.length})
               </Button>
-              <Button icon={<PlusOutlined />}>Add to Keyword List</Button>
               <Button icon={<DownloadOutlined />}>Download Report</Button>
             </Space>
           </div>
@@ -760,6 +1332,7 @@ const KeywordMagicTool: React.FC = () => {
         </>
       )}
 
+      {/* Export Modal */}
       <Modal
         title="Export Keywords"
         open={showExportModal}
@@ -768,14 +1341,24 @@ const KeywordMagicTool: React.FC = () => {
           <Button key="cancel" onClick={() => setShowExportModal(false)}>
             Cancel
           </Button>,
-          <Button key="submit" type="primary">
+          <Button key="submit" type="primary" onClick={handleExportKeywords}>
             Export to CSV
           </Button>,
         ]}
       >
         <p>
-          Export {selectedKeywords.length} selected keywords with all metrics.
+          Export {selectedKeywords.length} selected keywords with all metrics
+          including:
         </p>
+        <ul>
+          <li>Keyword</li>
+          <li>Search Volume</li>
+          <li>Keyword Difficulty</li>
+          <li>Cost Per Click (CPC)</li>
+          <li>Search Intent</li>
+          <li>Current Position</li>
+          <li>SERP Features</li>
+        </ul>
       </Modal>
     </div>
   );
