@@ -36,7 +36,7 @@ const HeaderSite = () => {
         </ul>
       </nav>
       <div className={styles.actions}>
-        <Dropdown
+        {/* <Dropdown
           menu={{
             items: [
               {
@@ -72,7 +72,7 @@ const HeaderSite = () => {
               style={{ color: "#fff", fontSize: 10, marginLeft: 2 }}
             />
           </Button>
-        </Dropdown>
+        </Dropdown> */}
         <Button
           type="default"
           className={styles.loginBtn}
@@ -153,7 +153,7 @@ const HeaderSite = () => {
             >
               {t("signup")}
             </Button>
-            <div style={{ marginTop: 16 }}>
+            {/* <div style={{ marginTop: 16 }}>
               <Dropdown
                 menu={{
                   items: [
@@ -205,7 +205,7 @@ const HeaderSite = () => {
                   />
                 </Button>
               </Dropdown>
-            </div>
+            </div> */}
           </div>
         </div>
       )}
