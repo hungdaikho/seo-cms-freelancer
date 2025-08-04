@@ -96,9 +96,9 @@ export async function GET(
             ];
 
             topics = Array.from({ length: Math.min(limit, 12) }, (_, i) => {
-                const topicName = mockTopicNames[i] || `Topic ${i + 1}`;
+                const topicName = mockTopicNames[i % mockTopicNames.length] || `Topic ${i + 1}`;
                 return {
-                    topic: topicName,
+                    topic: `${topicName} - ${domain.split('.')[0]}`,
                     keywords: Math.floor(Math.random() * 500) + 50,
                     traffic: Math.floor(Math.random() * 10000) + 1000,
                     difficulty: Math.floor(Math.random() * 40) + 40, // 40-80

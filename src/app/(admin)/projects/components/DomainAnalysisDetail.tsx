@@ -17,12 +17,7 @@ import {
   EyeOutlined,
 } from "@ant-design/icons";
 import { useDomain } from "@/stores/hooks";
-import type {
-  TopKeyword,
-  DomainCompetitor,
-  ContentTopic,
-} from "@/services/domain.service";
-
+import { ContentTopicItem } from "@/types/domain-overview.type";
 const { Title, Text } = Typography;
 
 interface Props {
@@ -342,7 +337,7 @@ const DomainAnalysisDetail: React.FC<Props> = ({ domain }) => {
           pagination={{ pageSize: 10 }}
           rowKey="topic"
           expandable={{
-            expandedRowRender: (record: ContentTopic) => (
+            expandedRowRender: (record: ContentTopicItem) => (
               <div style={{ margin: "10px 0" }}>
                 <Text strong>Top Keywords in this topic:</Text>
                 <div style={{ marginTop: "8px" }}>

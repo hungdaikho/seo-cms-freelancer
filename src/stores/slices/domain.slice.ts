@@ -1,16 +1,19 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import {
-    domainService,
-    DomainOverview,
+    domainService
+} from '../../services/domain.service';
+import {
+    DomainOverviewResponse,
     TopKeywordsResponse,
     CompetitorsResponse,
     TopicsResponse,
-    DomainAuthority,
+    DomainAuthorityMetrics,
     GetDomainOverviewParams,
     GetTopKeywordsParams,
     GetCompetitorsParams,
-    GetTopicsParams
-} from '../../services/domain.service';
+    GetTopicsParams,
+    GetDomainAuthorityParams
+} from '@/types/domain-overview.type';
 
 // Async thunks
 export const fetchDomainOverview = createAsyncThunk(
@@ -63,9 +66,9 @@ export const fetchTopics = createAsyncThunk(
 
 export const fetchDomainAuthority = createAsyncThunk(
     'domain/fetchDomainAuthority',
-    async (domain: string, { rejectWithValue }) => {
+    async (params: GetDomainAuthorityParams, { rejectWithValue }) => {
         try {
-            const response = await domainService.getDomainAuthority(domain);
+            const response = await domainService.getDomainAuthority(params);
             return response;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to fetch domain authority');
@@ -76,7 +79,7 @@ export const fetchDomainAuthority = createAsyncThunk(
 // State interface
 export interface DomainState {
     // Domain overview
-    overview: DomainOverview | null;
+    overview: DomainOverviewResponse | null;
     overviewLoading: boolean;
     overviewError: string | null;
 
@@ -96,7 +99,7 @@ export interface DomainState {
     topicsError: string | null;
 
     // Domain authority
-    authority: DomainAuthority | null;
+    authority: DomainAuthorityMetrics | any;
     authorityLoading: boolean;
     authorityError: string | null;
 

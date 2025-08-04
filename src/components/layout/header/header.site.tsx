@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import styles from "./header.site.module.scss";
 import Image from "next/image";
-import { Button, Dropdown } from "antd";
-import { DownOutlined, MenuOutlined, CloseOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import { MenuOutlined, CloseOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AuthModal from "@/components/ui/modal/auth_modal_new";
 

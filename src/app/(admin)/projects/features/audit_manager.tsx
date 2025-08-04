@@ -36,7 +36,6 @@ import { useAudit } from "@/stores/hooks/useAudit";
 import { useProject } from "@/stores/hooks/useProject";
 import { useAppDispatch } from "@/stores/hooks";
 import { startComprehensiveAudit } from "@/stores/slices/audit.slice";
-import { Audit, CreateAuditRequest } from "@/types/api.type";
 import styles from "./audit_manager.module.scss";
 
 const { Title, Text } = Typography;
@@ -56,22 +55,17 @@ const AuditManager: React.FC<AuditManagerProps> = ({
     audits,
     currentAudit,
     auditResults,
-    auditSummary,
     loading,
     error,
     pagination,
-    startNewAudit,
     fetchProjectAudits,
-    fetchAuditById,
     fetchAuditResults,
     fetchAuditSummary,
     deleteAudit,
     clearError,
     setCurrentAudit,
   } = useAudit();
-
-  const { projects, fetchProjectById } = useProject();
-
+  const { projects } = useProject();
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isResultsDrawerVisible, setIsResultsDrawerVisible] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -252,7 +246,7 @@ const AuditManager: React.FC<AuditManagerProps> = ({
     }
   };
 
-  const handleViewResults = async (audit: Audit) => {
+  const handleViewResults = async (audit: any) => {
     console.log("Opening results for audit:", audit);
     setCurrentAudit(audit);
     setIsResultsDrawerVisible(true);
@@ -353,14 +347,13 @@ const AuditManager: React.FC<AuditManagerProps> = ({
       {
         title: "Overall Score",
         key: "score",
-        render: (_: any, record: Audit) => {
+        render: (_: any, record: any) => {
           if (record.status !== "completed") return "-";
 
-          // Try to get real score from audit results first
-          const realScore = auditResults?.results?.overall_score;
+          // Get score from real audit results
+          const realScore = record.results?.overview?.score;
 
-          // If we have real score and this is the current audit, use it
-          if (realScore !== undefined && currentAudit?.id === record.id) {
+          if (realScore !== undefined) {
             return (
               <div className={styles.scoreCell}>
                 <Progress
@@ -392,20 +385,29 @@ const AuditManager: React.FC<AuditManagerProps> = ({
       {
         title: "Issues Found",
         key: "issues",
-        render: (_: any, record: Audit) => {
+        render: (_: any, record: any) => {
           if (record.status !== "completed") return "-";
 
-          // Try to get real issues data from audit results first
-          if (
-            auditResults?.results?.technical_seo?.issues &&
-            currentAudit?.id === record.id
-          ) {
-            const issues = auditResults.results.technical_seo.issues;
+          // Get issues from real audit results
+          if (record.results?.technical_seo?.issues) {
+            const issues = record.results.technical_seo.issues;
+            const contentIssues =
+              record.results?.content_analysis?.issues || [];
+            const accessibilityIssues =
+              record.results?.accessibility?.issues || [];
+
+            // Combine all issues
+            const allIssues = [
+              ...issues,
+              ...contentIssues,
+              ...accessibilityIssues,
+            ];
+
             const issueCounts = {
-              high: issues.filter((issue) => issue.severity === "high").length,
-              medium: issues.filter((issue) => issue.severity === "medium")
+              high: allIssues.filter((issue) => issue.impact === "high").length,
+              medium: allIssues.filter((issue) => issue.impact === "medium")
                 .length,
-              low: issues.filter((issue) => issue.severity === "low").length,
+              low: allIssues.filter((issue) => issue.impact === "low").length,
             };
 
             return (
@@ -414,6 +416,27 @@ const AuditManager: React.FC<AuditManagerProps> = ({
                   <Tag color="red">{issueCounts.high} High</Tag>
                   <Tag color="orange">{issueCounts.medium} Medium</Tag>
                   <Tag color="green">{issueCounts.low} Low</Tag>
+                </div>
+              </Space>
+            );
+          }
+
+          // Use total issues from overview if available
+          if (record.results?.overview?.total_issues) {
+            const totalIssues = record.results.overview.total_issues;
+            const criticalIssues = record.results.overview.critical_issues || 0;
+            const warnings = record.results.overview.warnings || 0;
+            const lowIssues = Math.max(
+              0,
+              totalIssues - criticalIssues - warnings
+            );
+
+            return (
+              <Space direction="vertical" size="small">
+                <div className={styles.issueItem}>
+                  <Tag color="red">{criticalIssues} High</Tag>
+                  <Tag color="orange">{warnings} Medium</Tag>
+                  <Tag color="green">{lowIssues} Low</Tag>
                 </div>
               </Space>
             );
@@ -447,7 +470,7 @@ const AuditManager: React.FC<AuditManagerProps> = ({
       {
         title: "Actions",
         key: "actions",
-        render: (_: any, record: Audit) => (
+        render: (_: any, record: any) => (
           <Space size="small">
             <Tooltip title="View Results">
               <Button
@@ -526,13 +549,16 @@ const AuditManager: React.FC<AuditManagerProps> = ({
       </div>
 
       {/* Summary Cards */}
-      {auditSummary ? (
+      {audits && audits.length > 0 ? (
         <Row gutter={[16, 16]} className={styles.summarySection}>
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
-                title="Total Audits"
-                value={auditSummary.total_audits || 0}
+                title="Total Audits Completed"
+                value={
+                  audits.filter((audit: any) => audit.status === "completed")
+                    .length
+                }
                 prefix={<CheckCircleOutlined />}
               />
             </Card>
@@ -541,10 +567,58 @@ const AuditManager: React.FC<AuditManagerProps> = ({
             <Card>
               <Statistic
                 title="Average Score"
-                value={auditSummary.average_score || 0}
+                value={
+                  audits.length > 0
+                    ? Math.round(
+                        audits
+                          .filter(
+                            (audit: any) =>
+                              audit.status === "completed" &&
+                              audit.results?.overview?.score
+                          )
+                          .reduce(
+                            (sum, audit: any) =>
+                              sum + (audit.results?.overview?.score || 0),
+                            0
+                          ) /
+                          Math.max(
+                            1,
+                            audits.filter(
+                              (audit: any) =>
+                                audit.status === "completed" &&
+                                audit.results?.overview?.score
+                            ).length
+                          )
+                      )
+                    : 0
+                }
                 suffix="/100"
                 valueStyle={{
-                  color: getScoreColor(auditSummary.average_score || 0),
+                  color: getScoreColor(
+                    audits.length > 0
+                      ? Math.round(
+                          audits
+                            .filter(
+                              (audit: any) =>
+                                audit.status === "completed" &&
+                                audit.results?.overview?.score
+                            )
+                            .reduce(
+                              (sum, audit: any) =>
+                                sum + (audit.results?.overview?.score || 0),
+                              0
+                            ) /
+                            Math.max(
+                              1,
+                              audits.filter(
+                                (audit: any) =>
+                                  audit.status === "completed" &&
+                                  audit.results?.overview?.score
+                              ).length
+                            )
+                        )
+                      : 0
+                  ),
                 }}
               />
             </Card>
@@ -553,26 +627,36 @@ const AuditManager: React.FC<AuditManagerProps> = ({
             <Card>
               <Statistic
                 title="Critical Issues"
-                value={auditSummary.critical_issues_count || 0}
+                value={audits
+                  .filter((audit: any) => audit.status === "completed")
+                  .reduce(
+                    (sum, audit: any) =>
+                      sum + (audit.results?.overview?.critical_issues || 0),
+                    0
+                  )}
                 prefix={<WarningOutlined />}
                 valueStyle={{ color: "#ff4d4f" }}
               />
             </Card>
           </Col>
-          <Col xs={24} sm={12} md={6}>
+          {/* <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
                 title="Last Audit"
                 value={
-                  auditSummary.last_audit_date
+                  audits.length > 0
                     ? new Date(
-                        auditSummary.last_audit_date
+                        audits.sort(
+                          (a: any, b: any) =>
+                            new Date(b.createdAt).getTime() -
+                            new Date(a.createdAt).getTime()
+                        )[0].createdAt
                       ).toLocaleDateString()
                     : "Never"
                 }
               />
             </Card>
-          </Col>
+          </Col> */}
         </Row>
       ) : loading ? (
         <Row gutter={[16, 16]} className={styles.summarySection}>
@@ -736,7 +820,8 @@ const AuditManager: React.FC<AuditManagerProps> = ({
         open={isResultsDrawerVisible}
         onClose={() => setIsResultsDrawerVisible(false)}
       >
-        {auditResults && currentAudit?.status === "completed" ? (
+        {(currentAudit as any)?.results &&
+        currentAudit?.status === "completed" ? (
           <div className={styles.resultsContent}>
             <Tabs defaultActiveKey="overview">
               <TabPane tab="Overview" key="overview">
@@ -745,10 +830,12 @@ const AuditManager: React.FC<AuditManagerProps> = ({
                     <Progress
                       type="circle"
                       size={120}
-                      percent={auditResults.results?.overall_score || 0}
+                      percent={
+                        (currentAudit as any).results?.overview?.score || 0
+                      }
                       format={(percent) => `${percent}`}
                       strokeColor={getScoreColor(
-                        auditResults.results?.overall_score || 0
+                        (currentAudit as any).results?.overview?.score || 0
                       )}
                     />
                     <Text
@@ -765,11 +852,15 @@ const AuditManager: React.FC<AuditManagerProps> = ({
                     <Card>
                       <Statistic
                         title="Technical SEO"
-                        value={auditResults.results?.technical_seo?.score || 0}
+                        value={
+                          (currentAudit as any).results?.technical_seo?.score ||
+                          0
+                        }
                         suffix="/100"
                         valueStyle={{
                           color: getScoreColor(
-                            auditResults.results?.technical_seo?.score || 0
+                            (currentAudit as any).results?.technical_seo
+                              ?.score || 0
                           ),
                         }}
                       />
@@ -779,11 +870,14 @@ const AuditManager: React.FC<AuditManagerProps> = ({
                     <Card>
                       <Statistic
                         title="Performance"
-                        value={auditResults.results?.performance?.score || 0}
+                        value={
+                          (currentAudit as any).results?.performance?.score || 0
+                        }
                         suffix="/100"
                         valueStyle={{
                           color: getScoreColor(
-                            auditResults.results?.performance?.score || 0
+                            (currentAudit as any).results?.performance?.score ||
+                              0
                           ),
                         }}
                       />
@@ -793,11 +887,15 @@ const AuditManager: React.FC<AuditManagerProps> = ({
                     <Card>
                       <Statistic
                         title="Content"
-                        value={auditResults.results?.content?.score || 0}
+                        value={
+                          (currentAudit as any).results?.content_analysis
+                            ?.score || 0
+                        }
                         suffix="/100"
                         valueStyle={{
                           color: getScoreColor(
-                            auditResults.results?.content?.score || 0
+                            (currentAudit as any).results?.content_analysis
+                              ?.score || 0
                           ),
                         }}
                       />
@@ -808,29 +906,28 @@ const AuditManager: React.FC<AuditManagerProps> = ({
 
               <TabPane tab="Technical Issues" key="technical">
                 <div className={styles.issuesSection}>
-                  {auditResults?.results?.technical_seo?.issues &&
-                  auditResults.results.technical_seo.issues.length > 0 ? (
-                    auditResults.results.technical_seo.issues.map(
-                      (issue, index) => (
+                  {(currentAudit as any)?.results?.technical_seo?.issues &&
+                  (currentAudit as any).results.technical_seo.issues.length >
+                    0 ? (
+                    (currentAudit as any).results.technical_seo.issues.map(
+                      (issue: any, index: number) => (
                         <Card
                           key={index}
                           size="small"
                           className={styles.issueCard}
                         >
                           <div className={styles.issueHeader}>
-                            <Tag color={getSeverityColor(issue.severity)}>
-                              {issue.severity?.toUpperCase() || "UNKNOWN"}
+                            <Tag color={getSeverityColor(issue.impact)}>
+                              {issue.impact?.toUpperCase() || "UNKNOWN"}
                             </Tag>
-                            <Text strong>
-                              {issue.type?.replace(/_/g, " ") ||
-                                "Unknown Issue"}
-                            </Text>
+                            <Text strong>{issue.title || "Unknown Issue"}</Text>
                           </div>
                           <Text>
                             {issue.description || "No description available"}
                           </Text>
                           <Text type="secondary" style={{ fontSize: "12px" }}>
-                            {issue.count || 0} instance(s) found
+                            {issue.recommendation ||
+                              "No recommendation available"}
                           </Text>
                         </Card>
                       )
@@ -844,48 +941,41 @@ const AuditManager: React.FC<AuditManagerProps> = ({
               </TabPane>
 
               <TabPane tab="Performance" key="performance">
-                <Card title="Core Web Vitals">
+                <Card title="Performance Metrics">
                   <Row gutter={[16, 16]}>
-                    <Col span={8}>
+                    <Col span={12}>
                       <Statistic
-                        title="LCP (Largest Contentful Paint)"
+                        title="Performance Score"
                         value={
-                          auditResults.results?.performance?.metrics
-                            ?.core_web_vitals?.lcp || 0
+                          (currentAudit as any).results?.performance?.score || 0
                         }
-                        suffix="s"
-                        precision={1}
+                        suffix="/100"
+                        valueStyle={{
+                          color: getScoreColor(
+                            (currentAudit as any).results?.performance?.score ||
+                              0
+                          ),
+                        }}
                       />
                     </Col>
-                    <Col span={8}>
+                    <Col span={12}>
                       <Statistic
-                        title="FID (First Input Delay)"
+                        title="Mobile Friendly"
                         value={
-                          auditResults.results?.performance?.metrics
-                            ?.core_web_vitals?.fid || 0
+                          (currentAudit as any).results?.performance?.metrics
+                            ?.mobile_friendly
+                            ? "Yes"
+                            : "No"
                         }
-                        suffix="ms"
-                      />
-                    </Col>
-                    <Col span={8}>
-                      <Statistic
-                        title="CLS (Cumulative Layout Shift)"
-                        value={
-                          auditResults.results?.performance?.metrics
-                            ?.core_web_vitals?.cls || 0
-                        }
-                        precision={2}
+                        valueStyle={{
+                          color: (currentAudit as any).results?.performance
+                            ?.metrics?.mobile_friendly
+                            ? "#52c41a"
+                            : "#ff4d4f",
+                        }}
                       />
                     </Col>
                   </Row>
-                  <div style={{ marginTop: "16px" }}>
-                    <Text strong>Page Load Time: </Text>
-                    <Text>
-                      {auditResults.results?.performance?.metrics
-                        ?.page_load_time || 0}
-                      s
-                    </Text>
-                  </div>
                 </Card>
               </TabPane>
 
@@ -894,17 +984,27 @@ const AuditManager: React.FC<AuditManagerProps> = ({
                   <Row gutter={[16, 16]}>
                     <Col span={12}>
                       <Statistic
-                        title="Word Count"
-                        value={auditResults.results?.content?.word_count || 0}
+                        title="Content Score"
+                        value={
+                          (currentAudit as any).results?.content_analysis
+                            ?.score || 0
+                        }
+                        suffix="/100"
+                        valueStyle={{
+                          color: getScoreColor(
+                            (currentAudit as any).results?.content_analysis
+                              ?.score || 0
+                          ),
+                        }}
                       />
                     </Col>
                     <Col span={12}>
                       <Statistic
-                        title="Readability Score"
+                        title="Average Word Count"
                         value={
-                          auditResults.results?.content?.readability_score || 0
+                          (currentAudit as any).results?.content_analysis
+                            ?.avg_word_count || 0
                         }
-                        suffix="/100"
                       />
                     </Col>
                   </Row>

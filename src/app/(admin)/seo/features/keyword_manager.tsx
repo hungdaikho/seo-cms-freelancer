@@ -75,6 +75,9 @@ const KeywordManager: React.FC<KeywordManagerProps> = ({ projectId }) => {
   const [isRankingDrawerVisible, setIsRankingDrawerVisible] = useState(false);
   const [editingKeyword, setEditingKeyword] = useState<Keyword | null>(null);
   const [searchText, setSearchText] = useState("");
+  const [isBulkAddLoading, setIsBulkAddLoading] = useState(false);
+  const [isCreateLoading, setIsCreateLoading] = useState(false);
+  const [isEditLoading, setIsEditLoading] = useState(false);
 
   useEffect(() => {
     loadKeywords();
@@ -102,17 +105,23 @@ const KeywordManager: React.FC<KeywordManagerProps> = ({ projectId }) => {
   };
 
   const handleCreateKeyword = async (values: any) => {
+    setIsCreateLoading(true);
     try {
       await dispatch(addKeywordToProject({ projectId, data: values })).unwrap();
       setIsCreateModalVisible(false);
       form.resetFields();
       message.success("Keyword added successfully");
+      // Refresh keywords list after successful creation
+      loadKeywords();
     } catch (error) {
       // Error is handled by the slice
+    } finally {
+      setIsCreateLoading(false);
     }
   };
 
   const handleBulkAddKeywords = async (values: any) => {
+    setIsBulkAddLoading(true);
     try {
       const keywords = values.keywords
         .split("\n")
@@ -131,14 +140,19 @@ const KeywordManager: React.FC<KeywordManagerProps> = ({ projectId }) => {
       setIsBulkModalVisible(false);
       bulkForm.resetFields();
       message.success(`${keywords.length} keywords added successfully`);
+      // Refresh keywords list after successful bulk add
+      loadKeywords();
     } catch (error) {
       // Error is handled by the slice
+    } finally {
+      setIsBulkAddLoading(false);
     }
   };
 
   const handleEditKeyword = async (values: any) => {
     if (!editingKeyword) return;
 
+    setIsEditLoading(true);
     try {
       await dispatch(
         updateKeyword({ keywordId: editingKeyword.id, data: values })
@@ -147,8 +161,12 @@ const KeywordManager: React.FC<KeywordManagerProps> = ({ projectId }) => {
       setEditingKeyword(null);
       form.resetFields();
       message.success("Keyword updated successfully");
+      // Refresh keywords list after successful update
+      loadKeywords();
     } catch (error) {
       // Error is handled by the slice
+    } finally {
+      setIsEditLoading(false);
     }
   };
 
@@ -364,12 +382,12 @@ const KeywordManager: React.FC<KeywordManagerProps> = ({ projectId }) => {
           <Text type="secondary">Track and manage your SEO keywords</Text>
         </div>
         <Space>
-          <Button
+          {/* <Button
             icon={<DownloadOutlined />}
             onClick={() => message.info("Export feature coming soon")}
           >
             Export
-          </Button>
+          </Button> */}
           <Button
             icon={<UploadOutlined />}
             onClick={() => setIsBulkModalVisible(true)}
@@ -583,7 +601,11 @@ const KeywordManager: React.FC<KeywordManagerProps> = ({ projectId }) => {
 
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit" loading={loading}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isCreateLoading}
+              >
                 Add Keyword
               </Button>
               <Button
@@ -591,6 +613,7 @@ const KeywordManager: React.FC<KeywordManagerProps> = ({ projectId }) => {
                   setIsCreateModalVisible(false);
                   form.resetFields();
                 }}
+                disabled={isCreateLoading}
               >
                 Cancel
               </Button>
@@ -667,7 +690,11 @@ link building`}
 
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit" loading={loading}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isBulkAddLoading}
+              >
                 Add Keywords
               </Button>
               <Button
@@ -675,6 +702,7 @@ link building`}
                   setIsBulkModalVisible(false);
                   bulkForm.resetFields();
                 }}
+                disabled={isBulkAddLoading}
               >
                 Cancel
               </Button>
@@ -763,7 +791,7 @@ link building`}
 
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit" loading={loading}>
+              <Button type="primary" htmlType="submit" loading={isEditLoading}>
                 Update Keyword
               </Button>
               <Button
@@ -772,6 +800,7 @@ link building`}
                   setEditingKeyword(null);
                   form.resetFields();
                 }}
+                disabled={isEditLoading}
               >
                 Cancel
               </Button>

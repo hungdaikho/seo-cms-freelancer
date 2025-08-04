@@ -12,6 +12,13 @@
         display: block;
         margin-bottom: 4px;
       }
+
+      // Style for the flex container with AutoComplete and Button
+      > div {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
     }
   }
 

@@ -494,7 +494,7 @@ const auditSlice = createSlice({
                 state.error = null;
                 state.currentStep = "Initializing audit...";
             })
-            .addCase(startComprehensiveAudit.fulfilled, (state, action) => {
+            .addCase(startComprehensiveAudit.fulfilled, (state, action: any) => {
                 state.loading = false;
                 state.realAudits.unshift(action.payload);
                 state.currentRealAudit = action.payload;
@@ -529,7 +529,7 @@ const auditSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchRealAuditResults.fulfilled, (state, action) => {
+            .addCase(fetchRealAuditResults.fulfilled, (state, action: any) => {
                 state.loading = false;
                 state.currentRealAudit = action.payload;
                 state.isRunningAudit = action.payload.status === "running";
@@ -545,7 +545,7 @@ const auditSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchProjectAuditHistory.fulfilled, (state, action) => {
+            .addCase(fetchProjectAuditHistory.fulfilled, (state, action: any) => {
                 state.loading = false;
                 state.realAudits = action.payload.data;
                 state.pagination = {

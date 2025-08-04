@@ -21,6 +21,7 @@ import {
   List,
   Badge,
   Empty,
+  Slider,
 } from "antd";
 import {
   SearchOutlined,
@@ -33,10 +34,13 @@ import {
   BulbOutlined,
   DeleteOutlined,
   DownloadOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { fetchProjects } from "@/stores/slices/project.slice";
+import { useKeywordGap } from "@/stores/hooks/useKeywordGap";
 import { Project } from "@/types/api.type";
+import { KeywordData, CompetitorDomain } from "@/services/keyword-gap.service";
 import styles from "./keyword_gap_analyzer.module.scss";
 
 const { Title, Text } = Typography;
@@ -55,7 +59,7 @@ interface KeywordGap {
   potentialTraffic: number;
 }
 
-interface CompetitorDomain {
+interface LocalCompetitorDomain {
   domain: string;
   totalKeywords: number;
   organicTraffic: number;
@@ -107,7 +111,7 @@ const mockKeywordGaps: KeywordGap[] = [
   },
 ];
 
-const mockCompetitors: CompetitorDomain[] = [
+const mockCompetitors: LocalCompetitorDomain[] = [
   {
     domain: "competitor1.com",
     totalKeywords: 15678,
@@ -131,19 +135,11 @@ const mockCompetitors: CompetitorDomain[] = [
 const KeywordGapAnalyzer: React.FC = () => {
   const dispatch = useAppDispatch();
   const { projects } = useAppSelector((state) => state.project);
+  const keywordGap = useKeywordGap();
 
   const [selectedProject, setSelectedProject] = useState<string>("");
-  const [competitors, setCompetitors] = useState<string[]>([]);
   const [newCompetitor, setNewCompetitor] = useState("");
-  const [keywordGaps, setKeywordGaps] = useState<KeywordGap[]>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [activeTab, setActiveTab] = useState("gaps");
-  const [filters, setFilters] = useState({
-    difficulty: [0, 100] as [number, number],
-    volume: [0, 100000] as [number, number],
-    intent: "all" as string,
-    opportunity: "all" as string,
-  });
+  const [seedKeyword, setSeedKeyword] = useState("");
 
   useEffect(() => {
     dispatch(fetchProjects());
@@ -156,35 +152,88 @@ const KeywordGapAnalyzer: React.FC = () => {
   }, [projects, selectedProject]);
 
   const addCompetitor = () => {
-    if (newCompetitor && !competitors.includes(newCompetitor)) {
-      if (competitors.length >= 5) {
+    if (
+      newCompetitor &&
+      !keywordGap.selectedCompetitors.includes(newCompetitor)
+    ) {
+      if (keywordGap.selectedCompetitors.length >= 5) {
         message.warning("Maximum 5 competitors allowed");
         return;
       }
-      setCompetitors([...competitors, newCompetitor]);
+      keywordGap.actions.addCompetitor(newCompetitor);
       setNewCompetitor("");
     }
   };
 
   const removeCompetitor = (domain: string) => {
-    setCompetitors(competitors.filter((c) => c !== domain));
+    keywordGap.actions.removeCompetitor(domain);
   };
 
   const startAnalysis = async () => {
-    if (competitors.length === 0) {
+    if (!keywordGap.computed.canStartAnalysis) {
       message.error("Please add at least one competitor");
       return;
     }
 
-    setIsAnalyzing(true);
+    if (!seedKeyword.trim()) {
+      message.error("Please enter a seed keyword");
+      return;
+    }
 
-    // Simulate analysis
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    const selectedProjectData = projects.find((p) => p.id === selectedProject);
+    if (!selectedProjectData) {
+      message.error("Please select a valid project");
+      return;
+    }
 
-    setKeywordGaps(mockKeywordGaps);
-    setIsAnalyzing(false);
-    setActiveTab("gaps");
-    message.success(`Found ${mockKeywordGaps.length} keyword opportunities!`);
+    try {
+      await keywordGap.actions.analyzeGaps({
+        seedKeyword: seedKeyword.trim(),
+        competitorDomains: keywordGap.selectedCompetitors,
+        includeCompetitorKeywords: true,
+        location: "US",
+        language: "en",
+        minVolume: 100,
+        limitPerCategory: 100,
+      });
+
+      keywordGap.actions.setActiveTab("gaps");
+      message.success(
+        `Found ${keywordGap.totalOpportunities} keyword opportunities!`
+      );
+    } catch (error) {
+      console.error("Analysis failed:", error);
+    }
+  };
+
+  const discoverCompetitors = async () => {
+    const selectedProjectData = projects.find((p) => p.id === selectedProject);
+    if (!selectedProjectData?.domain) {
+      message.error("Please select a project with a valid domain");
+      return;
+    }
+
+    try {
+      await keywordGap.actions.discoverCompetitors(
+        selectedProjectData.domain,
+        "US",
+        10
+      );
+      message.success(
+        "Competitors discovered! Check the Competitor Discovery tab."
+      );
+    } catch (error) {
+      console.error("Competitor discovery failed:", error);
+    }
+  };
+
+  // Update filters
+  const updateFilters = (newFilters: any) => {
+    keywordGap.actions.updateFilters(newFilters);
+  };
+
+  const exportKeywordGaps = () => {
+    keywordGap.actions.exportKeywordGaps();
   };
 
   const getOpportunityColor = (opportunity: string) => {
@@ -229,7 +278,7 @@ const KeywordGapAnalyzer: React.FC = () => {
       dataIndex: "keyword",
       key: "keyword",
       width: 200,
-      render: (keyword: string, record: KeywordGap) => (
+      render: (keyword: string, record: KeywordData) => (
         <div className={styles.keywordCell}>
           <Text strong>{keyword}</Text>
           <div className={styles.keywordMeta}>
@@ -246,7 +295,8 @@ const KeywordGapAnalyzer: React.FC = () => {
       dataIndex: "searchVolume",
       key: "searchVolume",
       width: 120,
-      sorter: (a: KeywordGap, b: KeywordGap) => a.searchVolume - b.searchVolume,
+      sorter: (a: KeywordData, b: KeywordData) =>
+        a.searchVolume - b.searchVolume,
       render: (volume: number) => (
         <Space direction="vertical" size={0}>
           <Text strong>{volume.toLocaleString()}</Text>
@@ -259,7 +309,7 @@ const KeywordGapAnalyzer: React.FC = () => {
       dataIndex: "difficulty",
       key: "difficulty",
       width: 120,
-      sorter: (a: KeywordGap, b: KeywordGap) => a.difficulty - b.difficulty,
+      sorter: (a: KeywordData, b: KeywordData) => a.difficulty - b.difficulty,
       render: (difficulty: number) => (
         <div className={styles.difficultyCell}>
           <Progress
@@ -282,14 +332,14 @@ const KeywordGapAnalyzer: React.FC = () => {
       dataIndex: "cpc",
       key: "cpc",
       width: 100,
-      sorter: (a: KeywordGap, b: KeywordGap) => a.cpc - b.cpc,
+      sorter: (a: KeywordData, b: KeywordData) => a.cpc - b.cpc,
       render: (cpc: number) => `$${cpc.toFixed(2)}`,
     },
     {
       title: "Competitor Positions",
       key: "competitors",
       width: 200,
-      render: (_: any, record: KeywordGap) => (
+      render: (_: any, record: KeywordData) => (
         <div className={styles.competitorPositions}>
           {Object.entries(record.competitorRankings).map(
             ([domain, position]) => (
@@ -314,7 +364,7 @@ const KeywordGapAnalyzer: React.FC = () => {
       dataIndex: "potentialTraffic",
       key: "potentialTraffic",
       width: 120,
-      sorter: (a: KeywordGap, b: KeywordGap) =>
+      sorter: (a: KeywordData, b: KeywordData) =>
         a.potentialTraffic - b.potentialTraffic,
       render: (traffic: number) => (
         <Text strong style={{ color: "#52c41a" }}>
@@ -326,7 +376,7 @@ const KeywordGapAnalyzer: React.FC = () => {
       title: "Actions",
       key: "actions",
       width: 120,
-      render: (_: any, record: KeywordGap) => (
+      render: (_: any, record: KeywordData) => (
         <Space>
           <Tooltip title="Add to keyword list">
             <Button size="small" type="primary" icon={<PlusOutlined />} />
@@ -347,22 +397,47 @@ const KeywordGapAnalyzer: React.FC = () => {
       render: (domain: string) => <Text strong>{domain}</Text>,
     },
     {
-      title: "Total Keywords",
-      dataIndex: "totalKeywords",
-      key: "totalKeywords",
-      render: (count: number) => count.toLocaleString(),
+      title: "Common Keywords",
+      dataIndex: "commonKeywords",
+      key: "commonKeywords",
+      render: (count: number) => count?.toLocaleString() || "N/A",
     },
     {
-      title: "Organic Traffic",
-      dataIndex: "organicTraffic",
-      key: "organicTraffic",
-      render: (traffic: number) => `${(traffic / 1000).toFixed(0)}K`,
+      title: "Keyword Gaps",
+      dataIndex: "keywordGaps",
+      key: "keywordGaps",
+      render: (gaps: number) => (
+        <Text strong style={{ color: "#1890ff" }}>
+          {gaps?.toLocaleString() || "N/A"}
+        </Text>
+      ),
     },
     {
-      title: "Avg. Position",
-      dataIndex: "averagePosition",
-      key: "averagePosition",
-      render: (position: number) => position.toFixed(1),
+      title: "Competition Level",
+      dataIndex: "competitionLevel",
+      key: "competitionLevel",
+      render: (level: string) => (
+        <Tag
+          color={
+            level === "High" ? "red" : level === "Medium" ? "orange" : "green"
+          }
+        >
+          {level}
+        </Tag>
+      ),
+    },
+    {
+      title: "Overlap Score",
+      dataIndex: "overlapScore",
+      key: "overlapScore",
+      render: (score: number) => (
+        <Progress
+          percent={Math.round(score * 100)}
+          size="small"
+          showInfo={false}
+          style={{ width: 60 }}
+        />
+      ),
     },
   ];
 
@@ -409,6 +484,28 @@ const KeywordGapAnalyzer: React.FC = () => {
 
       {/* Competitor Setup */}
       <Card title="Competitor Setup" className={styles.setupCard}>
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+          <Col span={12}>
+            <Input
+              placeholder="Enter seed keyword (e.g., seo tools)"
+              value={seedKeyword}
+              onChange={(e) => setSeedKeyword(e.target.value)}
+              size="large"
+            />
+          </Col>
+          <Col span={12}>
+            <Button
+              type="primary"
+              icon={<ReloadOutlined />}
+              onClick={discoverCompetitors}
+              loading={keywordGap.isDiscoveringCompetitors}
+              disabled={!selectedProject}
+            >
+              Discover Competitors
+            </Button>
+          </Col>
+        </Row>
+
         <Row gutter={16} align="middle">
           <Col span={12}>
             <Space.Compact style={{ width: "100%" }}>
@@ -432,20 +529,22 @@ const KeywordGapAnalyzer: React.FC = () => {
               type="primary"
               icon={<SearchOutlined />}
               onClick={startAnalysis}
-              loading={isAnalyzing}
-              disabled={competitors.length === 0}
+              loading={keywordGap.isAnalyzing}
+              disabled={
+                !keywordGap.computed.canStartAnalysis || !seedKeyword.trim()
+              }
               size="large"
             >
-              {isAnalyzing ? "Analyzing..." : "Start Analysis"}
+              {keywordGap.isAnalyzing ? "Analyzing..." : "Start Analysis"}
             </Button>
           </Col>
         </Row>
 
-        {competitors.length > 0 && (
+        {keywordGap.selectedCompetitors.length > 0 && (
           <div className={styles.competitorList}>
             <Title level={5}>Selected Competitors:</Title>
             <Space wrap>
-              {competitors.map((competitor) => (
+              {keywordGap.selectedCompetitors.map((competitor) => (
                 <Tag
                   key={competitor}
                   closable
@@ -458,23 +557,38 @@ const KeywordGapAnalyzer: React.FC = () => {
             </Space>
           </div>
         )}
+
+        {/* Errors */}
+        {keywordGap.computed.hasErrors && (
+          <Alert
+            message="Analysis Error"
+            description={keywordGap.analysisError || keywordGap.discoveryError}
+            type="error"
+            closable
+            onClose={keywordGap.actions.clearErrors}
+            style={{ marginTop: 16 }}
+          />
+        )}
       </Card>
 
       {/* Analysis Results */}
-      {keywordGaps.length > 0 && (
+      {keywordGap.computed.hasOpportunities && (
         <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
+          activeKey={keywordGap.activeTab}
+          onChange={keywordGap.actions.setActiveTab}
           className={styles.resultTabs}
         >
-          <TabPane tab={`Keyword Gaps (${keywordGaps.length})`} key="gaps">
+          <TabPane
+            tab={`Keyword Gaps (${keywordGap.totalOpportunities})`}
+            key="gaps"
+          >
             {/* Summary Stats */}
             <Row gutter={16} className={styles.summaryStats}>
               <Col span={6}>
                 <Card>
                   <Statistic
                     title="Total Opportunities"
-                    value={keywordGaps.length}
+                    value={keywordGap.totalOpportunities}
                     prefix={<BulbOutlined />}
                     valueStyle={{ color: "#1890ff" }}
                   />
@@ -484,10 +598,7 @@ const KeywordGapAnalyzer: React.FC = () => {
                 <Card>
                   <Statistic
                     title="Potential Traffic"
-                    value={keywordGaps.reduce(
-                      (sum, gap) => sum + gap.potentialTraffic,
-                      0
-                    )}
+                    value={keywordGap.potentialTraffic}
                     prefix={<RiseOutlined />}
                     valueStyle={{ color: "#52c41a" }}
                   />
@@ -497,11 +608,7 @@ const KeywordGapAnalyzer: React.FC = () => {
                 <Card>
                   <Statistic
                     title="Easy Wins"
-                    value={
-                      keywordGaps.filter(
-                        (gap) => gap.opportunity === "easy-win"
-                      ).length
-                    }
+                    value={keywordGap.computed.easyWinCount}
                     prefix={<TrophyOutlined />}
                     valueStyle={{ color: "#52c41a" }}
                   />
@@ -511,12 +618,7 @@ const KeywordGapAnalyzer: React.FC = () => {
                 <Card>
                   <Statistic
                     title="Avg. Difficulty"
-                    value={Math.round(
-                      keywordGaps.reduce(
-                        (sum, gap) => sum + gap.difficulty,
-                        0
-                      ) / keywordGaps.length
-                    )}
+                    value={keywordGap.computed.averageDifficulty}
                     suffix="%"
                     prefix={<ThunderboltOutlined />}
                     valueStyle={{ color: "#faad14" }}
@@ -525,14 +627,87 @@ const KeywordGapAnalyzer: React.FC = () => {
               </Col>
             </Row>
 
+            {/* Filters */}
+            <Card title="Filters" style={{ marginBottom: 16 }}>
+              <Row gutter={16}>
+                <Col span={6}>
+                  <div>
+                    <Text strong>Difficulty Range</Text>
+                    <Slider
+                      range
+                      defaultValue={keywordGap.filters.difficulty}
+                      onChange={(value) =>
+                        updateFilters({ difficulty: value as [number, number] })
+                      }
+                      style={{ marginTop: 8 }}
+                    />
+                  </div>
+                </Col>
+                <Col span={6}>
+                  <div>
+                    <Text strong>Volume Range</Text>
+                    <Slider
+                      range
+                      min={0}
+                      max={100000}
+                      step={1000}
+                      defaultValue={keywordGap.filters.volume}
+                      onChange={(value) =>
+                        updateFilters({ volume: value as [number, number] })
+                      }
+                      style={{ marginTop: 8 }}
+                    />
+                  </div>
+                </Col>
+                <Col span={6}>
+                  <div>
+                    <Text strong>Intent</Text>
+                    <Select
+                      value={keywordGap.filters.intent}
+                      onChange={(value) => updateFilters({ intent: value })}
+                      style={{ width: "100%", marginTop: 8 }}
+                    >
+                      <Option value="all">All Intent</Option>
+                      <Option value="informational">Informational</Option>
+                      <Option value="commercial">Commercial</Option>
+                      <Option value="transactional">Transactional</Option>
+                      <Option value="navigational">Navigational</Option>
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={6}>
+                  <div>
+                    <Text strong>Opportunity</Text>
+                    <Select
+                      value={keywordGap.filters.opportunity}
+                      onChange={(value) =>
+                        updateFilters({ opportunity: value })
+                      }
+                      style={{ width: "100%", marginTop: 8 }}
+                    >
+                      <Option value="all">All Opportunities</Option>
+                      <Option value="easy-win">Easy Win</Option>
+                      <Option value="quick-win">Quick Win</Option>
+                      <Option value="content-gap">Content Gap</Option>
+                      <Option value="long-term">Long Term</Option>
+                    </Select>
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+
             {/* Keywords Table */}
             <Card
               title="Keyword Opportunities"
-              extra={<Button icon={<DownloadOutlined />}>Export CSV</Button>}
+              extra={
+                <Button icon={<DownloadOutlined />} onClick={exportKeywordGaps}>
+                  Export CSV
+                </Button>
+              }
             >
               <Table
                 columns={gapColumns}
-                dataSource={keywordGaps}
+                dataSource={keywordGap.keywordOpportunities}
                 rowKey="keyword"
                 pagination={{
                   pageSize: 10,
@@ -543,41 +718,57 @@ const KeywordGapAnalyzer: React.FC = () => {
             </Card>
           </TabPane>
 
-          <TabPane tab="Competitor Overview" key="competitors">
-            <Card title="Competitor Analysis">
-              <Table
-                columns={competitorColumns}
-                dataSource={mockCompetitors}
-                rowKey="domain"
-                pagination={false}
-              />
-            </Card>
+          <TabPane tab="Competitor Discovery" key="discovery">
+            {keywordGap.competitorDiscovery && (
+              <Card title="Discovered Competitors">
+                <Table
+                  columns={competitorColumns}
+                  dataSource={keywordGap.competitorDiscovery.competitors}
+                  rowKey="domain"
+                  pagination={{
+                    pageSize: 10,
+                    showTotal: (total) => `Total ${total} competitors`,
+                  }}
+                />
+              </Card>
+            )}
           </TabPane>
         </Tabs>
       )}
 
       {/* Empty State */}
-      {keywordGaps.length === 0 && !isAnalyzing && (
-        <Card className={styles.emptyState}>
-          <Empty
-            description="No analysis results yet"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          >
-            <Text type="secondary">
-              Add competitors and start analysis to discover keyword
-              opportunities
-            </Text>
-          </Empty>
-        </Card>
-      )}
+      {!keywordGap.computed.hasOpportunities &&
+        !keywordGap.computed.isLoading && (
+          <Card className={styles.emptyState}>
+            <Empty
+              description="No analysis results yet"
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            >
+              <Text type="secondary">
+                Add competitors and start analysis to discover keyword
+                opportunities
+              </Text>
+            </Empty>
+          </Card>
+        )}
 
       {/* Loading State */}
-      {isAnalyzing && (
+      {keywordGap.computed.isLoading && (
         <Card className={styles.loadingState}>
           <div style={{ textAlign: "center", padding: "40px" }}>
-            <Title level={4}>Analyzing Keyword Gaps...</Title>
+            <Title level={4}>
+              {keywordGap.isAnalyzing && "Analyzing Keyword Gaps..."}
+              {keywordGap.isDiscoveringCompetitors &&
+                "Discovering Competitors..."}
+              {keywordGap.isAnalyzingCompetitor && "Analyzing Competitor..."}
+            </Title>
             <Text type="secondary">
-              Comparing your domain with {competitors.length} competitors
+              {keywordGap.isAnalyzing &&
+                `Comparing your domain with ${keywordGap.selectedCompetitors.length} competitors`}
+              {keywordGap.isDiscoveringCompetitors &&
+                "Finding competitors based on keyword overlap"}
+              {keywordGap.isAnalyzingCompetitor &&
+                "Analyzing competitor strategy and content gaps"}
             </Text>
             <div style={{ marginTop: 24 }}>
               <Progress percent={75} status="active" />

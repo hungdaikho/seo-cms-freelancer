@@ -191,24 +191,24 @@ const Page = (props: Props) => {
       ),
       children: <ListTool />,
     },
-    {
-      key: "ai",
-      label: (
-        <span>
-          <RobotOutlined />
-          AI Assistant
-        </span>
-      ),
-      disabled: !currentProject,
-      children: currentProject ? (
-        <>
-          {renderProjectSelector()}
-          <CopilotAI />
-        </>
-      ) : (
-        renderEmptyState()
-      ),
-    },
+    // {
+    //   key: "ai",
+    //   label: (
+    //     <span>
+    //       <RobotOutlined />
+    //       AI Assistant
+    //     </span>
+    //   ),
+    //   disabled: !currentProject,
+    //   children: currentProject ? (
+    //     <>
+    //       {renderProjectSelector()}
+    //       <CopilotAI />
+    //     </>
+    //   ) : (
+    //     renderEmptyState()
+    //   ),
+    // },
     {
       key: "domain",
       label: (

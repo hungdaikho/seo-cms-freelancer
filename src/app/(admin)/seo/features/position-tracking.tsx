@@ -32,7 +32,6 @@ const PositionTracking: React.FC<PositionTrackingProps> = ({
   selectedProjectId,
 }) => {
   const router = useRouter();
-  const [period, setPeriod] = useState("7days");
 
   // Get projects from Redux store
   const { projects } = useSelector((state: RootState) => state.project);
@@ -53,19 +52,20 @@ const PositionTracking: React.FC<PositionTrackingProps> = ({
     fetchProjectOverview,
     setFilters,
     clearError,
+    filters,
   } = usePositionTracking();
 
-  // Fetch data when component mounts or project changes
+  // Fetch data when component mounts, project changes, or filters change
   useEffect(() => {
     if (currentProject?.id) {
       fetchProjectOverview(currentProject.id);
     }
-  }, [currentProject?.id]);
+  }, [currentProject?.id, filters.period]);
 
   // Handle period change
   const handlePeriodChange = (value: string) => {
-    setPeriod(value);
     setFilters({ period: value });
+    // Data will be fetched automatically by the useEffect above
   };
 
   // Get trend icon based on keyword trend
@@ -90,6 +90,35 @@ const PositionTracking: React.FC<PositionTrackingProps> = ({
       lost: Math.floor(total * 0.05), // 5% assumed lost
     };
   };
+
+  // Get date range based on selected period
+  const getDateRange = (period: string) => {
+    const now = new Date();
+    let days = 7; // default
+
+    switch (period) {
+      case "7d":
+        days = 7;
+        break;
+      case "30d":
+        days = 30;
+        break;
+      case "90d":
+        days = 90;
+        break;
+      default:
+        days = 7;
+    }
+
+    const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    return {
+      start: startDate.toLocaleDateString(),
+      end: now.toLocaleDateString(),
+    };
+  };
+
+  // Get current date range based on selected period
+  const currentDateRange = getDateRange(filters.period);
 
   if (error) {
     return (
@@ -120,7 +149,7 @@ const PositionTracking: React.FC<PositionTrackingProps> = ({
             </Tooltip>
           </h3>
           <div className={styles.locationSelector}>
-            <span>🇻🇳 Vietnam (Google) - Vietnamese</span>
+            <span>🇺🇸 United States (Google) - English</span>
           </div>
         </div>
         <div className={styles.headerRight}>
@@ -128,25 +157,19 @@ const PositionTracking: React.FC<PositionTrackingProps> = ({
             Updated: {loading ? "Updating..." : "12 hours ago"}
           </span>
           <span className={styles.dateRange}>
-            {new Date(
-              Date.now() - 7 * 24 * 60 * 60 * 1000
-            ).toLocaleDateString()}{" "}
-            - {new Date().toLocaleDateString()}
+            {currentDateRange.start} - {currentDateRange.end}
           </span>
           <div className={styles.controls}>
             <Select
-              value={period}
+              value={filters.period}
               size="small"
               onChange={handlePeriodChange}
               disabled={loading}
             >
-              <Option value="7days">last 7 days</Option>
-              <Option value="30days">last 30 days</Option>
-              <Option value="90days">last 90 days</Option>
+              <Option value="7d">last 7 days</Option>
+              <Option value="30d">last 30 days</Option>
+              <Option value="90d">last 90 days</Option>
             </Select>
-            <Button type="text" size="small">
-              ✕
-            </Button>
           </div>
         </div>
       </div>
@@ -162,7 +185,7 @@ const PositionTracking: React.FC<PositionTrackingProps> = ({
             <Row gutter={24}>
               <Col span={6}>
                 <div className={styles.statItem}>
-                  <div className={styles.statLabel}>Keywords</div>
+                  {/* <div className={styles.statLabel}>Keywords</div> */}
                   <div className={styles.statSection}>
                     <div className={styles.sectionTitle}>Top 3</div>
                     <div className={styles.sectionValue}>

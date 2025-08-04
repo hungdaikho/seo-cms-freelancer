@@ -35,7 +35,7 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
 }) => {
   const { projectStats, fetchProjectStats } = useProject();
   const { fetchProjectKeywords } = useKeyword();
-  const { audits, auditSummary, fetchProjectAudits, fetchAuditSummary }: any =
+  const { audits, auditSummary, fetchProjectAudits, fetchAuditSummary } =
     useAudit();
 
   useEffect(() => {
@@ -103,7 +103,7 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
           <Card>
             <Statistic
               title="Audits Completed"
-              value={auditSummary?.totalAudits || 0}
+              value={auditSummary ? 1 : 0}
               prefix={<FileSearchOutlined />}
               valueStyle={{ color: "#eb2f96" }}
             />
@@ -117,11 +117,11 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
         <Col xs={24} lg={12}>
           <Card
             title="Keyword Performance"
-            extra={
-              <Button type="link" size="small">
-                View All
-              </Button>
-            }
+            // extra={
+            //   <Button type="link" size="small">
+            //     View All
+            //   </Button>
+            // }
           >
             <Row gutter={[16, 16]} className={styles.keywordStats}>
               <Col span={8}>
@@ -182,31 +182,32 @@ const ProjectDashboard: React.FC<ProjectDashboardProps> = ({
 
         {/* Recent Audits */}
         <Col xs={24} lg={12}>
-          <Card
-            title="Recent Audits"
-            extra={
-              <Button type="link" size="small">
-                View All
-              </Button>
-            }
-          >
+          <Card title="Recent Audits">
             {auditSummary && (
               <div className={styles.auditSummary}>
                 <Row gutter={[16, 16]}>
                   <Col span={12}>
                     <Statistic
                       title="Average Score"
-                      value={auditSummary.averageScore || 0}
+                      value={
+                        auditSummary.latestAudit?.results?.overview?.score || 0
+                      }
                       suffix="/100"
                       valueStyle={{
-                        color: getScoreColor(auditSummary.averageScore || 0),
+                        color: getScoreColor(
+                          auditSummary.latestAudit?.results?.overview?.score ||
+                            0
+                        ),
                       }}
                     />
                   </Col>
                   <Col span={12}>
                     <Statistic
                       title="Critical Issues"
-                      value={auditSummary.criticalIssues || 0}
+                      value={
+                        auditSummary.latestAudit?.results?.overview
+                          ?.critical_issues || 0
+                      }
                       valueStyle={{ color: "#ff4d4f" }}
                     />
                   </Col>

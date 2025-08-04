@@ -5,6 +5,7 @@ import {
   Col,
   Button,
   Select,
+  AutoComplete,
   Statistic,
   Tag,
   Typography,
@@ -55,14 +56,28 @@ const OrganicResearchWidget: React.FC<OrganicResearchWidgetProps> = ({
   useEffect(() => {
     if (currentProject?.domain) {
       setSelectedDomain(currentProject.domain);
-      analyzeDomain(currentProject.domain, selectedCountry);
+      analyzeDomain(currentProject.domain, selectedCountry, "google");
     }
   }, [currentProject?.domain, selectedCountry, selectedProjectId]);
 
-  // Handle manual domain change
+  // Handle manual domain change/select
   const handleDomainChange = (domain: string) => {
     setSelectedDomain(domain);
-    analyzeDomain(domain, selectedCountry);
+    if (domain && domain.trim()) {
+      analyzeDomain(domain.trim(), selectedCountry, "google");
+    }
+  };
+
+  // Handle domain input change (without triggering analysis)
+  const handleDomainInput = (value: string) => {
+    setSelectedDomain(value);
+  };
+
+  // Manual analyze current domain
+  const handleAnalyze = () => {
+    if (selectedDomain && selectedDomain.trim()) {
+      analyzeDomain(selectedDomain.trim(), selectedCountry, "google");
+    }
   };
 
   // Format numbers for display
@@ -112,23 +127,49 @@ const OrganicResearchWidget: React.FC<OrganicResearchWidgetProps> = ({
       </Card>
     );
   }
-
   return (
     <Card title="Organic Research" className={styles.organicResearchWidget}>
       <Spin spinning={loading}>
         <div className={styles.header}>
           <div className={styles.domainSelector}>
             <Text style={{ fontSize: "12px", color: "#666" }}>Domain:</Text>
-            <Select
-              value={selectedDomain}
-              onChange={handleDomainChange}
-              style={{ width: "100%" }}
-              size="small"
-            >
-              <Option value={currentProject.domain}>
-                {currentProject.domain}
-              </Option>
-            </Select>
+            <div style={{ display: "flex", gap: "4px" }}>
+              <AutoComplete
+                defaultValue={currentProject.domain || ""}
+                onChange={handleDomainInput}
+                onSelect={handleDomainChange}
+                style={{ flex: 1 }}
+                size="small"
+                placeholder="Enter or search domain"
+                options={
+                  currentProject?.domain &&
+                  currentProject.domain !== selectedDomain
+                    ? [
+                        {
+                          value: currentProject.domain,
+                          label: currentProject.domain,
+                        },
+                      ]
+                    : []
+                }
+                filterOption={(inputValue, option) =>
+                  option?.value
+                    .toLowerCase()
+                    .includes(inputValue.toLowerCase()) ?? false
+                }
+              />
+              {selectedDomain && selectedDomain !== currentProject?.domain && (
+                <Button
+                  size="small"
+                  type="primary"
+                  loading={loading}
+                  onClick={handleAnalyze}
+                  style={{ flexShrink: 0 }}
+                >
+                  Analyze
+                </Button>
+              )}
+            </div>
           </div>
           <div className={styles.countrySelector}>
             <Text style={{ fontSize: "12px", color: "#666" }}>Country:</Text>
@@ -137,6 +178,7 @@ const OrganicResearchWidget: React.FC<OrganicResearchWidgetProps> = ({
               onChange={setSelectedCountry}
               style={{ width: "100%" }}
               size="small"
+              showSearch
             >
               <Option value="US">United States</Option>
               <Option value="UK">United Kingdom</Option>

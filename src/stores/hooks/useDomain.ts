@@ -34,13 +34,8 @@ import {
     selectHasAnyError,
     selectAllErrors,
 } from '../selectors/domain.selectors';
-import {
-    GetDomainOverviewParams,
-    GetTopKeywordsParams,
-    GetCompetitorsParams,
-    GetTopicsParams
-} from '../../services/domain.service';
 import { useCallback } from 'react';
+import { GetCompetitorsParams, GetDomainOverviewParams, GetTopicsParams, GetTopKeywordsParams } from '@/types/domain-overview.type';
 
 export const useDomain = () => {
     const dispatch = useAppDispatch();
@@ -104,7 +99,7 @@ export const useDomain = () => {
     );
 
     const getDomainAuthority = useCallback(
-        (domain: string) => {
+        (domain: any) => {
             return dispatch(fetchDomainAuthority(domain));
         },
         [dispatch]
@@ -144,7 +139,7 @@ export const useDomain = () => {
 
     // Utility functions
     const analyzeDomain = useCallback(
-        async (domain: string, country: string = 'US', includeSubdomains: boolean = false) => {
+        async (domain: any, country: string = 'US', includeSubdomains: boolean = false) => {
             const params = { domain, country, includeSubdomains };
 
             // Parallel fetch all domain data

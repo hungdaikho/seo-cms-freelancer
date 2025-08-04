@@ -7,6 +7,7 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 // Export custom hooks
 export { useDomain } from './useDomain';
+export { useDomainOverview } from './useDomainOverview';
 export { usePositionTracking, usePositionTrackingOverview, useKeywordRanking } from './usePositionTracking';
 export {
     useOrganicResearch,
@@ -16,3 +17,6 @@ export {
     useTopPages,
     useApiLimits
 } from './useOrganicResearch';
+export { useGlobalSearch } from './useGlobalSearch';
+export { useKeywordGap } from './useKeywordGap';
+export { useBacklink } from './useBacklink';

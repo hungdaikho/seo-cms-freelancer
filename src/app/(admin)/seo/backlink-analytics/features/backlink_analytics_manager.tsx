@@ -18,13 +18,12 @@ import {
   Modal,
   Alert,
   List,
-  Avatar,
-  Tooltip,
+  message,
+  Typography,
 } from "antd";
 import {
   LinkOutlined,
   ArrowUpOutlined,
-  ArrowDownOutlined,
   SearchOutlined,
   ExportOutlined,
   WarningOutlined,
@@ -32,215 +31,142 @@ import {
   InfoCircleOutlined,
   MoreOutlined,
   GlobalOutlined,
+  SwapOutlined,
 } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { RootState } from "@/stores/store";
+import { useBacklink } from "@/stores/hooks";
+import { useProject } from "@/stores/hooks/useProject";
+import { Backlink } from "@/types/backlink.type";
 import styles from "./backlink_analytics_manager.module.scss";
 
 const { Option } = Select;
 const { Search } = Input;
 
-interface Backlink {
-  id: string;
-  sourceUrl: string;
-  sourceDomain: string;
-  targetUrl: string;
-  anchorText: string;
-  linkType: "follow" | "nofollow";
-  linkStatus: "active" | "lost" | "new";
-  domainAuthority: number;
-  pageAuthority: number;
-  trustFlow: number;
-  citationFlow: number;
-  firstSeen: string;
-  lastSeen: string;
-  linkPosition: "content" | "sidebar" | "footer" | "navigation";
-  isSponsored: boolean;
-  isUGC: boolean;
-  category: string;
-}
-
-interface BacklinkProfile {
-  totalBacklinks: number;
-  referringDomains: number;
-  domainAuthority: number;
-  trustFlow: number;
-  newBacklinks: Backlink[];
-  lostBacklinks: Backlink[];
-  topBacklinks: Backlink[];
-  toxicLinks: Backlink[];
-  linkTypes: {
-    follow: number;
-    nofollow: number;
-  };
-  anchorTextDistribution: Array<{
-    text: string;
-    count: number;
-    percentage: number;
-  }>;
-}
-
 const BacklinkAnalyticsManager: React.FC = () => {
   const selectedProject = useSelector(
     (state: RootState) => state.project.currentProject
   );
-  const [backlinkData, setBacklinkData] = useState<BacklinkProfile | null>(
-    null
-  );
-  const [loading, setLoading] = useState(false);
+
+  const { projects, setCurrentProject } = useProject();
+
+  // Debug log để kiểm tra state
+  useEffect(() => {
+    console.log("🔍 Backlink Analytics Debug:");
+    console.log("selectedProject:", selectedProject);
+    console.log("selectedProject?.id:", selectedProject?.id);
+    console.log("projects:", projects);
+  }, [selectedProject, projects]);
+
+  const {
+    backlinkProfile,
+    allBacklinksForTable,
+    newBacklinks,
+    toxicLinks,
+    backlinkSummary,
+    anchorTextDistribution,
+    anyLoading,
+    error,
+    initializeBacklinkData,
+    updateFilters,
+    removeBacklinks,
+    getStatusColor,
+    getAuthorityColor,
+    filters,
+  } = useBacklink();
+
   const [activeTab, setActiveTab] = useState("overview");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState<string>("all");
   const [showDisavowModal, setShowDisavowModal] = useState(false);
   const [selectedBacklinks, setSelectedBacklinks] = useState<string[]>([]);
 
-  // Mock data for backlink analytics
-  const mockBacklinkData: BacklinkProfile = {
-    totalBacklinks: 12845,
-    referringDomains: 2156,
-    domainAuthority: 68,
-    trustFlow: 42,
-    linkTypes: {
-      follow: 8920,
-      nofollow: 3925,
-    },
-    anchorTextDistribution: [
-      { text: "seo tools", count: 245, percentage: 25.4 },
-      { text: "keyword research", count: 189, percentage: 19.6 },
-      { text: "example.com", count: 156, percentage: 16.2 },
-      { text: "click here", count: 98, percentage: 10.2 },
-      { text: "read more", count: 67, percentage: 6.9 },
-    ],
-    newBacklinks: [
-      {
-        id: "1",
-        sourceUrl: "https://marketing-blog.com/seo-tools-2025",
-        sourceDomain: "marketing-blog.com",
-        targetUrl: "/seo-tools",
-        anchorText: "best seo tools",
-        linkType: "follow",
-        linkStatus: "new",
-        domainAuthority: 72,
-        pageAuthority: 65,
-        trustFlow: 48,
-        citationFlow: 52,
-        firstSeen: "2025-01-20",
-        lastSeen: "2025-01-20",
-        linkPosition: "content",
-        isSponsored: false,
-        isUGC: false,
-        category: "Marketing",
-      },
-      {
-        id: "2",
-        sourceUrl: "https://tech-news.com/digital-marketing-trends",
-        sourceDomain: "tech-news.com",
-        targetUrl: "/blog/digital-marketing",
-        anchorText: "digital marketing platform",
-        linkType: "follow",
-        linkStatus: "new",
-        domainAuthority: 68,
-        pageAuthority: 58,
-        trustFlow: 45,
-        citationFlow: 49,
-        firstSeen: "2025-01-19",
-        lastSeen: "2025-01-19",
-        linkPosition: "content",
-        isSponsored: false,
-        isUGC: false,
-        category: "Technology",
-      },
-    ],
-    lostBacklinks: [
-      {
-        id: "3",
-        sourceUrl: "https://old-blog.com/seo-review",
-        sourceDomain: "old-blog.com",
-        targetUrl: "/home",
-        anchorText: "seo platform",
-        linkType: "follow",
-        linkStatus: "lost",
-        domainAuthority: 45,
-        pageAuthority: 38,
-        trustFlow: 25,
-        citationFlow: 32,
-        firstSeen: "2024-12-15",
-        lastSeen: "2025-01-15",
-        linkPosition: "content",
-        isSponsored: false,
-        isUGC: false,
-        category: "SEO",
-      },
-    ],
-    topBacklinks: [
-      {
-        id: "4",
-        sourceUrl: "https://authority-site.com/resources",
-        sourceDomain: "authority-site.com",
-        targetUrl: "/",
-        anchorText: "example.com",
-        linkType: "follow",
-        linkStatus: "active",
-        domainAuthority: 89,
-        pageAuthority: 82,
-        trustFlow: 78,
-        citationFlow: 85,
-        firstSeen: "2024-08-10",
-        lastSeen: "2025-01-20",
-        linkPosition: "content",
-        isSponsored: false,
-        isUGC: false,
-        category: "Business",
-      },
-    ],
-    toxicLinks: [
-      {
-        id: "5",
-        sourceUrl: "https://spam-site.com/links",
-        sourceDomain: "spam-site.com",
-        targetUrl: "/",
-        anchorText: "cheap viagra",
-        linkType: "follow",
-        linkStatus: "active",
-        domainAuthority: 12,
-        pageAuthority: 8,
-        trustFlow: 5,
-        citationFlow: 15,
-        firstSeen: "2025-01-18",
-        lastSeen: "2025-01-20",
-        linkPosition: "footer",
-        isSponsored: false,
-        isUGC: false,
-        category: "Spam",
-      },
-    ],
-  };
+  // Auto-select first project if available and no current project
+  useEffect(() => {
+    if (!selectedProject && projects.length > 0) {
+      setCurrentProject(projects[0]);
+    }
+  }, [projects, selectedProject, setCurrentProject]);
 
   useEffect(() => {
-    if (selectedProject) {
-      setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setBacklinkData(mockBacklinkData);
-        setLoading(false);
-      }, 1000);
+    if (selectedProject?.id) {
+      initializeBacklinkData(selectedProject.id);
     }
-  }, [selectedProject]);
+  }, [selectedProject?.id, initializeBacklinkData]);
 
-  const getStatusColor = (status: string) => {
-    const colors = {
-      active: "green",
-      new: "blue",
-      lost: "red",
-    };
-    return colors[status as keyof typeof colors] || "default";
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+    }
+  }, [error]);
+
+  const handleSearch = (value: string) => {
+    updateFilters({ searchTerm: value });
   };
 
-  const getAuthorityColor = (score: number) => {
-    if (score >= 70) return "#52c41a";
-    if (score >= 40) return "#faad14";
-    return "#ff4d4f";
+  const handleFilterChange = (filterType: string, value: string) => {
+    updateFilters({ [filterType]: value });
   };
+
+  const handleDisavowSelected = async () => {
+    if (!selectedProject?.id || selectedBacklinks.length === 0) return;
+
+    try {
+      await removeBacklinks(selectedProject.id, selectedBacklinks);
+      message.success(
+        `Successfully disavowed ${selectedBacklinks.length} backlinks`
+      );
+      setSelectedBacklinks([]);
+      setShowDisavowModal(false);
+      // Refresh data
+      initializeBacklinkData(selectedProject.id);
+    } catch (error) {
+      message.error("Failed to disavow backlinks");
+    }
+  };
+
+  const handleProjectChange = (projectId: string) => {
+    const project = projects.find((p) => p.id === projectId);
+    if (project) {
+      setCurrentProject(project);
+    }
+  };
+
+  const renderProjectSelector = () => (
+    <div
+      style={{
+        marginBottom: 16,
+        padding: "0 16px",
+        background: "#fafafa",
+        borderRadius: 8,
+      }}
+    >
+      <Space
+        align="center"
+        style={{
+          width: "100%",
+          justifyContent: "space-between",
+          padding: "12px 0",
+        }}
+      >
+        <Typography.Text strong>
+          <SwapOutlined style={{ marginRight: 8 }} />
+          Current Project:
+        </Typography.Text>
+        <Select
+          value={selectedProject?.id}
+          onChange={handleProjectChange}
+          placeholder="Select a project"
+          style={{ minWidth: 200 }}
+          size="small"
+        >
+          {projects.map((project) => (
+            <Select.Option key={project.id} value={project.id}>
+              {project.name} ({project.domain})
+            </Select.Option>
+          ))}
+        </Select>
+      </Space>
+    </div>
+  );
 
   const backlinkColumns = [
     {
@@ -272,10 +198,10 @@ const BacklinkAnalyticsManager: React.FC = () => {
       dataIndex: "anchorText",
       key: "anchorText",
       sorter: (a: Backlink, b: Backlink) =>
-        a.anchorText.localeCompare(b.anchorText),
+        (a.anchorText || "").localeCompare(b.anchorText || ""),
       render: (text: string, record: Backlink) => (
         <div className={styles.anchorCell}>
-          <span className={styles.anchorText}>{text}</span>
+          <span className={styles.anchorText}>{text || "N/A"}</span>
           <div className={styles.linkAttributes}>
             {record.linkType === "nofollow" && (
               <Tag color="orange">nofollow</Tag>
@@ -288,14 +214,13 @@ const BacklinkAnalyticsManager: React.FC = () => {
     },
     {
       title: "DA",
-      dataIndex: "domainAuthority",
-      key: "domainAuthority",
-      sorter: (a: Backlink, b: Backlink) =>
-        a.domainAuthority - b.domainAuthority,
+      dataIndex: "authorityScore",
+      key: "authorityScore",
+      sorter: (a: Backlink, b: Backlink) => a.authorityScore - b.authorityScore,
       render: (da: number) => (
         <div className={styles.metricCell}>
           <span style={{ color: getAuthorityColor(da), fontWeight: 600 }}>
-            {da}
+            {da || 0}
           </span>
         </div>
       ),
@@ -304,11 +229,12 @@ const BacklinkAnalyticsManager: React.FC = () => {
       title: "PA",
       dataIndex: "pageAuthority",
       key: "pageAuthority",
-      sorter: (a: Backlink, b: Backlink) => a.pageAuthority - b.pageAuthority,
+      sorter: (a: Backlink, b: Backlink) =>
+        (a.pageAuthority || 0) - (b.pageAuthority || 0),
       render: (pa: number) => (
         <div className={styles.metricCell}>
-          <span style={{ color: getAuthorityColor(pa), fontWeight: 600 }}>
-            {pa}
+          <span style={{ color: getAuthorityColor(pa || 0), fontWeight: 600 }}>
+            {pa || 0}
           </span>
         </div>
       ),
@@ -317,11 +243,12 @@ const BacklinkAnalyticsManager: React.FC = () => {
       title: "Trust Flow",
       dataIndex: "trustFlow",
       key: "trustFlow",
-      sorter: (a: Backlink, b: Backlink) => a.trustFlow - b.trustFlow,
+      sorter: (a: Backlink, b: Backlink) =>
+        (a.trustFlow || 0) - (b.trustFlow || 0),
       render: (tf: number) => (
         <div className={styles.metricCell}>
-          <span style={{ color: getAuthorityColor(tf), fontWeight: 600 }}>
-            {tf}
+          <span style={{ color: getAuthorityColor(tf || 0), fontWeight: 600 }}>
+            {tf || 0}
           </span>
         </div>
       ),
@@ -342,10 +269,10 @@ const BacklinkAnalyticsManager: React.FC = () => {
     },
     {
       title: "First Seen",
-      dataIndex: "firstSeen",
-      key: "firstSeen",
+      dataIndex: "discoveredAt",
+      key: "discoveredAt",
       sorter: (a: Backlink, b: Backlink) =>
-        new Date(a.firstSeen).getTime() - new Date(b.firstSeen).getTime(),
+        new Date(a.discoveredAt).getTime() - new Date(b.discoveredAt).getTime(),
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
@@ -376,29 +303,29 @@ const BacklinkAnalyticsManager: React.FC = () => {
   const overviewStats = [
     {
       title: "Total Backlinks",
-      value: backlinkData?.totalBacklinks || 0,
+      value: backlinkSummary?.totalBacklinks || 0,
       prefix: <LinkOutlined />,
       suffix: "links",
     },
     {
       title: "Referring Domains",
-      value: backlinkData?.referringDomains || 0,
+      value: backlinkSummary?.referringDomains || 0,
       prefix: <GlobalOutlined />,
       suffix: "domains",
     },
     {
       title: "Domain Authority",
-      value: backlinkData?.domainAuthority || 0,
+      value: backlinkSummary?.domainAuthority || 0,
       prefix: <ArrowUpOutlined />,
       valueStyle: {
-        color: getAuthorityColor(backlinkData?.domainAuthority || 0),
+        color: getAuthorityColor(backlinkSummary?.domainAuthority || 0),
       },
     },
     {
       title: "Trust Flow",
-      value: backlinkData?.trustFlow || 0,
+      value: backlinkSummary?.trustFlow || 0,
       prefix: <CheckCircleOutlined />,
-      valueStyle: { color: getAuthorityColor(backlinkData?.trustFlow || 0) },
+      valueStyle: { color: getAuthorityColor(backlinkSummary?.trustFlow || 0) },
     },
   ];
 
@@ -428,12 +355,12 @@ const BacklinkAnalyticsManager: React.FC = () => {
                   <div className={styles.linkTypeStat}>
                     <span className={styles.label}>Follow Links:</span>
                     <span className={styles.value}>
-                      {backlinkData?.linkTypes.follow.toLocaleString()}
+                      {backlinkProfile?.linkTypes.follow.toLocaleString() || 0}
                     </span>
                     <Progress
                       percent={
-                        ((backlinkData?.linkTypes.follow || 0) /
-                          (backlinkData?.totalBacklinks || 1)) *
+                        ((backlinkProfile?.linkTypes.follow || 0) /
+                          (backlinkProfile?.totalBacklinks || 1)) *
                         100
                       }
                       strokeColor="#52c41a"
@@ -443,12 +370,13 @@ const BacklinkAnalyticsManager: React.FC = () => {
                   <div className={styles.linkTypeStat}>
                     <span className={styles.label}>NoFollow Links:</span>
                     <span className={styles.value}>
-                      {backlinkData?.linkTypes.nofollow.toLocaleString()}
+                      {backlinkProfile?.linkTypes.nofollow.toLocaleString() ||
+                        0}
                     </span>
                     <Progress
                       percent={
-                        ((backlinkData?.linkTypes.nofollow || 0) /
-                          (backlinkData?.totalBacklinks || 1)) *
+                        ((backlinkProfile?.linkTypes.nofollow || 0) /
+                          (backlinkProfile?.totalBacklinks || 1)) *
                         100
                       }
                       strokeColor="#faad14"
@@ -462,7 +390,7 @@ const BacklinkAnalyticsManager: React.FC = () => {
             <Col xs={24} lg={12}>
               <Card title="Top Anchor Texts" className={styles.anchorTextCard}>
                 <List
-                  dataSource={backlinkData?.anchorTextDistribution || []}
+                  dataSource={anchorTextDistribution || []}
                   renderItem={(item) => (
                     <List.Item className={styles.anchorItem}>
                       <div className={styles.anchorItemContent}>
@@ -496,23 +424,23 @@ const BacklinkAnalyticsManager: React.FC = () => {
               <Col xs={24} sm={12} md={8}>
                 <Search
                   placeholder="Search domains or anchor text..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={filters.searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
                   style={{ width: "100%" }}
                 />
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <Select
                   placeholder="Filter by type"
-                  value={filterType}
-                  onChange={setFilterType}
+                  value={filters.linkType}
+                  onChange={(value) => handleFilterChange("linkType", value)}
                   style={{ width: "100%" }}
                 >
                   <Option value="all">All Links</Option>
                   <Option value="follow">Follow Only</Option>
                   <Option value="nofollow">NoFollow Only</Option>
-                  <Option value="new">New Links</Option>
-                  <Option value="lost">Lost Links</Option>
+                  <Option value="sponsored">Sponsored Only</Option>
+                  <Option value="ugc">UGC Only</Option>
                 </Select>
               </Col>
               <Col xs={24} sm={24} md={10}>
@@ -535,13 +463,9 @@ const BacklinkAnalyticsManager: React.FC = () => {
 
           <Table
             columns={backlinkColumns}
-            dataSource={[
-              ...(backlinkData?.newBacklinks || []),
-              ...(backlinkData?.topBacklinks || []),
-              ...(backlinkData?.lostBacklinks || []),
-            ]}
+            dataSource={allBacklinksForTable}
             rowKey="id"
-            loading={loading}
+            loading={anyLoading}
             rowSelection={{
               selectedRowKeys: selectedBacklinks,
               onChange: (keys) => setSelectedBacklinks(keys as string[]),
@@ -565,7 +489,7 @@ const BacklinkAnalyticsManager: React.FC = () => {
           <Alert
             message="New Backlinks Detected"
             description={`${
-              backlinkData?.newBacklinks.length || 0
+              newBacklinks?.length || 0
             } new backlinks have been discovered in the last 30 days.`}
             type="success"
             showIcon
@@ -573,9 +497,9 @@ const BacklinkAnalyticsManager: React.FC = () => {
           />
           <Table
             columns={backlinkColumns}
-            dataSource={backlinkData?.newBacklinks || []}
+            dataSource={newBacklinks}
             rowKey="id"
-            loading={loading}
+            loading={anyLoading}
             pagination={false}
           />
         </div>
@@ -595,9 +519,9 @@ const BacklinkAnalyticsManager: React.FC = () => {
           />
           <Table
             columns={backlinkColumns}
-            dataSource={backlinkData?.toxicLinks || []}
+            dataSource={toxicLinks}
             rowKey="id"
-            loading={loading}
+            loading={anyLoading}
             pagination={false}
           />
         </div>
@@ -609,8 +533,7 @@ const BacklinkAnalyticsManager: React.FC = () => {
     return (
       <div className={styles.noProject}>
         <Card>
-          <div style={{ textAlign: "center", padding: "40px 0" }}>
-            <LinkOutlined style={{ fontSize: "48px", color: "#d9d9d9" }} />
+          <div style={{ textAlign: "center", padding: "40px" }}>
             <h3>No Project Selected</h3>
             <p>Please select a project to view backlink analytics.</p>
           </div>
@@ -624,19 +547,11 @@ const BacklinkAnalyticsManager: React.FC = () => {
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <h1>Backlink Analytics</h1>
-          <p>
-            Monitor your backlink profile and discover new link opportunities
-          </p>
-        </div>
-        <div className={styles.headerActions}>
-          <Space>
-            <Button icon={<SearchOutlined />}>Analyze Competitors</Button>
-            <Button type="primary" icon={<ExportOutlined />}>
-              Export Report
-            </Button>
-          </Space>
+          <p>Monitor and analyze your website's backlink profile</p>
         </div>
       </div>
+
+      {renderProjectSelector()}
 
       <Tabs
         activeKey={activeTab}
@@ -647,26 +562,23 @@ const BacklinkAnalyticsManager: React.FC = () => {
       />
 
       <Modal
-        title="Disavow Backlinks"
+        title="Disavow Selected Backlinks"
         open={showDisavowModal}
+        onOk={handleDisavowSelected}
         onCancel={() => setShowDisavowModal(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setShowDisavowModal(false)}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" danger>
-            Add to Disavow File
-          </Button>,
-        ]}
+        okText="Disavow"
+        okButtonProps={{ danger: true }}
       >
+        <p>
+          Are you sure you want to disavow {selectedBacklinks.length} selected
+          backlinks? This action cannot be undone.
+        </p>
         <Alert
           message="Warning"
-          description="Disavowing backlinks should be done carefully. Only disavow links that you believe are harming your site's rankings."
+          description="Disavowing backlinks tells search engines to ignore these links when evaluating your site. Only disavow links you believe are harmful to your SEO."
           type="warning"
           showIcon
-          style={{ marginBottom: 16 }}
         />
-        <p>You are about to disavow {selectedBacklinks.length} backlink(s).</p>
       </Modal>
     </div>
   );

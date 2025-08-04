@@ -147,9 +147,13 @@ export class SeoService extends BaseService {
   /**
    * Analyze domain for organic research
    */
-  async analyzeDomain(domain: string, country: string = "US"): Promise<OrganicDomainAnalysis> {
+  async analyzeDomain(domain: string, country: string = "US", database: string = "google"): Promise<OrganicDomainAnalysis> {
     try {
-      const response = await this.get<OrganicDomainAnalysis>(`/seo/organic-research/domain/${domain}?country=${country}`);
+      const queryParams = new URLSearchParams();
+      queryParams.append('country', country);
+      if (database) queryParams.append('database', database);
+
+      const response = await this.get<OrganicDomainAnalysis>(`/api/v1/seo/organic-research/domain/${domain}?${queryParams.toString()}`);
       return response;
     } catch (error) {
       // Return mock data if API fails
@@ -177,7 +181,7 @@ export class SeoService extends BaseService {
       if (params.sortBy) queryParams.append('sortBy', params.sortBy);
       if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
 
-      const response = await this.get<OrganicKeywordsResponse>(`/seo/organic-research/keywords/${domain}?${queryParams.toString()}`);
+      const response = await this.get<OrganicKeywordsResponse>(`/api/v1/seo/organic-research/keywords/${domain}?${queryParams.toString()}`);
       return response;
     } catch (error) {
       // Return mock data if API fails
@@ -229,7 +233,7 @@ export class SeoService extends BaseService {
       queryParams.append('country', params.country);
       if (params.limit) queryParams.append('limit', params.limit.toString());
 
-      const response = await this.get<CompetitorsResponse>(`/seo/organic-research/competitors/${domain}?${queryParams.toString()}`);
+      const response = await this.get<CompetitorsResponse>(`/api/v1/seo/organic-research/competitors/${domain}?${queryParams.toString()}`);
       return response;
     } catch (error) {
       // Return mock data if API fails
@@ -266,7 +270,7 @@ export class SeoService extends BaseService {
       if (params.limit) queryParams.append('limit', params.limit.toString());
       if (params.sortBy) queryParams.append('sortBy', params.sortBy);
 
-      const response = await this.get<TopPagesResponse>(`/seo/organic-research/top-pages/${domain}?${queryParams.toString()}`);
+      const response = await this.get<TopPagesResponse>(`/api/v1/seo/organic-research/top-pages/${domain}?${queryParams.toString()}`);
       return response;
     } catch (error) {
       // Return mock data if API fails
@@ -696,11 +700,26 @@ export class SeoService extends BaseService {
   }
 
   /**
-   * Get project rankings overview
+   * Get project rankings overview with optional filters
    */
-  getProjectRankingsOverview(projectId: string): Promise<ProjectRankingsOverview> {
+  getProjectRankingsOverview(projectId: string, filters?: {
+    period?: string;
+    searchEngine?: string;
+    location?: string;
+    device?: string;
+  }): Promise<ProjectRankingsOverview> {
+    // Build query params from filters
+    const params = new URLSearchParams();
+    if (filters?.period) params.append('period', filters.period);
+    if (filters?.searchEngine) params.append('searchEngine', filters.searchEngine);
+    if (filters?.location) params.append('location', filters.location);
+    if (filters?.device) params.append('device', filters.device);
+
+    const queryString = params.toString();
+    const url = `/projects/${projectId}/rankings/overview${queryString ? `?${queryString}` : ''}`;
+
     // For demo purposes, return mock data if API is not available
-    return this.get<ProjectRankingsOverview>(`/projects/${projectId}/rankings/overview`)
+    return this.get<ProjectRankingsOverview>(url)
       .catch(() => {
         // Mock data for demonstration
         const mockOverview: ProjectRankingsOverview = {
@@ -1408,14 +1427,26 @@ export class SeoService extends BaseService {
    */
   async getApiLimits(): Promise<ApiLimitsResponse> {
     try {
-      const response = await this.get<ApiLimitsResponse>('/seo/organic-research/api-limits');
+      const response = await this.get<ApiLimitsResponse>('/api/v1/seo/organic-research/api-limits');
       return response;
     } catch (error) {
       // Return mock data if API fails
       return {
-        semrush: 1000,
-        ahrefs: 500,
-        moz: 300,
+        semrush: {
+          remaining: 850,
+          total: 1000,
+          resetDate: "2025-09-01T00:00:00Z"
+        },
+        ahrefs: {
+          remaining: 420,
+          total: 500,
+          resetDate: "2025-08-15T00:00:00Z"
+        },
+        moz: {
+          remaining: 280,
+          total: 300,
+          resetDate: "2025-08-10T00:00:00Z"
+        }
       };
     }
   }

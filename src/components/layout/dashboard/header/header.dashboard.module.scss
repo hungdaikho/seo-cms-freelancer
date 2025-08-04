@@ -24,23 +24,39 @@
       height: 100%;
       display: flex;
       align-items: center;
-      Input {
+
+      .globalSearchWrapper {
         flex: 1;
-        box-sizing: border-box;
-        border: none;
-        border-radius: 0px;
-        height: 30px;
-        border-bottom-left-radius: 5px;
-        border-top-left-radius: 5px;
-      }
-      Button {
-        background: #e96b22;
-        border: none;
-        color: #fff;
-        border-radius: 0px;
-        height: 30px;
-        border-bottom-right-radius: 5px;
-        border-top-right-radius: 5px;
+
+        :global(.globalSearch) {
+          .searchContainer {
+            .searchInput {
+              height: 30px;
+              border-radius: 5px;
+              border: none;
+              background: white;
+
+              :global(.ant-input) {
+                height: 28px;
+                padding: 4px 12px;
+                border-bottom-left-radius: 5px;
+                border-top-left-radius: 5px;
+              }
+
+              :global(.ant-input-suffix) {
+                background: #e96b22;
+                margin: 0;
+                padding: 0 8px;
+                border-bottom-right-radius: 5px;
+                border-top-right-radius: 5px;
+
+                svg {
+                  color: white;
+                }
+              }
+            }
+          }
+        }
       }
     }
     .menu {

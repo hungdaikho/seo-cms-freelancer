@@ -24,7 +24,7 @@ import KeywordMagicTool from "./keyword-magic-tool/features/keyword_magic_tool";
 import BacklinkAnalyticsManager from "./backlink-analytics/features/backlink_analytics_manager";
 import KeywordGapAnalyzer from "./keyword-gap/features/keyword_gap_analyzer";
 import OrganicResearchPage from "./organic-research/page";
-import DomainOverviewPage from "./domain-overview/page";
+import DomainOverviewDashboard from "./domain-overview/components/DomainOverviewDashboard";
 import TopicResearchPage from "./topic-research/page";
 import styles from "./page.module.scss";
 import PositionTracking from "./features/position-tracking";
@@ -148,7 +148,9 @@ const SeoPage: React.FC = () => {
                   Domain Overview
                 </span>
               ),
-              children: <DomainOverviewPage />,
+              children: (
+                <DomainOverviewDashboard selectedProjectId={selectedProject} />
+              ),
             },
             {
               key: "backlink-analytics",

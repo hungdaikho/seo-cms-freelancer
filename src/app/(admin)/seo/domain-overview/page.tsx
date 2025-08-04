@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -17,7 +16,6 @@ import {
   Table,
   Space,
   Tooltip,
-  Divider,
 } from "antd";
 import {
   SearchOutlined,
@@ -25,139 +23,328 @@ import {
   LineChartOutlined,
   GlobalOutlined,
   InfoCircleOutlined,
-  RiseOutlined,
-  FallOutlined,
-  ExportOutlined,
 } from "@ant-design/icons";
-import { useSearchParams } from "next/navigation";
-import { seoService } from "@/services/seo.service";
+import { useDomainOverview } from "@/stores/hooks/useDomainOverview";
+import { DomainAuthorityCard } from "@/components/domain-overview/DomainAuthorityCard";
 import styles from "./page.module.scss";
+import { useAppSelector } from "@/stores/hooks";
+import { useSearchParams } from "next/navigation";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-interface DomainMetrics {
-  authorityScore: number;
-  organicKeywords: number;
-  organicTraffic: number;
-  organicCost: number;
-  backlinks: number;
-  referringDomains: number;
-  avgPosition: number;
-  visibility: number;
-}
-
-interface TopKeyword {
-  keyword: string;
-  position: number;
-  searchVolume: number;
-  trafficShare: number;
-  difficulty: number;
-  cpc: number;
-}
-
-interface Competitor {
-  domain: string;
-  authorityScore: number;
-  organicKeywords: number;
-  commonKeywords: number;
-  competitionLevel: string;
-}
-
-interface Topic {
-  topic: string;
-  keywords: number;
-  traffic: number;
-  volume: number;
-}
+// List of all countries
+const countries = [
+  { code: "AD", name: "Andorra" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "AF", name: "Afghanistan" },
+  { code: "AG", name: "Antigua and Barbuda" },
+  { code: "AI", name: "Anguilla" },
+  { code: "AL", name: "Albania" },
+  { code: "AM", name: "Armenia" },
+  { code: "AO", name: "Angola" },
+  { code: "AQ", name: "Antarctica" },
+  { code: "AR", name: "Argentina" },
+  { code: "AS", name: "American Samoa" },
+  { code: "AT", name: "Austria" },
+  { code: "AU", name: "Australia" },
+  { code: "AW", name: "Aruba" },
+  { code: "AX", name: "Åland Islands" },
+  { code: "AZ", name: "Azerbaijan" },
+  { code: "BA", name: "Bosnia and Herzegovina" },
+  { code: "BB", name: "Barbados" },
+  { code: "BD", name: "Bangladesh" },
+  { code: "BE", name: "Belgium" },
+  { code: "BF", name: "Burkina Faso" },
+  { code: "BG", name: "Bulgaria" },
+  { code: "BH", name: "Bahrain" },
+  { code: "BI", name: "Burundi" },
+  { code: "BJ", name: "Benin" },
+  { code: "BL", name: "Saint Barthélemy" },
+  { code: "BM", name: "Bermuda" },
+  { code: "BN", name: "Brunei Darussalam" },
+  { code: "BO", name: "Bolivia" },
+  { code: "BQ", name: "Bonaire, Sint Eustatius and Saba" },
+  { code: "BR", name: "Brazil" },
+  { code: "BS", name: "Bahamas" },
+  { code: "BT", name: "Bhutan" },
+  { code: "BV", name: "Bouvet Island" },
+  { code: "BW", name: "Botswana" },
+  { code: "BY", name: "Belarus" },
+  { code: "BZ", name: "Belize" },
+  { code: "CA", name: "Canada" },
+  { code: "CC", name: "Cocos (Keeling) Islands" },
+  { code: "CD", name: "Congo, Democratic Republic of the" },
+  { code: "CF", name: "Central African Republic" },
+  { code: "CG", name: "Congo" },
+  { code: "CH", name: "Switzerland" },
+  { code: "CI", name: "Côte d'Ivoire" },
+  { code: "CK", name: "Cook Islands" },
+  { code: "CL", name: "Chile" },
+  { code: "CM", name: "Cameroon" },
+  { code: "CN", name: "China" },
+  { code: "CO", name: "Colombia" },
+  { code: "CR", name: "Costa Rica" },
+  { code: "CU", name: "Cuba" },
+  { code: "CV", name: "Cabo Verde" },
+  { code: "CW", name: "Curaçao" },
+  { code: "CX", name: "Christmas Island" },
+  { code: "CY", name: "Cyprus" },
+  { code: "CZ", name: "Czech Republic" },
+  { code: "DE", name: "Germany" },
+  { code: "DJ", name: "Djibouti" },
+  { code: "DK", name: "Denmark" },
+  { code: "DM", name: "Dominica" },
+  { code: "DO", name: "Dominican Republic" },
+  { code: "DZ", name: "Algeria" },
+  { code: "EC", name: "Ecuador" },
+  { code: "EE", name: "Estonia" },
+  { code: "EG", name: "Egypt" },
+  { code: "EH", name: "Western Sahara" },
+  { code: "ER", name: "Eritrea" },
+  { code: "ES", name: "Spain" },
+  { code: "ET", name: "Ethiopia" },
+  { code: "FI", name: "Finland" },
+  { code: "FJ", name: "Fiji" },
+  { code: "FK", name: "Falkland Islands (Malvinas)" },
+  { code: "FM", name: "Micronesia" },
+  { code: "FO", name: "Faroe Islands" },
+  { code: "FR", name: "France" },
+  { code: "GA", name: "Gabon" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "GD", name: "Grenada" },
+  { code: "GE", name: "Georgia" },
+  { code: "GF", name: "French Guiana" },
+  { code: "GG", name: "Guernsey" },
+  { code: "GH", name: "Ghana" },
+  { code: "GI", name: "Gibraltar" },
+  { code: "GL", name: "Greenland" },
+  { code: "GM", name: "Gambia" },
+  { code: "GN", name: "Guinea" },
+  { code: "GP", name: "Guadeloupe" },
+  { code: "GQ", name: "Equatorial Guinea" },
+  { code: "GR", name: "Greece" },
+  { code: "GS", name: "South Georgia and the South Sandwich Islands" },
+  { code: "GT", name: "Guatemala" },
+  { code: "GU", name: "Guam" },
+  { code: "GW", name: "Guinea-Bissau" },
+  { code: "GY", name: "Guyana" },
+  { code: "HK", name: "Hong Kong" },
+  { code: "HM", name: "Heard Island and McDonald Islands" },
+  { code: "HN", name: "Honduras" },
+  { code: "HR", name: "Croatia" },
+  { code: "HT", name: "Haiti" },
+  { code: "HU", name: "Hungary" },
+  { code: "ID", name: "Indonesia" },
+  { code: "IE", name: "Ireland" },
+  { code: "IL", name: "Israel" },
+  { code: "IM", name: "Isle of Man" },
+  { code: "IN", name: "India" },
+  { code: "IO", name: "British Indian Ocean Territory" },
+  { code: "IQ", name: "Iraq" },
+  { code: "IR", name: "Iran" },
+  { code: "IS", name: "Iceland" },
+  { code: "IT", name: "Italy" },
+  { code: "JE", name: "Jersey" },
+  { code: "JM", name: "Jamaica" },
+  { code: "JO", name: "Jordan" },
+  { code: "JP", name: "Japan" },
+  { code: "KE", name: "Kenya" },
+  { code: "KG", name: "Kyrgyzstan" },
+  { code: "KH", name: "Cambodia" },
+  { code: "KI", name: "Kiribati" },
+  { code: "KM", name: "Comoros" },
+  { code: "KN", name: "Saint Kitts and Nevis" },
+  { code: "KP", name: "Korea, Democratic People's Republic of" },
+  { code: "KR", name: "Korea, Republic of" },
+  { code: "KW", name: "Kuwait" },
+  { code: "KY", name: "Cayman Islands" },
+  { code: "KZ", name: "Kazakhstan" },
+  { code: "LA", name: "Lao People's Democratic Republic" },
+  { code: "LB", name: "Lebanon" },
+  { code: "LC", name: "Saint Lucia" },
+  { code: "LI", name: "Liechtenstein" },
+  { code: "LK", name: "Sri Lanka" },
+  { code: "LR", name: "Liberia" },
+  { code: "LS", name: "Lesotho" },
+  { code: "LT", name: "Lithuania" },
+  { code: "LU", name: "Luxembourg" },
+  { code: "LV", name: "Latvia" },
+  { code: "LY", name: "Libya" },
+  { code: "MA", name: "Morocco" },
+  { code: "MC", name: "Monaco" },
+  { code: "MD", name: "Moldova" },
+  { code: "ME", name: "Montenegro" },
+  { code: "MF", name: "Saint Martin (French part)" },
+  { code: "MG", name: "Madagascar" },
+  { code: "MH", name: "Marshall Islands" },
+  { code: "MK", name: "North Macedonia" },
+  { code: "ML", name: "Mali" },
+  { code: "MM", name: "Myanmar" },
+  { code: "MN", name: "Mongolia" },
+  { code: "MO", name: "Macao" },
+  { code: "MP", name: "Northern Mariana Islands" },
+  { code: "MQ", name: "Martinique" },
+  { code: "MR", name: "Mauritania" },
+  { code: "MS", name: "Montserrat" },
+  { code: "MT", name: "Malta" },
+  { code: "MU", name: "Mauritius" },
+  { code: "MV", name: "Maldives" },
+  { code: "MW", name: "Malawi" },
+  { code: "MX", name: "Mexico" },
+  { code: "MY", name: "Malaysia" },
+  { code: "MZ", name: "Mozambique" },
+  { code: "NA", name: "Namibia" },
+  { code: "NC", name: "New Caledonia" },
+  { code: "NE", name: "Niger" },
+  { code: "NF", name: "Norfolk Island" },
+  { code: "NG", name: "Nigeria" },
+  { code: "NI", name: "Nicaragua" },
+  { code: "NL", name: "Netherlands" },
+  { code: "NO", name: "Norway" },
+  { code: "NP", name: "Nepal" },
+  { code: "NR", name: "Nauru" },
+  { code: "NU", name: "Niue" },
+  { code: "NZ", name: "New Zealand" },
+  { code: "OM", name: "Oman" },
+  { code: "PA", name: "Panama" },
+  { code: "PE", name: "Peru" },
+  { code: "PF", name: "French Polynesia" },
+  { code: "PG", name: "Papua New Guinea" },
+  { code: "PH", name: "Philippines" },
+  { code: "PK", name: "Pakistan" },
+  { code: "PL", name: "Poland" },
+  { code: "PM", name: "Saint Pierre and Miquelon" },
+  { code: "PN", name: "Pitcairn" },
+  { code: "PR", name: "Puerto Rico" },
+  { code: "PS", name: "Palestine, State of" },
+  { code: "PT", name: "Portugal" },
+  { code: "PW", name: "Palau" },
+  { code: "PY", name: "Paraguay" },
+  { code: "QA", name: "Qatar" },
+  { code: "RE", name: "Réunion" },
+  { code: "RO", name: "Romania" },
+  { code: "RS", name: "Serbia" },
+  { code: "RU", name: "Russian Federation" },
+  { code: "RW", name: "Rwanda" },
+  { code: "SA", name: "Saudi Arabia" },
+  { code: "SB", name: "Solomon Islands" },
+  { code: "SC", name: "Seychelles" },
+  { code: "SD", name: "Sudan" },
+  { code: "SE", name: "Sweden" },
+  { code: "SG", name: "Singapore" },
+  { code: "SH", name: "Saint Helena, Ascension and Tristan da Cunha" },
+  { code: "SI", name: "Slovenia" },
+  { code: "SJ", name: "Svalbard and Jan Mayen" },
+  { code: "SK", name: "Slovakia" },
+  { code: "SL", name: "Sierra Leone" },
+  { code: "SM", name: "San Marino" },
+  { code: "SN", name: "Senegal" },
+  { code: "SO", name: "Somalia" },
+  { code: "SR", name: "Suriname" },
+  { code: "SS", name: "South Sudan" },
+  { code: "ST", name: "Sao Tome and Principe" },
+  { code: "SV", name: "El Salvador" },
+  { code: "SX", name: "Sint Maarten (Dutch part)" },
+  { code: "SY", name: "Syrian Arab Republic" },
+  { code: "SZ", name: "Eswatini" },
+  { code: "TC", name: "Turks and Caicos Islands" },
+  { code: "TD", name: "Chad" },
+  { code: "TF", name: "French Southern Territories" },
+  { code: "TG", name: "Togo" },
+  { code: "TH", name: "Thailand" },
+  { code: "TJ", name: "Tajikistan" },
+  { code: "TK", name: "Tokelau" },
+  { code: "TL", name: "Timor-Leste" },
+  { code: "TM", name: "Turkmenistan" },
+  { code: "TN", name: "Tunisia" },
+  { code: "TO", name: "Tonga" },
+  { code: "TR", name: "Turkey" },
+  { code: "TT", name: "Trinidad and Tobago" },
+  { code: "TV", name: "Tuvalu" },
+  { code: "TW", name: "Taiwan" },
+  { code: "TZ", name: "Tanzania" },
+  { code: "UA", name: "Ukraine" },
+  { code: "UG", name: "Uganda" },
+  { code: "UM", name: "United States Minor Outlying Islands" },
+  { code: "US", name: "United States" },
+  { code: "UY", name: "Uruguay" },
+  { code: "UZ", name: "Uzbekistan" },
+  { code: "VA", name: "Holy See (Vatican City State)" },
+  { code: "VC", name: "Saint Vincent and the Grenadines" },
+  { code: "VE", name: "Venezuela" },
+  { code: "VG", name: "Virgin Islands, British" },
+  { code: "VI", name: "Virgin Islands, U.S." },
+  { code: "VN", name: "Viet Nam" },
+  { code: "VU", name: "Vanuatu" },
+  { code: "WF", name: "Wallis and Futuna" },
+  { code: "WS", name: "Samoa" },
+  { code: "YE", name: "Yemen" },
+  { code: "YT", name: "Mayotte" },
+  { code: "ZA", name: "South Africa" },
+  { code: "ZM", name: "Zambia" },
+  { code: "ZW", name: "Zimbabwe" },
+];
 
 const DomainOverviewPage: React.FC = () => {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get("projectId");
+  const selectedProjectId = searchParams.get("projectId");
+  // Use domain overview hook
+  const { projects } = useAppSelector((state) => state.project);
+  const {
+    overview,
+    topKeywords,
+    competitors,
+    topics,
+    authority,
+    isLoading,
 
-  const [loading, setLoading] = useState(false);
-  const [searchDomain, setSearchDomain] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("US");
-  const [domainMetrics, setDomainMetrics] = useState<DomainMetrics>({
-    authorityScore: 0,
-    organicKeywords: 0,
-    organicTraffic: 0,
-    organicCost: 0,
-    backlinks: 0,
-    referringDomains: 0,
-    avgPosition: 0,
-    visibility: 0,
-  });
+    selectedDomain,
+    selectedCountry,
+    analyzeDomain,
+    setCountry,
+  } = useDomainOverview();
+  const [searchDomain, setSearchDomain] = useState(selectedDomain || "");
 
-  const [topKeywords, setTopKeywords] = useState<TopKeyword[]>([]);
-  const [competitors, setCompetitors] = useState<Competitor[] | any>([]);
-  const [topics, setTopics] = useState<Topic[]>([]);
-
+  useEffect(() => {
+    if (selectedProjectId) {
+      // Auto-load data when project is selected
+      // This could be enhanced to remember last analyzed domain
+      setSearchDomain(
+        projects.find((project) => project.id === selectedProjectId)?.domain ||
+          ""
+      );
+    }
+  }, [selectedProjectId, projects]);
   // Analyze domain function
-  const analyzeDomain = async (domain: string) => {
+  const handleAnalyzeDomain = async (domain: string) => {
     if (!domain.trim()) {
       message.warning("Please enter a valid domain");
       return;
     }
 
-    setLoading(true);
     try {
-      // Get domain overview
-      const overviewResponse = await seoService.getDomainOverview(domain, {
+      await analyzeDomain(domain, {
         country: selectedCountry,
         includeSubdomains: false,
+        keywordsLimit: 50,
+        competitorsLimit: 10,
+        topicsLimit: 20,
+        includeAuthority: true,
       });
-      setDomainMetrics(overviewResponse);
-
-      // Get top keywords
-      const keywordsResponse = await seoService.getDomainTopKeywords(domain, {
-        country: selectedCountry,
-        limit: 50,
-      });
-      setTopKeywords(keywordsResponse);
-
-      // Get competitors
-      const competitorsResponse = await seoService.getDomainCompetitors(
-        domain,
-        {
-          country: selectedCountry,
-          limit: 10,
-        }
-      );
-      setCompetitors(competitorsResponse);
-
       message.success(`Domain analysis completed for ${domain}`);
     } catch (error) {
       console.error("Error analyzing domain:", error);
       message.error("Failed to analyze domain. Please try again.");
-      // Reset to empty state on error
-      setDomainMetrics({
-        authorityScore: 0,
-        organicKeywords: 0,
-        organicTraffic: 0,
-        organicCost: 0,
-        backlinks: 0,
-        referringDomains: 0,
-        avgPosition: 0,
-        visibility: 0,
-      });
-      setTopKeywords([]);
-      setCompetitors([]);
-      setTopics([]);
-    } finally {
-      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (projectId) {
-      // Auto-load data when project is selected
-      // This could be enhanced to remember last analyzed domain
-    }
-  }, [projectId]);
-
   const handleSearch = () => {
-    analyzeDomain(searchDomain);
+    handleAnalyzeDomain(searchDomain);
+  };
+
+  const handleCountryChange = (country: string) => {
+    setCountry(country);
   };
 
   const getAuthorityScoreColor = (score: number) => {
@@ -165,15 +352,6 @@ const DomainOverviewPage: React.FC = () => {
     if (score >= 60) return "#faad14";
     if (score >= 40) return "#fa8c16";
     return "#ff4d4f";
-  };
-
-  const getCompetitionColor = (level: string) => {
-    const colors = {
-      High: "red",
-      Medium: "orange",
-      Low: "green",
-    };
-    return colors[level as keyof typeof colors] || "default";
   };
 
   const keywordColumns = [
@@ -205,10 +383,10 @@ const DomainOverviewPage: React.FC = () => {
       render: (volume: number) => volume.toLocaleString(),
     },
     {
-      title: "Traffic %",
-      dataIndex: "trafficShare",
-      key: "trafficShare",
-      render: (share: number) => `${share}%`,
+      title: "Traffic",
+      dataIndex: "traffic",
+      key: "traffic",
+      render: (traffic: number) => traffic.toLocaleString(),
     },
     {
       title: "Difficulty",
@@ -272,8 +450,21 @@ const DomainOverviewPage: React.FC = () => {
       title: "Competition Level",
       dataIndex: "competitionLevel",
       key: "competitionLevel",
-      render: (level: string) => (
-        <Tag color={getCompetitionColor(level)}>{level}</Tag>
+      render: (level: number) => {
+        const levelText = level >= 80 ? "High" : level >= 50 ? "Medium" : "Low";
+        const color = level >= 80 ? "red" : level >= 50 ? "orange" : "green";
+        return <Tag color={color}>{levelText}</Tag>;
+      },
+    },
+    {
+      title: "Traffic Gap",
+      dataIndex: "trafficGap",
+      key: "trafficGap",
+      render: (gap: number) => (
+        <span style={{ color: gap > 0 ? "#52c41a" : "#ff4d4f" }}>
+          {gap > 0 ? "+" : ""}
+          {gap.toLocaleString()}
+        </span>
       ),
     },
   ];
@@ -298,10 +489,29 @@ const DomainOverviewPage: React.FC = () => {
       render: (traffic: number) => traffic.toLocaleString(),
     },
     {
-      title: "Search Volume",
-      dataIndex: "volume",
-      key: "volume",
-      render: (volume: number) => volume.toLocaleString(),
+      title: "Difficulty",
+      dataIndex: "difficulty",
+      key: "difficulty",
+      render: (difficulty: number) => (
+        <Progress
+          percent={difficulty}
+          size="small"
+          strokeColor={
+            difficulty > 70
+              ? "#ff4d4f"
+              : difficulty > 40
+              ? "#faad14"
+              : "#52c41a"
+          }
+          showInfo={false}
+        />
+      ),
+    },
+    {
+      title: "Opportunities",
+      dataIndex: "opportunities",
+      key: "opportunities",
+      render: (opportunities: number) => opportunities.toLocaleString(),
     },
   ];
 
@@ -330,13 +540,28 @@ const DomainOverviewPage: React.FC = () => {
           <Form.Item>
             <Select
               value={selectedCountry}
-              onChange={setSelectedCountry}
-              style={{ width: 150 }}
+              onChange={handleCountryChange}
+              style={{ width: 200 }}
+              showSearch
+              placeholder="Select country"
+              filterOption={(input, option) =>
+                (option?.label as string)
+                  ?.toLowerCase()
+                  .includes(input.toLowerCase()) ||
+                (option?.value as string)
+                  ?.toLowerCase()
+                  .includes(input.toLowerCase())
+              }
             >
-              <Option value="US">United States</Option>
-              <Option value="UK">United Kingdom</Option>
-              <Option value="CA">Canada</Option>
-              <Option value="AU">Australia</Option>
+              {countries.map((country) => (
+                <Option
+                  key={country.code}
+                  value={country.code}
+                  label={country.name}
+                >
+                  {country.name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
           <Form.Item>
@@ -344,14 +569,14 @@ const DomainOverviewPage: React.FC = () => {
               type="primary"
               icon={<SearchOutlined />}
               onClick={handleSearch}
-              loading={loading}
+              loading={isLoading}
             >
               Analyze
             </Button>
           </Form.Item>
-          <Form.Item>
+          {/* <Form.Item>
             <Button icon={<ExportOutlined />}>Export</Button>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </Card>
 
@@ -368,10 +593,10 @@ const DomainOverviewPage: React.FC = () => {
                   </Tooltip>
                 </Space>
               }
-              value={domainMetrics.authorityScore}
+              value={overview?.authorityScore || 0}
               suffix="/100"
               valueStyle={{
-                color: getAuthorityScoreColor(domainMetrics.authorityScore),
+                color: getAuthorityScoreColor(overview?.authorityScore || 0),
               }}
               prefix={<TrophyOutlined />}
             />
@@ -381,7 +606,7 @@ const DomainOverviewPage: React.FC = () => {
           <Card>
             <Statistic
               title="Organic Keywords"
-              value={domainMetrics.organicKeywords}
+              value={overview?.organicKeywords || 0}
               formatter={(value) => value?.toLocaleString()}
               prefix={<SearchOutlined />}
             />
@@ -391,7 +616,7 @@ const DomainOverviewPage: React.FC = () => {
           <Card>
             <Statistic
               title="Organic Traffic"
-              value={domainMetrics.organicTraffic}
+              value={overview?.organicTraffic || 0}
               formatter={(value) => value?.toLocaleString()}
               prefix={<LineChartOutlined />}
             />
@@ -401,7 +626,7 @@ const DomainOverviewPage: React.FC = () => {
           <Card>
             <Statistic
               title="Traffic Cost"
-              value={domainMetrics.organicCost}
+              value={overview?.organicCost || 0}
               formatter={(value) => `$${value?.toLocaleString()}`}
               prefix="$"
             />
@@ -411,7 +636,7 @@ const DomainOverviewPage: React.FC = () => {
           <Card>
             <Statistic
               title="Backlinks"
-              value={domainMetrics.backlinks}
+              value={overview?.backlinks || 0}
               formatter={(value) => value?.toLocaleString()}
               prefix={<GlobalOutlined />}
             />
@@ -421,7 +646,7 @@ const DomainOverviewPage: React.FC = () => {
           <Card>
             <Statistic
               title="Referring Domains"
-              value={domainMetrics.referringDomains}
+              value={overview?.referringDomains || 0}
               formatter={(value) => value?.toLocaleString()}
               prefix={<GlobalOutlined />}
             />
@@ -430,9 +655,9 @@ const DomainOverviewPage: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Avg Position"
-              value={domainMetrics.avgPosition}
-              precision={1}
+              title="Domain Trend"
+              value={overview?.trafficTrend?.length || 0}
+              suffix=" months"
               prefix={<InfoCircleOutlined />}
             />
           </Card>
@@ -440,22 +665,27 @@ const DomainOverviewPage: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Visibility"
-              value={domainMetrics.visibility}
-              suffix="%"
+              title="Top Countries"
+              value={overview?.topCountries?.length || 0}
+              suffix=" countries"
               prefix={<TrophyOutlined />}
             />
           </Card>
         </Col>
       </Row>
 
+      {/* Domain Authority Section */}
+      {authority && (
+        <DomainAuthorityCard authority={authority} loading={isLoading} />
+      )}
+
       {/* Top Keywords Section */}
       <Card className={styles.contentCard} title="Top Organic Keywords">
         <Table
-          dataSource={topKeywords}
+          dataSource={topKeywords?.data || []}
           columns={keywordColumns}
-          loading={loading}
-          rowKey="keyword"
+          loading={isLoading}
+          rowKey={(record, index) => `keyword-${record.keyword}-${index}`}
           pagination={{
             pageSize: 10,
             showTotal: (total) => `Top ${total} keywords`,
@@ -466,10 +696,10 @@ const DomainOverviewPage: React.FC = () => {
       {/* Main Competitors Section */}
       <Card className={styles.contentCard} title="Main Organic Competitors">
         <Table
-          dataSource={competitors}
+          dataSource={competitors?.data || []}
           columns={competitorColumns}
-          loading={loading}
-          rowKey="domain"
+          loading={isLoading}
+          rowKey={(record, index) => `competitor-${record.domain}-${index}`}
           pagination={{
             pageSize: 10,
             showTotal: (total) => `Top ${total} competitors`,
@@ -480,10 +710,10 @@ const DomainOverviewPage: React.FC = () => {
       {/* Top Topics Section */}
       <Card className={styles.contentCard} title="Top Organic Topics">
         <Table
-          dataSource={topics}
+          dataSource={topics?.data || []}
           columns={topicColumns}
-          loading={loading}
-          rowKey="topic"
+          loading={isLoading}
+          rowKey={(record, index) => `topic-${record.topic}-${index}`}
           pagination={{
             pageSize: 10,
             showTotal: (total) => `Top ${total} topics`,

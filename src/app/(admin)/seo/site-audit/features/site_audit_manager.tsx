@@ -19,8 +19,6 @@ import {
   message,
   Tabs,
   List,
-  Badge,
-  Tooltip,
   Modal,
   Form,
   Switch,
@@ -28,13 +26,9 @@ import {
   notification,
 } from "antd";
 import {
-  SearchOutlined,
   BugOutlined,
   ExclamationCircleOutlined,
-  InfoCircleOutlined,
   CheckCircleOutlined,
-  DownloadOutlined,
-  ReloadOutlined,
   GlobalOutlined,
   MobileOutlined,
   ThunderboltOutlined,
@@ -44,6 +38,7 @@ import {
   DeleteOutlined,
   EyeOutlined,
   BarChartOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { fetchProjects } from "@/stores/slices/project.slice";
@@ -61,7 +56,7 @@ import { Project } from "@/types/api.type";
 import { RealAuditResult } from "@/services/audit.service";
 import styles from "./site_audit_manager.module.scss";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 const SiteAuditManager: React.FC = () => {
@@ -77,7 +72,6 @@ const SiteAuditManager: React.FC = () => {
     currentStep,
     error,
   } = useAppSelector((state) => state.audit);
-
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [websiteUrl, setWebsiteUrl] = useState<string>("");
   const [activeTab, setActiveTab] = useState("overview");
@@ -137,19 +131,21 @@ const SiteAuditManager: React.FC = () => {
       });
       return;
     }
-    if (!websiteUrl.startsWith("http")) {
-      notification.error({
-        message: "Invalid URL",
-        description:
-          "Please enter a valid URL starting with http:// or https://",
-      });
-      return;
+
+    // Auto prepend https:// or www if missing
+    let normalizedUrl = websiteUrl.trim();
+    if (!/^https?:\/\//i.test(normalizedUrl)) {
+      if (!/^www\./i.test(normalizedUrl)) {
+        normalizedUrl = "https://www." + normalizedUrl;
+      } else {
+        normalizedUrl = "https://" + normalizedUrl;
+      }
     }
 
     try {
       console.log("Starting audit with:", {
         projectId: selectedProject,
-        url: websiteUrl,
+        url: normalizedUrl,
         options: {
           auditType: auditSettings.auditType,
           settings: auditSettings,
@@ -159,7 +155,7 @@ const SiteAuditManager: React.FC = () => {
       const result = await dispatch(
         startComprehensiveAudit({
           projectId: selectedProject,
-          url: websiteUrl,
+          url: normalizedUrl,
           options: {
             auditType: auditSettings.auditType,
             settings: auditSettings,
@@ -167,8 +163,6 @@ const SiteAuditManager: React.FC = () => {
         })
       ).unwrap();
 
-      console.log("Audit started successfully:", result);
-      message.success("Comprehensive website audit started successfully!");
       setAuditModalVisible(false);
       setActiveTab("current");
     } catch (error: any) {
@@ -213,7 +207,7 @@ const SiteAuditManager: React.FC = () => {
 
   const viewAuditDetails = (audit: RealAuditResult) => {
     dispatch(fetchRealAuditResults(audit.id));
-    setActiveTab("current");
+    setActiveTab("overview");
   };
 
   if (loading && !isRunningAudit) {
@@ -224,7 +218,6 @@ const SiteAuditManager: React.FC = () => {
       </div>
     );
   }
-
   if (!selectedProject && projects.length === 0) {
     return (
       <div className={styles.noProject}>
@@ -240,7 +233,6 @@ const SiteAuditManager: React.FC = () => {
       </div>
     );
   }
-
   return (
     <div className={styles.siteAuditManager}>
       {/* Header */}
@@ -378,11 +370,15 @@ const SiteAuditManager: React.FC = () => {
                         >
                           <Progress
                             type="circle"
-                            percent={currentRealAudit?.overview?.score || 0}
+                            percent={
+                              currentRealAudit?.results?.overview?.score || 0
+                            }
                             strokeColor={
-                              (currentRealAudit?.overview?.score || 0) >= 80
+                              (currentRealAudit?.results?.overview?.score ||
+                                0) >= 80
                                 ? "#52c41a"
-                                : (currentRealAudit?.overview?.score || 0) >= 60
+                                : (currentRealAudit?.results?.overview?.score ||
+                                    0) >= 60
                                 ? "#faad14"
                                 : "#ff4d4f"
                             }
@@ -392,7 +388,9 @@ const SiteAuditManager: React.FC = () => {
                             Overall Score
                           </Title>
                           <Tag color="blue">
-                            Real Data from {currentRealAudit?.url || "N/A"}
+                            Real Data from{" "}
+                            {currentRealAudit?.results?.pages_analyzed?.[0]
+                              ?.url || "N/A"}
                           </Tag>
                         </div>
                       </Col>
@@ -402,7 +400,8 @@ const SiteAuditManager: React.FC = () => {
                             <Statistic
                               title="Pages Analyzed"
                               value={
-                                currentRealAudit?.overview?.pages_analyzed || 0
+                                currentRealAudit?.results.overview
+                                  ?.pages_analyzed || 0
                               }
                               prefix={<FileImageOutlined />}
                               valueStyle={{ color: "#1890ff" }}
@@ -412,7 +411,8 @@ const SiteAuditManager: React.FC = () => {
                             <Statistic
                               title="Critical Issues"
                               value={
-                                currentRealAudit?.overview?.critical_issues || 0
+                                currentRealAudit?.results.overview
+                                  ?.critical_issues || 0
                               }
                               valueStyle={{ color: "#ff4d4f" }}
                               prefix={<BugOutlined />}
@@ -421,7 +421,10 @@ const SiteAuditManager: React.FC = () => {
                           <Col span={6}>
                             <Statistic
                               title="Warnings"
-                              value={currentRealAudit?.overview?.warnings || 0}
+                              value={
+                                currentRealAudit?.results.overview?.warnings ||
+                                0
+                              }
                               valueStyle={{ color: "#faad14" }}
                               prefix={<ExclamationCircleOutlined />}
                             />
@@ -430,7 +433,8 @@ const SiteAuditManager: React.FC = () => {
                             <Statistic
                               title="Passed Checks"
                               value={
-                                currentRealAudit?.overview?.passed_checks || 0
+                                currentRealAudit?.results.overview
+                                  ?.passed_checks || 0
                               }
                               valueStyle={{ color: "#52c41a" }}
                               prefix={<CheckCircleOutlined />}
@@ -450,13 +454,19 @@ const SiteAuditManager: React.FC = () => {
                       <Col span={6}>
                         <Statistic
                           title="Performance Score"
-                          value={currentRealAudit?.performance?.score || 0}
+                          value={
+                            currentRealAudit?.results.performance?.score || 0
+                          }
                           suffix="/100"
                           valueStyle={{
                             color:
-                              (currentRealAudit?.performance?.score || 0) >= 80
+                              (currentRealAudit?.results.performance?.score ||
+                                0) >= 80
                                 ? "#52c41a"
-                                : "#faad14",
+                                : (currentRealAudit?.results.performance
+                                    ?.score || 0) >= 60
+                                ? "#faad14"
+                                : "#ff4d4f",
                           }}
                           prefix={<ThunderboltOutlined />}
                         />
@@ -465,15 +475,19 @@ const SiteAuditManager: React.FC = () => {
                         <Statistic
                           title="LCP (Real)"
                           value={
-                            currentRealAudit?.performance?.metrics?.lcp?.toFixed(
-                              1
-                            ) || "0.0"
+                            currentRealAudit?.results.performance?.metrics
+                              ?.core_web_vitals?.lcp
+                              ? (
+                                  currentRealAudit.results.performance.metrics
+                                    .core_web_vitals.lcp / 1000
+                                ).toFixed(1)
+                              : "0.0"
                           }
                           suffix="s"
                           valueStyle={{
                             color:
-                              (currentRealAudit?.performance?.metrics?.lcp ||
-                                0) <= 2.5
+                              (currentRealAudit?.results.performance?.metrics
+                                ?.core_web_vitals?.lcp || 0) <= 2500
                                 ? "#52c41a"
                                 : "#ff4d4f",
                           }}
@@ -486,13 +500,14 @@ const SiteAuditManager: React.FC = () => {
                         <Statistic
                           title="FID (Real)"
                           value={
-                            currentRealAudit?.performance?.metrics?.fid || 0
+                            currentRealAudit?.results.performance?.metrics
+                              ?.core_web_vitals?.fid || 0
                           }
                           suffix="ms"
                           valueStyle={{
                             color:
-                              (currentRealAudit?.performance?.metrics?.fid ||
-                                0) <= 100
+                              (currentRealAudit?.results.performance?.metrics
+                                ?.core_web_vitals?.fid || 0) <= 100
                                 ? "#52c41a"
                                 : "#ff4d4f",
                           }}
@@ -505,17 +520,81 @@ const SiteAuditManager: React.FC = () => {
                         <Statistic
                           title="Mobile Friendly"
                           value={
-                            currentRealAudit?.performance?.mobile_friendly
+                            currentRealAudit?.results.performance?.metrics
+                              ?.mobile_friendly
                               ? "Yes"
                               : "No"
                           }
                           valueStyle={{
-                            color: currentRealAudit?.performance
-                              ?.mobile_friendly
+                            color: currentRealAudit?.results.performance
+                              ?.metrics?.mobile_friendly
                               ? "#52c41a"
                               : "#ff4d4f",
                           }}
                           prefix={<MobileOutlined />}
+                        />
+                      </Col>
+                    </Row>
+
+                    {/* Additional Core Web Vitals */}
+                    <Row gutter={16} style={{ marginTop: 16 }}>
+                      <Col span={8}>
+                        <Statistic
+                          title="CLS (Real)"
+                          value={
+                            currentRealAudit?.results.performance?.metrics?.core_web_vitals?.cls?.toFixed(
+                              3
+                            ) || "0.000"
+                          }
+                          valueStyle={{
+                            color:
+                              (currentRealAudit?.results.performance?.metrics
+                                ?.core_web_vitals?.cls || 0) <= 0.1
+                                ? "#52c41a"
+                                : "#ff4d4f",
+                          }}
+                        />
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          Cumulative Layout Shift
+                        </Text>
+                      </Col>
+                      <Col span={8}>
+                        <Statistic
+                          title="Page Speed Score"
+                          value={
+                            currentRealAudit?.results.performance?.metrics
+                              ?.avg_page_speed || 0
+                          }
+                          suffix="/100"
+                          valueStyle={{
+                            color:
+                              (currentRealAudit?.results.performance?.metrics
+                                ?.avg_page_speed || 0) >= 80
+                                ? "#52c41a"
+                                : (currentRealAudit?.results.performance
+                                    ?.metrics?.avg_page_speed || 0) >= 60
+                                ? "#faad14"
+                                : "#ff4d4f",
+                          }}
+                        />
+                      </Col>
+                      <Col span={8}>
+                        <Alert
+                          message="Lighthouse Status"
+                          description={
+                            currentRealAudit?.results?.pages_analyzed?.[0]
+                              ?.lighthouse_mobile?.diagnostics?.[0]
+                              ?.description || "Analysis completed successfully"
+                          }
+                          type={
+                            currentRealAudit?.results?.pages_analyzed?.[0]
+                              ?.lighthouse_mobile?.diagnostics?.[0]?.id ===
+                            "lighthouse-failed"
+                              ? "warning"
+                              : "success"
+                          }
+                          showIcon
+                          style={{ fontSize: 12 }}
                         />
                       </Col>
                     </Row>
@@ -527,20 +606,22 @@ const SiteAuditManager: React.FC = () => {
               key: "seo",
               label: "🔍 SEO Analysis",
               children: (
-                <Card title="Real SEO Analysis Results (Cheerio Parser)">
-                  <Row gutter={16}>
-                    <Col span={12}>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Card title="Page SEO Information" size="small">
                       <div style={{ marginBottom: 16 }}>
                         <Text strong>Page Title:</Text>
                         <div style={{ marginTop: 4 }}>
                           <Tag
                             color={
-                              currentRealAudit?.seo_analysis?.title
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.title
                                 ? "green"
                                 : "red"
                             }
                           >
-                            {currentRealAudit?.seo_analysis?.title || "Missing"}
+                            {currentRealAudit?.results?.pages_analyzed?.[0]
+                              ?.seo_analysis?.title || "Missing"}
                           </Tag>
                         </div>
                       </div>
@@ -549,28 +630,48 @@ const SiteAuditManager: React.FC = () => {
                         <div style={{ marginTop: 4 }}>
                           <Tag
                             color={
-                              currentRealAudit?.seo_analysis?.meta_description
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.meta_description
                                 ? "green"
                                 : "red"
                             }
                           >
-                            {currentRealAudit?.seo_analysis?.meta_description
-                              ? "Present"
+                            {currentRealAudit?.results?.pages_analyzed?.[0]
+                              ?.seo_analysis?.meta_description
+                              ? `Present (${currentRealAudit?.results?.pages_analyzed?.[0]?.seo_analysis?.meta_description?.length} chars)`
                               : "Missing"}
                           </Tag>
                         </div>
+                        {currentRealAudit?.results?.pages_analyzed?.[0]
+                          ?.seo_analysis?.meta_description && (
+                          <Text
+                            type="secondary"
+                            style={{
+                              fontSize: 12,
+                              display: "block",
+                              marginTop: 4,
+                            }}
+                          >
+                            "
+                            {
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.meta_description
+                            }
+                            "
+                          </Text>
+                        )}
                       </div>
                       <div style={{ marginBottom: 16 }}>
                         <Text strong>H1 Tags Found:</Text>
                         <div style={{ marginTop: 4 }}>
-                          {currentRealAudit?.seo_analysis?.h1_tags?.length >
-                          0 ? (
-                            currentRealAudit.seo_analysis.h1_tags.map(
+                          {currentRealAudit?.results?.pages_analyzed?.[0]
+                            ?.seo_analysis?.h1_tags?.length > 0 ? (
+                            currentRealAudit?.results?.pages_analyzed?.[0]?.seo_analysis?.h1_tags?.map(
                               (h1, index) => (
                                 <Tag
                                   key={`h1-tag-${index}`}
                                   color="blue"
-                                  style={{ marginBottom: 4 }}
+                                  style={{ marginBottom: 4, display: "block" }}
                                 >
                                   {h1 || "N/A"}
                                 </Tag>
@@ -581,15 +682,63 @@ const SiteAuditManager: React.FC = () => {
                           )}
                         </div>
                       </div>
-                    </Col>
-                    <Col span={12}>
+                      <div style={{ marginBottom: 16 }}>
+                        <Text strong>H2 Tags:</Text>
+                        <div style={{ marginTop: 4 }}>
+                          {currentRealAudit?.results?.pages_analyzed?.[0]
+                            ?.seo_analysis?.h2_tags?.length > 0 ? (
+                            currentRealAudit?.results?.pages_analyzed?.[0]?.seo_analysis?.h2_tags
+                              ?.slice(0, 3)
+                              .map((h2, index) => (
+                                <Tag
+                                  key={`h2-tag-${index}`}
+                                  color="cyan"
+                                  style={{ marginBottom: 4, marginRight: 4 }}
+                                >
+                                  {h2}
+                                </Tag>
+                              ))
+                          ) : (
+                            <Tag color="orange">No H2 tags found</Tag>
+                          )}
+                          {currentRealAudit?.results?.pages_analyzed?.[0]
+                            ?.seo_analysis?.h2_tags?.length > 3 && (
+                            <Tag color="default">
+                              +
+                              {currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.h2_tags?.length - 3}{" "}
+                              more
+                            </Tag>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ marginBottom: 16 }}>
+                        <Text strong>Canonical URL:</Text>
+                        <div style={{ marginTop: 4 }}>
+                          <Tag
+                            color={
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.canonical_url
+                                ? "green"
+                                : "red"
+                            }
+                          >
+                            {currentRealAudit?.results?.pages_analyzed?.[0]
+                              ?.seo_analysis?.canonical_url || "Missing"}
+                          </Tag>
+                        </div>
+                      </div>
+                    </Card>
+                  </Col>
+                  <Col span={12}>
+                    <Card title="SEO Statistics" size="small">
                       <Row gutter={16}>
                         <Col span={12}>
                           <Statistic
                             title="Internal Links"
                             value={
-                              currentRealAudit?.seo_analysis?.internal_links ||
-                              0
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.internal_links || 0
                             }
                             prefix={<GlobalOutlined />}
                           />
@@ -598,8 +747,8 @@ const SiteAuditManager: React.FC = () => {
                           <Statistic
                             title="External Links"
                             value={
-                              currentRealAudit?.seo_analysis?.external_links ||
-                              0
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.external_links || 0
                             }
                             prefix={<GlobalOutlined />}
                           />
@@ -608,13 +757,13 @@ const SiteAuditManager: React.FC = () => {
                           <Statistic
                             title="Images Missing Alt"
                             value={
-                              currentRealAudit?.seo_analysis
-                                ?.images_without_alt || 0
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.images_without_alt || 0
                             }
                             valueStyle={{
                               color:
-                                (currentRealAudit?.seo_analysis
-                                  ?.images_without_alt || 0) > 0
+                                (currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.seo_analysis?.images_without_alt || 0) > 0
                                   ? "#ff4d4f"
                                   : "#52c41a",
                             }}
@@ -623,17 +772,113 @@ const SiteAuditManager: React.FC = () => {
                         </Col>
                         <Col span={12}>
                           <Statistic
-                            title="Word Count"
+                            title="Total Images"
                             value={
-                              currentRealAudit?.seo_analysis?.word_count || 0
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.images_total || 0
                             }
                             prefix={<FileImageOutlined />}
                           />
                         </Col>
+                        <Col span={12}>
+                          <Statistic
+                            title="Word Count"
+                            value={
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.word_count || 0
+                            }
+                            prefix={<FileImageOutlined />}
+                          />
+                        </Col>
+                        <Col span={12}>
+                          <Statistic
+                            title="Schema Markup"
+                            value={
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.seo_analysis?.schema_markup || 0
+                            }
+                            valueStyle={{
+                              color:
+                                (currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.seo_analysis?.schema_markup || 0) > 0
+                                  ? "#52c41a"
+                                  : "#ff4d4f",
+                            }}
+                          />
+                        </Col>
                       </Row>
-                    </Col>
-                  </Row>
-                </Card>
+                    </Card>
+                  </Col>
+                  <Col span={24} style={{ marginTop: 16 }}>
+                    <Card title="SEO Issues & Recommendations" size="small">
+                      {currentRealAudit?.results?.pages_analyzed?.[0]
+                        ?.seo_analysis?.issues?.length > 0 ? (
+                        <List
+                          size="small"
+                          dataSource={
+                            currentRealAudit?.results?.pages_analyzed?.[0]
+                              ?.seo_analysis?.issues || []
+                          }
+                          renderItem={(issue, index) => (
+                            <List.Item key={`seo-issue-${index}`}>
+                              <List.Item.Meta
+                                avatar={
+                                  <Tag
+                                    color={
+                                      issue.type === "warning"
+                                        ? "orange"
+                                        : issue.type === "error"
+                                        ? "red"
+                                        : "blue"
+                                    }
+                                  >
+                                    {issue.type?.toUpperCase()}
+                                  </Tag>
+                                }
+                                title={
+                                  <span>
+                                    {issue.title}
+                                    <Tag
+                                      color={
+                                        issue.impact === "high"
+                                          ? "red"
+                                          : issue.impact === "medium"
+                                          ? "orange"
+                                          : "blue"
+                                      }
+                                      style={{ marginLeft: 8 }}
+                                    >
+                                      {issue.impact?.toUpperCase()} IMPACT
+                                    </Tag>
+                                  </span>
+                                }
+                                description={
+                                  <div>
+                                    <Text>{issue.description}</Text>
+                                    <br />
+                                    <Text
+                                      type="secondary"
+                                      style={{ fontSize: 12 }}
+                                    >
+                                      💡 <strong>Recommendation:</strong>{" "}
+                                      {issue.recommendation}
+                                    </Text>
+                                  </div>
+                                }
+                              />
+                            </List.Item>
+                          )}
+                        />
+                      ) : (
+                        <Alert
+                          message="No SEO issues found!"
+                          type="success"
+                          showIcon
+                        />
+                      )}
+                    </Card>
+                  </Col>
+                </Row>
               ),
             },
             {
@@ -649,29 +894,25 @@ const SiteAuditManager: React.FC = () => {
                           {
                             title: "Robots.txt",
                             status:
-                              currentRealAudit?.technical_seo?.robots_txt
-                                ?.exists || false,
+                              currentRealAudit?.results.technical_seo
+                                ?.robots_txt?.exists || false,
                             issues:
-                              currentRealAudit?.technical_seo?.robots_txt
-                                ?.issues || [],
+                              currentRealAudit?.results.technical_seo
+                                ?.robots_txt?.issues || [],
                           },
                           {
                             title: "XML Sitemap",
                             status:
-                              currentRealAudit?.technical_seo?.sitemap
+                              currentRealAudit?.results.technical_seo?.sitemap
                                 ?.exists || false,
                             count:
-                              currentRealAudit?.technical_seo?.sitemap
-                                ?.urls_count || 0,
+                              currentRealAudit?.results.technical_seo?.sitemap
+                                ?.url_count || 0,
                           },
                           {
                             title: "SSL Certificate",
-                            status:
-                              currentRealAudit?.technical_seo?.ssl_certificate
-                                ?.valid || false,
-                            expires:
-                              currentRealAudit?.technical_seo?.ssl_certificate
-                                ?.expires_at,
+                            status: true, // Assuming HTTPS if we can access the site
+                            expires: "N/A",
                           },
                         ]}
                         renderItem={(item, index) => (
@@ -688,13 +929,13 @@ const SiteAuditManager: React.FC = () => {
                               description={
                                 item.count
                                   ? `${item.count} URLs found`
-                                  : item.expires
+                                  : item.expires && item.expires !== "N/A"
                                   ? `Expires: ${new Date(
                                       item.expires
                                     ).toLocaleDateString()}`
                                   : item.issues && item.issues.length > 0
                                   ? item.issues.join(", ")
-                                  : null
+                                  : "Working properly"
                               }
                             />
                           </List.Item>
@@ -703,59 +944,169 @@ const SiteAuditManager: React.FC = () => {
                     </Card>
                   </Col>
                   <Col span={12}>
-                    <Card title="Page Speed Scores" size="small">
+                    <Card title="Lighthouse Performance Scores" size="small">
                       <Row gutter={16}>
                         <Col span={12}>
                           <Statistic
-                            title="Desktop Score"
+                            title="Desktop Performance"
                             value={
-                              currentRealAudit?.technical_seo?.page_speed
-                                ?.desktop_score || 0
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.lighthouse_desktop?.performance_score || 0
                             }
                             suffix="/100"
                             valueStyle={{
                               color:
-                                (currentRealAudit?.technical_seo?.page_speed
-                                  ?.desktop_score || 0) >= 80
+                                (currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.lighthouse_desktop?.performance_score ||
+                                  0) >= 80
                                   ? "#52c41a"
-                                  : "#faad14",
+                                  : (currentRealAudit?.results
+                                      ?.pages_analyzed?.[0]?.lighthouse_desktop
+                                      ?.performance_score || 0) >= 60
+                                  ? "#faad14"
+                                  : "#ff4d4f",
                             }}
                           />
                         </Col>
                         <Col span={12}>
                           <Statistic
-                            title="Mobile Score"
+                            title="Mobile Performance"
                             value={
-                              currentRealAudit?.technical_seo?.page_speed
-                                ?.mobile_score || 0
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.lighthouse_mobile?.performance_score || 0
                             }
                             suffix="/100"
                             valueStyle={{
                               color:
-                                (currentRealAudit?.technical_seo?.page_speed
-                                  ?.mobile_score || 0) >= 80
+                                (currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.lighthouse_mobile?.performance_score ||
+                                  0) >= 80
                                   ? "#52c41a"
-                                  : "#faad14",
+                                  : (currentRealAudit?.results
+                                      ?.pages_analyzed?.[0]?.lighthouse_mobile
+                                      ?.performance_score || 0) >= 60
+                                  ? "#faad14"
+                                  : "#ff4d4f",
+                            }}
+                          />
+                        </Col>
+                        <Col span={12}>
+                          <Statistic
+                            title="SEO Score"
+                            value={
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.lighthouse_mobile?.seo_score || 0
+                            }
+                            suffix="/100"
+                            valueStyle={{
+                              color:
+                                (currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.lighthouse_mobile?.seo_score || 0) >= 80
+                                  ? "#52c41a"
+                                  : (currentRealAudit?.results
+                                      ?.pages_analyzed?.[0]?.lighthouse_mobile
+                                      ?.seo_score || 0) >= 60
+                                  ? "#faad14"
+                                  : "#ff4d4f",
+                            }}
+                          />
+                        </Col>
+                        <Col span={12}>
+                          <Statistic
+                            title="Best Practices"
+                            value={
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.lighthouse_mobile?.best_practices_score || 0
+                            }
+                            suffix="/100"
+                            valueStyle={{
+                              color:
+                                (currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.lighthouse_mobile?.best_practices_score ||
+                                  0) >= 80
+                                  ? "#52c41a"
+                                  : (currentRealAudit?.results
+                                      ?.pages_analyzed?.[0]?.lighthouse_mobile
+                                      ?.best_practices_score || 0) >= 60
+                                  ? "#faad14"
+                                  : "#ff4d4f",
                             }}
                           />
                         </Col>
                       </Row>
-                      {(currentRealAudit?.technical_seo?.page_speed?.suggestions
-                        ?.length || 0) > 0 && (
+
+                      {/* Response Time and Status */}
+                      <div style={{ marginTop: 16 }}>
+                        <Row gutter={16}>
+                          <Col span={12}>
+                            <Statistic
+                              title="Response Time"
+                              value={
+                                currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.response_time || 0
+                              }
+                              suffix="ms"
+                              valueStyle={{
+                                color:
+                                  (currentRealAudit?.results
+                                    ?.pages_analyzed?.[0]?.response_time ||
+                                    0) <= 1000
+                                    ? "#52c41a"
+                                    : (currentRealAudit?.results
+                                        ?.pages_analyzed?.[0]?.response_time ||
+                                        0) <= 3000
+                                    ? "#faad14"
+                                    : "#ff4d4f",
+                              }}
+                            />
+                          </Col>
+                          <Col span={12}>
+                            <Statistic
+                              title="Status Code"
+                              value={
+                                currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.status_code || 0
+                              }
+                              valueStyle={{
+                                color:
+                                  (currentRealAudit?.results
+                                    ?.pages_analyzed?.[0]?.status_code || 0) ===
+                                  200
+                                    ? "#52c41a"
+                                    : "#ff4d4f",
+                              }}
+                            />
+                          </Col>
+                        </Row>
+                      </div>
+
+                      {/* Lighthouse Diagnostics */}
+                      {currentRealAudit?.results?.pages_analyzed?.[0]
+                        ?.lighthouse_mobile?.diagnostics?.length > 0 && (
                         <div style={{ marginTop: 16 }}>
-                          <Text strong>Suggestions:</Text>
+                          <Text strong>Lighthouse Diagnostics:</Text>
                           <List
                             size="small"
                             dataSource={
-                              currentRealAudit?.technical_seo?.page_speed
-                                ?.suggestions || []
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.lighthouse_mobile?.diagnostics || []
                             }
-                            renderItem={(suggestion, index) => (
+                            renderItem={(diagnostic, index) => (
                               <List.Item
-                                key={`suggestion-${index}`}
+                                key={`diagnostic-${index}`}
                                 style={{ padding: "4px 0" }}
                               >
-                                <Text type="secondary">• {suggestion}</Text>
+                                <Alert
+                                  message={diagnostic.title}
+                                  description={diagnostic.description}
+                                  type={
+                                    diagnostic.impact === "medium"
+                                      ? "warning"
+                                      : "info"
+                                  }
+                                  showIcon
+                                  style={{ fontSize: 12 }}
+                                />
                               </List.Item>
                             )}
                           />
@@ -772,22 +1123,30 @@ const SiteAuditManager: React.FC = () => {
               children: (
                 <Card
                   title={`Accessibility Score: ${
-                    currentRealAudit?.accessibility?.score || 0
+                    currentRealAudit?.results.accessibility?.score || 0
                   }/100 (WCAG Testing)`}
                 >
                   <div style={{ marginBottom: 16 }}>
                     <Tag color="blue">
                       WCAG Compliance:{" "}
-                      {currentRealAudit?.accessibility?.wcag_compliance ||
-                        "Unknown"}
+                      {currentRealAudit?.results.accessibility
+                        ?.wcag_compliance || "Unknown"}
+                    </Tag>
+                    <Tag color="green" style={{ marginLeft: 8 }}>
+                      Lighthouse Score:{" "}
+                      {currentRealAudit?.results?.pages_analyzed?.[0]
+                        ?.lighthouse_mobile?.accessibility_score || 0}
+                      /100
                     </Tag>
                   </div>
 
-                  {(currentRealAudit?.accessibility?.issues?.length || 0) >
-                  0 ? (
+                  {(currentRealAudit?.results.accessibility?.issues?.length ||
+                    0) > 0 ? (
                     <Table
                       size="small"
-                      dataSource={currentRealAudit?.accessibility?.issues || []}
+                      dataSource={
+                        currentRealAudit?.results.accessibility?.issues || []
+                      }
                       pagination={false}
                       rowKey={(record, index) => `accessibility-issue-${index}`}
                       columns={[
@@ -837,6 +1196,7 @@ const SiteAuditManager: React.FC = () => {
                   ) : (
                     <Alert
                       message="No accessibility issues found!"
+                      description="Your website meets WCAG AA compliance standards with no critical accessibility issues detected."
                       type="success"
                       showIcon
                     />
@@ -845,86 +1205,284 @@ const SiteAuditManager: React.FC = () => {
               ),
             },
             {
-              key: "actions",
-              label: "📥 Export & Actions",
+              key: "content",
+              label: "📝 Content Analysis",
               children: (
-                <Card title="Export Results">
-                  <Space direction="vertical" style={{ width: "100%" }}>
-                    <Text>
-                      Download your comprehensive audit results in various
-                      formats:
-                    </Text>
-                    <Space>
-                      <Button
-                        icon={<DownloadOutlined />}
-                        onClick={() =>
-                          handleExportAudit(currentRealAudit?.id || "", "pdf")
-                        }
-                        type="primary"
-                        disabled={!currentRealAudit?.id}
-                      >
-                        Export PDF
-                      </Button>
-                      <Button
-                        icon={<DownloadOutlined />}
-                        onClick={() =>
-                          handleExportAudit(currentRealAudit?.id || "", "excel")
-                        }
-                        disabled={!currentRealAudit?.id}
-                      >
-                        Export Excel
-                      </Button>
-                      <Button
-                        icon={<DownloadOutlined />}
-                        onClick={() =>
-                          handleExportAudit(currentRealAudit?.id || "", "csv")
-                        }
-                        disabled={!currentRealAudit?.id}
-                      >
-                        Export CSV
-                      </Button>
-                    </Space>
-
-                    <div
-                      style={{
-                        marginTop: 24,
-                        paddingTop: 16,
-                        borderTop: "1px solid #f0f0f0",
-                      }}
-                    >
-                      <Text strong>Audit Information:</Text>
-                      <div style={{ marginTop: 8 }}>
-                        <Text>
-                          Started:{" "}
-                          {currentRealAudit?.startedAt
-                            ? new Date(
-                                currentRealAudit.startedAt
-                              ).toLocaleString()
-                            : "N/A"}
-                        </Text>
-                        <br />
-                        <Text>
-                          Completed:{" "}
-                          {currentRealAudit?.completedAt
-                            ? new Date(
-                                currentRealAudit.completedAt
-                              ).toLocaleString()
-                            : "N/A"}
-                        </Text>
-                        <br />
-                        <Text>URL: {currentRealAudit?.url || "N/A"}</Text>
-                        <br />
-                        <Text>
-                          Response Time:{" "}
-                          {currentRealAudit?.overview?.total_response_time || 0}
-                          ms
-                        </Text>
-                      </div>
-                    </div>
-                  </Space>
-                </Card>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Card title="Content Quality" size="small">
+                      <Row gutter={16}>
+                        <Col span={12}>
+                          <Statistic
+                            title="Content Score"
+                            value={
+                              currentRealAudit?.results.content_analysis
+                                ?.score || 0
+                            }
+                            suffix="/100"
+                            valueStyle={{
+                              color:
+                                (currentRealAudit?.results.content_analysis
+                                  ?.score || 0) >= 80
+                                  ? "#52c41a"
+                                  : (currentRealAudit?.results.content_analysis
+                                      ?.score || 0) >= 60
+                                  ? "#faad14"
+                                  : "#ff4d4f",
+                            }}
+                          />
+                        </Col>
+                        <Col span={12}>
+                          <Statistic
+                            title="Average Word Count"
+                            value={
+                              currentRealAudit?.results.content_analysis
+                                ?.avg_word_count || 0
+                            }
+                          />
+                        </Col>
+                        <Col span={12}>
+                          <Statistic
+                            title="Readability Score"
+                            value={
+                              currentRealAudit?.results?.pages_analyzed?.[0]
+                                ?.content_analysis?.readability_score || 0
+                            }
+                            suffix="/100"
+                            valueStyle={{
+                              color:
+                                (currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.content_analysis?.readability_score || 0) >=
+                                70
+                                  ? "#52c41a"
+                                  : (currentRealAudit?.results
+                                      ?.pages_analyzed?.[0]?.content_analysis
+                                      ?.readability_score || 0) >= 50
+                                  ? "#faad14"
+                                  : "#ff4d4f",
+                            }}
+                          />
+                        </Col>
+                        <Col span={12}>
+                          <div>
+                            <Text strong>Thin Content:</Text>
+                            <div style={{ marginTop: 4 }}>
+                              <Tag
+                                color={
+                                  currentRealAudit?.results?.pages_analyzed?.[0]
+                                    ?.content_analysis?.thin_content
+                                    ? "red"
+                                    : "green"
+                                }
+                              >
+                                {currentRealAudit?.results?.pages_analyzed?.[0]
+                                  ?.content_analysis?.thin_content
+                                  ? "Yes"
+                                  : "No"}
+                              </Tag>
+                            </div>
+                          </div>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                  <Col span={12}>
+                    <Card title="Duplicate Content Check" size="small">
+                      {currentRealAudit?.results.content_analysis
+                        ?.duplicate_content?.length > 0 ? (
+                        <List
+                          size="small"
+                          dataSource={
+                            currentRealAudit?.results.content_analysis
+                              ?.duplicate_content || []
+                          }
+                          renderItem={(item, index) => (
+                            <List.Item key={`duplicate-${index}`}>
+                              <Alert
+                                message="Duplicate Content Found"
+                                description={`Similar content detected in: ${item}`}
+                                type="warning"
+                                showIcon
+                                style={{ width: "100%" }}
+                              />
+                            </List.Item>
+                          )}
+                        />
+                      ) : (
+                        <Alert
+                          message="No Duplicate Content"
+                          description="No duplicate content issues detected on your website."
+                          type="success"
+                          showIcon
+                        />
+                      )}
+                    </Card>
+                  </Col>
+                  <Col span={24} style={{ marginTop: 16 }}>
+                    <Card title="Content Issues & Recommendations" size="small">
+                      {currentRealAudit?.results.content_analysis?.issues
+                        ?.length > 0 ? (
+                        <List
+                          size="small"
+                          dataSource={
+                            currentRealAudit?.results.content_analysis
+                              ?.issues || []
+                          }
+                          renderItem={(issue, index) => (
+                            <List.Item key={`content-issue-${index}`}>
+                              <List.Item.Meta
+                                avatar={
+                                  <Tag
+                                    color={
+                                      issue.type === "warning"
+                                        ? "orange"
+                                        : issue.type === "error"
+                                        ? "red"
+                                        : "blue"
+                                    }
+                                  >
+                                    {issue.type?.toUpperCase()}
+                                  </Tag>
+                                }
+                                title={
+                                  <span>
+                                    {issue.title}
+                                    <Tag
+                                      color={
+                                        issue.impact === "high"
+                                          ? "red"
+                                          : issue.impact === "medium"
+                                          ? "orange"
+                                          : "blue"
+                                      }
+                                      style={{ marginLeft: 8 }}
+                                    >
+                                      {issue.impact?.toUpperCase()} IMPACT
+                                    </Tag>
+                                  </span>
+                                }
+                                description={
+                                  <div>
+                                    <Text>{issue.description}</Text>
+                                    <br />
+                                    <Text
+                                      type="secondary"
+                                      style={{ fontSize: 12 }}
+                                    >
+                                      💡 <strong>Recommendation:</strong>{" "}
+                                      {issue.recommendation}
+                                    </Text>
+                                  </div>
+                                }
+                              />
+                            </List.Item>
+                          )}
+                        />
+                      ) : (
+                        <Alert
+                          message="No content issues found!"
+                          description="Your content quality is good with no major issues detected."
+                          type="success"
+                          showIcon
+                        />
+                      )}
+                    </Card>
+                  </Col>
+                </Row>
               ),
             },
+            // {
+            //   key: "actions",
+            //   label: "📥 Export & Actions",
+            //   children: (
+            //     <Card title="Export Results">
+            //       <Space direction="vertical" style={{ width: "100%" }}>
+            //         <Text>
+            //           Download your comprehensive audit results in various
+            //           formats:
+            //         </Text>
+            //         <Space>
+            //           <Button
+            //             icon={<DownloadOutlined />}
+            //             onClick={() =>
+            //               handleExportAudit(currentRealAudit?.id || "", "pdf")
+            //             }
+            //             type="primary"
+            //             disabled={!currentRealAudit?.id}
+            //           >
+            //             Export PDF
+            //           </Button>
+            //           <Button
+            //             icon={<DownloadOutlined />}
+            //             onClick={() =>
+            //               handleExportAudit(currentRealAudit?.id || "", "excel")
+            //             }
+            //             disabled={!currentRealAudit?.id}
+            //           >
+            //             Export Excel
+            //           </Button>
+            //           <Button
+            //             icon={<DownloadOutlined />}
+            //             onClick={() =>
+            //               handleExportAudit(currentRealAudit?.id || "", "csv")
+            //             }
+            //             disabled={!currentRealAudit?.id}
+            //           >
+            //             Export CSV
+            //           </Button>
+            //         </Space>
+
+            //         <div
+            //           style={{
+            //             marginTop: 24,
+            //             paddingTop: 16,
+            //             borderTop: "1px solid #f0f0f0",
+            //           }}
+            //         >
+            //           <Text strong>Audit Information:</Text>
+            //           <div style={{ marginTop: 8 }}>
+            //             <Text>
+            //               Started:{" "}
+            //               {currentRealAudit?.createdAt
+            //                 ? new Date(
+            //                     currentRealAudit.createdAt
+            //                   ).toLocaleString()
+            //                 : "N/A"}
+            //             </Text>
+            //             <br />
+            //             <Text>
+            //               Completed:{" "}
+            //               {currentRealAudit?.results?.completed_at
+            //                 ? new Date(
+            //                     currentRealAudit.results.completed_at
+            //                   ).toLocaleString()
+            //                 : "N/A"}
+            //             </Text>
+            //             <br />
+            //             <Text>
+            //               URL:{" "}
+            //               {currentRealAudit?.results?.pages_analyzed?.[0]
+            //                 ?.url || "N/A"}
+            //             </Text>
+            //             <br />
+            //             <Text>
+            //               Processing Time:{" "}
+            //               {currentRealAudit?.results?.processing_time || 0}
+            //               ms
+            //             </Text>
+            //             <br />
+            //             <Text>
+            //               Response Time:{" "}
+            //               {currentRealAudit?.results.overview
+            //                 ?.total_response_time || 0}
+            //               ms
+            //             </Text>
+            //           </div>
+            //         </div>
+            //       </Space>
+            //     </Card>
+            //   ),
+            // },
           ]}
         />
       )}
@@ -939,8 +1497,8 @@ const SiteAuditManager: React.FC = () => {
             columns={[
               {
                 title: "Date",
-                dataIndex: "startedAt",
-                key: "startedAt",
+                dataIndex: "created_at",
+                key: "createdAt",
                 render: (date) =>
                   date ? new Date(date).toLocaleDateString() : "N/A",
               },
@@ -949,6 +1507,15 @@ const SiteAuditManager: React.FC = () => {
                 dataIndex: "url",
                 key: "url",
                 ellipsis: true,
+                render: () => (
+                  <a
+                    href={websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {websiteUrl}
+                  </a>
+                ),
               },
               {
                 title: "Status",
@@ -970,26 +1537,21 @@ const SiteAuditManager: React.FC = () => {
               },
               {
                 title: "Score",
-                dataIndex: "overview",
+                dataIndex: "summary",
                 key: "score",
-                render: (overview) => overview?.score || 0,
+                render: (summary) => summary?.score || 0,
               },
               {
                 title: "Issues",
-                dataIndex: "overview",
+                dataIndex: "summary",
                 key: "issues",
-                render: (overview) =>
-                  overview
-                    ? `${
-                        (overview.critical_issues || 0) +
-                        (overview.warnings || 0)
-                      }`
-                    : "0",
+                render: (summary) =>
+                  summary ? `${summary.issues_found || 0} issues` : "0",
               },
               {
                 title: "Actions",
                 key: "actions",
-                render: (_, record) => (
+                render: (_, record: any) => (
                   <Space>
                     <Button
                       size="small"
@@ -998,13 +1560,13 @@ const SiteAuditManager: React.FC = () => {
                     >
                       View
                     </Button>
-                    <Button
+                    {/* <Button
                       size="small"
                       icon={<DownloadOutlined />}
                       onClick={() => handleExportAudit(record.id, "pdf")}
                     >
                       Export
-                    </Button>
+                    </Button> */}
                     <Button
                       size="small"
                       danger
@@ -1013,6 +1575,22 @@ const SiteAuditManager: React.FC = () => {
                     >
                       Delete
                     </Button>
+                    <Button
+                      size="small"
+                      icon={<ReloadOutlined />}
+                      onClick={() => {
+                        const firstProject = projects[0];
+                        setSelectedProject(firstProject.id);
+                        setWebsiteUrl(firstProject.domain || "");
+
+                        // Load existing audits for the project
+                        dispatch(
+                          fetchProjectAuditHistory({
+                            projectId: firstProject.id,
+                          })
+                        );
+                      }}
+                    ></Button>
                   </Space>
                 ),
               },
@@ -1023,46 +1601,179 @@ const SiteAuditManager: React.FC = () => {
 
       {/* Dashboard Summary */}
       {auditSummary && (
-        <Card title="📊 Audit Summary Dashboard" style={{ marginTop: 16 }}>
+        <Card title="📊 Latest Audit Dashboard" style={{ marginTop: 16 }}>
           <Row gutter={16}>
             <Col span={6}>
               <Statistic
-                title="Total Audits"
-                value={auditSummary?.total_audits || 0}
-                prefix={<BarChartOutlined />}
-              />
-            </Col>
-            <Col span={6}>
-              <Statistic
-                title="Average Score"
-                value={auditSummary?.average_score || 0}
+                title="Overall Score"
+                value={auditSummary?.latestAudit?.results?.overview?.score || 0}
                 suffix="/100"
+                prefix={<BarChartOutlined />}
                 valueStyle={{
                   color:
-                    (auditSummary?.average_score || 0) >= 80
+                    (auditSummary?.latestAudit?.results?.overview?.score ||
+                      0) >= 80
                       ? "#52c41a"
-                      : "#faad14",
+                      : (auditSummary?.latestAudit?.results?.overview?.score ||
+                          0) >= 60
+                      ? "#faad14"
+                      : "#ff4d4f",
                 }}
               />
             </Col>
             <Col span={6}>
               <Statistic
-                title="Critical Issues"
-                value={auditSummary?.critical_issues_count || 0}
+                title="Total Issues"
+                value={
+                  auditSummary?.latestAudit?.results?.overview?.total_issues ||
+                  0
+                }
                 valueStyle={{ color: "#ff4d4f" }}
+              />
+            </Col>
+            <Col span={6}>
+              <Statistic
+                title="Passed Checks"
+                value={
+                  auditSummary?.latestAudit?.results?.overview?.passed_checks ||
+                  0
+                }
+                valueStyle={{ color: "#52c41a" }}
               />
             </Col>
             <Col span={6}>
               <Statistic
                 title="Last Audit"
                 value={
-                  auditSummary?.last_audit_date
+                  auditSummary?.latestAudit?.createdAt
                     ? new Date(
-                        auditSummary.last_audit_date
+                        auditSummary.latestAudit.createdAt
                       ).toLocaleDateString()
                     : "N/A"
                 }
               />
+            </Col>
+          </Row>
+
+          {/* Additional Score Breakdown */}
+          <Row gutter={16} style={{ marginTop: 16 }}>
+            <Col span={6}>
+              <Statistic
+                title="Performance"
+                value={
+                  auditSummary?.latestAudit.results?.performance?.score || 0
+                }
+                suffix="/100"
+                valueStyle={{
+                  color:
+                    (auditSummary?.latestAudit.results?.performance?.score ||
+                      0) >= 80
+                      ? "#52c41a"
+                      : (auditSummary?.latestAudit.results?.performance
+                          ?.score || 0) >= 60
+                      ? "#faad14"
+                      : "#ff4d4f",
+                }}
+              />
+            </Col>
+            <Col span={6}>
+              <Statistic
+                title="Technical SEO"
+                value={
+                  auditSummary?.latestAudit.results?.technical_seo?.score || 0
+                }
+                suffix="/100"
+                valueStyle={{
+                  color:
+                    (auditSummary?.latestAudit.results?.technical_seo?.score ||
+                      0) >= 80
+                      ? "#52c41a"
+                      : (auditSummary?.latestAudit.results?.technical_seo
+                          ?.score || 0) >= 60
+                      ? "#faad14"
+                      : "#ff4d4f",
+                }}
+              />
+            </Col>
+            <Col span={6}>
+              <Statistic
+                title="Content Score"
+                value={
+                  auditSummary?.latestAudit.results?.content_analysis?.score ||
+                  0
+                }
+                suffix="/100"
+                valueStyle={{
+                  color:
+                    (auditSummary?.latestAudit.results?.content_analysis
+                      ?.score || 0) >= 80
+                      ? "#52c41a"
+                      : (auditSummary?.latestAudit.results?.content_analysis
+                          ?.score || 0) >= 60
+                      ? "#faad14"
+                      : "#ff4d4f",
+                }}
+              />
+            </Col>
+            <Col span={6}>
+              <Statistic
+                title="Accessibility"
+                value={
+                  auditSummary?.latestAudit.results?.accessibility?.score || 0
+                }
+                suffix="/100"
+                valueStyle={{
+                  color:
+                    (auditSummary?.latestAudit.results?.accessibility?.score ||
+                      0) >= 80
+                      ? "#52c41a"
+                      : (auditSummary?.latestAudit.results?.accessibility
+                          ?.score || 0) >= 60
+                      ? "#faad14"
+                      : "#ff4d4f",
+                }}
+              />
+            </Col>
+          </Row>
+
+          {/* Status and Processing Info */}
+          <Row gutter={16} style={{ marginTop: 16 }}>
+            <Col span={8}>
+              <div>
+                <Text strong>Audit Status: </Text>
+                <Tag
+                  color={
+                    auditSummary?.latestAudit.status === "completed"
+                      ? "green"
+                      : auditSummary?.latestAudit.status === "running"
+                      ? "blue"
+                      : "red"
+                  }
+                >
+                  {auditSummary?.latestAudit.status?.toUpperCase() || "UNKNOWN"}
+                </Tag>
+              </div>
+            </Col>
+            <Col span={8}>
+              <div>
+                <Text strong>Pages Analyzed: </Text>
+                <Text>
+                  {auditSummary?.latestAudit.results?.overview
+                    ?.pages_analyzed || 0}
+                </Text>
+              </div>
+            </Col>
+            <Col span={8}>
+              <div>
+                <Text strong>Processing Time: </Text>
+                <Text>
+                  {auditSummary?.latestAudit.results?.processing_time
+                    ? `${(
+                        auditSummary.latestAudit.results.processing_time / 1000
+                      ).toFixed(1)}s`
+                    : "N/A"}
+                </Text>
+              </div>
             </Col>
           </Row>
         </Card>

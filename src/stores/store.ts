@@ -13,6 +13,9 @@ import copilotAISlice from './slices/copilot_ai.slice';
 import domainSlice from './slices/domain.slice';
 import positionTrackingSlice from './slices/position-tracking.slice';
 import organicResearchSlice from './slices/organic-research.slice';
+import globalSearchSlice from './slices/global-search.slice';
+import backlinkSlice from './slices/backlink.slice';
+import keywordGapSlice from './slices/keyword-gap.slice';
 
 const store = configureStore({
   reducer: {
@@ -29,6 +32,9 @@ const store = configureStore({
     domain: domainSlice,
     positionTracking: positionTrackingSlice,
     organicResearch: organicResearchSlice,
+    globalSearch: globalSearchSlice,
+    backlink: backlinkSlice,
+    keywordGap: keywordGapSlice,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiEventMiddleware),
   // middleware mặc định đã hỗ trợ thunk, có thể custom thêm nếu cần

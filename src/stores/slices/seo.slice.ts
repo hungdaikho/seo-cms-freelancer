@@ -155,8 +155,8 @@ const seoSlice = createSlice({
             })
             .addCase(addKeywordToProject.fulfilled, (state, action) => {
                 state.loading = false;
-                state.keywords.unshift(action.payload);
-                state.pagination.total += 1;
+                // Don't update keywords array here, let the component reload the list
+                // This prevents potential inconsistencies between client and server state
             })
             .addCase(addKeywordToProject.rejected, (state, action) => {
                 state.loading = false;
@@ -171,8 +171,8 @@ const seoSlice = createSlice({
             })
             .addCase(bulkAddKeywords.fulfilled, (state, action) => {
                 state.loading = false;
-                state.keywords = [...action.payload, ...state.keywords];
-                state.pagination.total += action.payload.length;
+                // Don't update keywords array here, let the component reload the list
+                // This prevents potential inconsistencies between client and server state
             })
             .addCase(bulkAddKeywords.rejected, (state, action) => {
                 state.loading = false;
@@ -208,10 +208,8 @@ const seoSlice = createSlice({
             })
             .addCase(updateKeyword.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.keywords.findIndex(k => k.id === action.payload.id);
-                if (index !== -1) {
-                    state.keywords[index] = action.payload;
-                }
+                // Don't update keywords array here, let the component reload the list
+                // This prevents potential inconsistencies between client and server state
                 if (state.currentKeyword?.id === action.payload.id) {
                     state.currentKeyword = action.payload;
                 }

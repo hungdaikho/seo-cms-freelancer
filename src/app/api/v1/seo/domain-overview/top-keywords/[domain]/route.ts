@@ -114,14 +114,14 @@ export async function GET(
             ];
 
             keywords = Array.from({ length: Math.min(limit, 50) }, (_, i) => ({
-                keyword: mockKeywordTerms[Math.floor(Math.random() * mockKeywordTerms.length)] + ` ${domain.split('.')[0]}`,
+                keyword: `${mockKeywordTerms[i % mockKeywordTerms.length]} ${domain.split('.')[0]}`,
                 position: Math.floor(Math.random() * 50) + 1,
                 searchVolume: Math.floor(Math.random() * 50000) + 100,
                 traffic: Math.floor(Math.random() * 5000) + 50,
                 cpc: parseFloat((Math.random() * 25 + 0.5).toFixed(2)),
                 difficulty: Math.floor(Math.random() * 60) + 20,
                 trend: ['up', 'down', 'stable'][Math.floor(Math.random() * 3)] as 'up' | 'down' | 'stable',
-                url: `https://${domain}/${mockKeywordTerms[Math.floor(Math.random() * mockKeywordTerms.length)].replace(' ', '-')}`
+                url: `https://${domain}/${mockKeywordTerms[i % mockKeywordTerms.length].replace(' ', '-')}`
             }));
         }
 

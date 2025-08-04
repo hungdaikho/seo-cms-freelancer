@@ -24,8 +24,8 @@ export const useOrganicResearch = () => {
     const dispatch = useDispatch<AppDispatch>();
     const state = useSelector((state: RootState) => state.organicResearch);
 
-    const performDomainAnalysis = async (domain: string, country: string = 'US') => {
-        return dispatch(analyzeDomain({ domain, country }));
+    const performDomainAnalysis = async (domain: string, country: string = 'US', database: string = 'google') => {
+        return dispatch(analyzeDomain({ domain, country, database }));
     };
 
     const getOrganicKeywords = async (domain: string, params: OrganicKeywordsParams) => {
@@ -86,8 +86,8 @@ export const useDomainAnalysis = () => {
         currentCountry,
     } = useSelector((state: RootState) => state.organicResearch);
 
-    const analyzeDomainData = async (domain: string, country: string = 'US') => {
-        return dispatch(analyzeDomain({ domain, country }));
+    const analyzeDomainData = async (domain: string, country: string = 'US', database: string = 'google') => {
+        return dispatch(analyzeDomain({ domain, country, database }));
     };
 
     const clearAnalysisError = () => {

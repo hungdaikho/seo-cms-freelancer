@@ -637,13 +637,13 @@ const SiderDashBoard = () => {
           <span>AI</span>
         </div>
       </Dropdown> */}
-      <div
+      {/* <div
         className={`${styles.menuItem} ${isActive("/ai") ? styles.active : ""}`}
         onClick={() => router.push("/ai")}
       >
         <GoStar />
         <span>AI</span>
-      </div>
+      </div> */}
       {/* <Dropdown
         popupRender={() => (
           <div

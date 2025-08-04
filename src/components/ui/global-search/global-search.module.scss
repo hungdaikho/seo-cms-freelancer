@@ -1,0 +1,310 @@
+.globalSearch {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+
+  .searchContainer {
+    position: relative;
+    width: 100%;
+
+    .searchInput {
+      width: 100%;
+      height: 40px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: white;
+      font-size: 14px;
+      transition: all 0.2s ease;
+
+      &:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .ant-input {
+        border: none;
+        box-shadow: none;
+        padding: 8px 12px;
+
+        &:focus {
+          border: none;
+          box-shadow: none;
+        }
+      }
+
+      .ant-input-suffix {
+        .searchIcon {
+          color: #6b7280;
+          font-size: 16px;
+        }
+      }
+    }
+
+    .searchDropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-height: 400px;
+      overflow-y: auto;
+
+      .searchSection {
+        padding: 12px 0;
+
+        &:not(:last-child) {
+          border-bottom: 1px solid #f3f4f6;
+        }
+
+        .sectionHeader {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0 16px 8px;
+          margin-bottom: 4px;
+
+          svg {
+            color: #6b7280;
+            font-size: 14px;
+          }
+
+          .sectionTitle {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+        }
+
+        .searchItem {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 16px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: #f9fafb;
+          }
+
+          .resultIcon {
+            color: #6b7280;
+            font-size: 16px;
+            flex-shrink: 0;
+          }
+
+          .resultContent {
+            flex: 1;
+            min-width: 0;
+
+            .resultTitle {
+              display: block;
+              font-size: 14px;
+              font-weight: 500;
+              color: #111827;
+              line-height: 1.4;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .resultDescription {
+              display: block;
+              font-size: 12px;
+              color: #6b7280;
+              line-height: 1.3;
+              margin-top: 2px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+
+          .resultType {
+            flex-shrink: 0;
+
+            .typeLabel {
+              font-size: 10px;
+              color: #9ca3af;
+              background: #f3f4f6;
+              padding: 2px 6px;
+              border-radius: 4px;
+              text-transform: capitalize;
+            }
+          }
+        }
+
+        .loadingContainer {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          padding: 24px;
+
+          .ant-spin {
+            color: #3b82f6;
+          }
+
+          span {
+            font-size: 12px;
+            color: #6b7280;
+          }
+        }
+
+        .emptyContainer {
+          padding: 24px;
+
+          .ant-empty {
+            .ant-empty-description {
+              font-size: 12px;
+              color: #6b7280;
+            }
+          }
+        }
+
+        .tipsList {
+          padding: 0 16px;
+
+          .tip {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.5;
+            margin-bottom: 4px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Dark theme support
+.dark .globalSearch {
+  .searchContainer {
+    .searchInput {
+      background: #1f2937;
+      border-color: #374151;
+      color: white;
+
+      .ant-input {
+        background: transparent;
+        color: white;
+
+        &::placeholder {
+          color: #9ca3af;
+        }
+      }
+
+      &:focus {
+        border-color: #3b82f6;
+      }
+    }
+
+    .searchDropdown {
+      background: #1f2937;
+      border-color: #374151;
+
+      .searchSection {
+        border-color: #374151;
+
+        .sectionHeader {
+          .sectionTitle {
+            color: #9ca3af;
+          }
+
+          svg {
+            color: #9ca3af;
+          }
+        }
+
+        .searchItem {
+          &:hover {
+            background-color: #374151;
+          }
+
+          .resultIcon {
+            color: #9ca3af;
+          }
+
+          .resultContent {
+            .resultTitle {
+              color: white;
+            }
+
+            .resultDescription {
+              color: #9ca3af;
+            }
+          }
+
+          .resultType {
+            .typeLabel {
+              background: #374151;
+              color: #d1d5db;
+            }
+          }
+        }
+
+        .loadingContainer {
+          span {
+            color: #9ca3af;
+          }
+        }
+
+        .tipsList {
+          .tip {
+            color: #9ca3af;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .globalSearch {
+    .searchContainer {
+      .searchDropdown {
+        left: -16px;
+        right: -16px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        max-height: 300px;
+      }
+    }
+  }
+}
+
+// Header dashboard specific styles
+.headerDashboard {
+  .globalSearch {
+    .searchContainer {
+      .searchInput {
+        height: 30px;
+        border-radius: 5px;
+        border: none;
+        background: white;
+
+        .ant-input {
+          height: 28px;
+          padding: 4px 8px;
+        }
+
+        &:focus {
+          border: 1px solid #3b82f6;
+        }
+      }
+    }
+  }
+}

@@ -34,12 +34,12 @@ const ListTool = (props: Props) => {
       des: "Create SEO-friendly content with AI and competitive data.",
       link: "/content",
     },
-    {
-      icon: <GoStar style={{ color: "#0e345b" }} />,
-      title: "AI",
-      des: "Grow your visibility in AI search tools like ChatGPT and Google’s AI Overviews.",
-      link: "/ai",
-    },
+    // {
+    //   icon: <GoStar style={{ color: "#0e345b" }} />,
+    //   title: "AI",
+    //   des: "Grow your visibility in AI search tools like ChatGPT and Google’s AI Overviews.",
+    //   link: "/ai",
+    // },
     // {
     //   icon: <IoShareSocial style={{ color: "#4ebdd8" }} />,
     //   title: "Social",

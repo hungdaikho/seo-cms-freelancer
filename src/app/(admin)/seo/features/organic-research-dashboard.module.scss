@@ -1,0 +1,52 @@
+.dashboard {
+  .controls {
+    margin-bottom: 16px;
+
+    .ant-card-body {
+      padding: 16px;
+    }
+  }
+
+  .dataCard {
+    .ant-tabs-content-holder {
+      padding-top: 16px;
+    }
+
+    .ant-table-wrapper {
+      .ant-table-thead > tr > th {
+        background: #fafafa;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      .ant-table-tbody > tr > td {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 992px) {
+  .dashboard {
+    .controls {
+      .ant-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    .dataCard {
+      .ant-tabs-nav {
+        .ant-tabs-tab {
+          padding: 8px 12px;
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}

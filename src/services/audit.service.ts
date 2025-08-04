@@ -675,48 +675,9 @@ export class AuditService extends BaseService {
      * Get audit summary for dashboard
      */
     async getAuditSummary(projectId: string): Promise<AuditSummaryDashboard> {
-        try {
-            return this.get<AuditSummaryDashboard>(`/projects/${projectId}/audits/summary`);
-        } catch (error) {
-            console.log("API call failed, generating mock dashboard summary...");
 
-            // Generate realistic dashboard summary
-            const totalAudits = Math.floor(Math.random() * 20) + 5; // 5-25 audits
-            const averageScore = Math.floor(Math.random() * 30) + 65; // 65-95
-            const criticalIssues = Math.floor(Math.random() * 15); // 0-15 issues
+        return this.get<AuditSummaryDashboard>(`/projects/${projectId}/audits/summary`);
 
-            // Recent audit date (within last month)
-            const lastAuditDate = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
-
-            return Promise.resolve({
-                total_audits: totalAudits,
-                last_audit_date: lastAuditDate.toISOString(),
-                average_score: averageScore,
-                trending_issues: [
-                    {
-                        type: "Performance",
-                        count: Math.floor(Math.random() * 8) + 2,
-                        trend: ["up", "down", "stable"][Math.floor(Math.random() * 3)] as "up" | "down" | "stable"
-                    },
-                    {
-                        type: "SEO",
-                        count: Math.floor(Math.random() * 6) + 1,
-                        trend: ["up", "down", "stable"][Math.floor(Math.random() * 3)] as "up" | "down" | "stable"
-                    },
-                    {
-                        type: "Accessibility",
-                        count: Math.floor(Math.random() * 5) + 1,
-                        trend: ["up", "down", "stable"][Math.floor(Math.random() * 3)] as "up" | "down" | "stable"
-                    },
-                    {
-                        type: "Images",
-                        count: Math.floor(Math.random() * 10) + 3,
-                        trend: ["up", "down", "stable"][Math.floor(Math.random() * 3)] as "up" | "down" | "stable"
-                    }
-                ],
-                critical_issues_count: criticalIssues,
-            });
-        }
     }    /**
      * Compare audit results over time
      */

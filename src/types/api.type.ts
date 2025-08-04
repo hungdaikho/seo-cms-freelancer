@@ -524,107 +524,172 @@ export interface SiteAuditResult {
 
 export interface RealAuditResult {
     id: string;
-    projectId: string;
-    url: string;
-    status: "running" | "completed" | "failed";
-    progress: number;
-    startedAt: string;
+    projectId?: string;
+    url?: string;
+    progress?: number;
+    startedAt?: string;
     completedAt?: string;
-    overview: {
-        score: number;
-        total_issues: number;
-        critical_issues: number;
-        warnings: number;
-        passed_checks: number;
-        pages_analyzed: number;
-        total_response_time: number;
-    };
-    performance: {
-        score: number;
-        metrics: {
-            lcp: number; // Largest Contentful Paint
-            fid: number; // First Input Delay
-            cls: number; // Cumulative Layout Shift
-            fcp: number; // First Contentful Paint
-            tti: number; // Time to Interactive
+    createdAt: string;
+    status: "running" | "completed" | "failed";
+    results: {
+        overview: {
+            score: number;
+            total_issues: number;
+            critical_issues: number;
+            warnings: number;
+            passed_checks: number;
+            pages_analyzed: number;
+            total_response_time: number;
         };
-        mobile_friendly: boolean;
-    };
-    seo_analysis: {
-        title: string;
-        meta_description: string;
-        h1_tags: string[];
-        images_without_alt: number;
-        internal_links: number;
-        external_links: number;
-        schema_markup: number;
-        word_count: number;
-        canonical_url?: string;
-        og_title?: string;
-        og_description?: string;
-        meta_keywords?: string;
-    };
-    accessibility: {
-        score: number;
-        issues: Array<{
-            type: "error" | "warning" | "notice";
-            message: string;
-            impact: "low" | "medium" | "high" | "critical";
-            selector?: string;
-            code?: string;
-        }>;
-        wcag_compliance: "A" | "AA" | "AAA";
-    };
-    technical_seo: {
-        robots_txt: {
-            exists: boolean;
-            issues: string[];
+        performance: {
+            score: number;
+            issues: any[];
+            metrics: {
+                avg_page_speed: number;
+                core_web_vitals: {
+                    cls: number; // Cumulative Layout Shift
+                    fid: number; // First Input Delay
+                    lcp: number; // Largest Contentful Paint
+                };
+                mobile_friendly: boolean;
+            };
         };
-        sitemap: {
-            exists: boolean;
-            urls_count: number;
-            issues: string[];
+        accessibility: {
+            score: number;
+            issues: any[];
+            wcag_compliance: "A" | "AA" | "AAA";
         };
-        ssl_certificate: {
-            valid: boolean;
-            expires_at?: string;
+        technical_seo: {
+            score: number;
+            issues: any[];
+            robots_txt: {
+                exists: boolean;
+                issues: string[];
+            };
+            sitemap: {
+                exists: boolean;
+                url_count: number;
+            };
         };
-        page_speed: {
-            desktop_score: number;
-            mobile_score: number;
-            suggestions: string[];
+        content_analysis: {
+            score: number;
+            issues: Array<{
+                type: "info" | "warning" | "error";
+                title: string;
+                impact: "low" | "medium" | "high";
+                description: string;
+                recommendation: string;
+            }>;
+            avg_word_count: number;
+            duplicate_content: any[];
         };
-    };
-    content_analysis: {
-        thin_content_pages: number;
-        duplicate_content_issues: number;
-        missing_meta_descriptions: number;
-        duplicate_title_tags: number;
-        missing_h1_tags: number;
-    };
-    link_analysis: {
-        broken_internal_links: Array<{
+        pages_analyzed: Array<{
             url: string;
             status_code: number;
-            found_on_pages: string[];
+            response_time: number;
+            broken_links: any[];
+            image_issues: any[];
+            accessibility_issues: any[];
+            seo_analysis: {
+                url: string;
+                score: number;
+                title: string;
+                meta_description: string;
+                h1_tags: string[];
+                h2_tags: string[];
+                h3_tags: string[];
+                og_image: string;
+                og_title: string;
+                og_description: string;
+                word_count: number;
+                meta_robots: string;
+                images_total: number;
+                twitter_card: string;
+                canonical_url: string;
+                hreflang_tags: number;
+                meta_keywords: string;
+                schema_markup: number;
+                external_links: number;
+                internal_links: number;
+                images_without_alt: number;
+                issues: Array<{
+                    type: "info" | "warning" | "error";
+                    title: string;
+                    impact: "low" | "medium" | "high";
+                    description: string;
+                    recommendation: string;
+                }>;
+            };
+            content_analysis: {
+                word_count: number;
+                thin_content: boolean;
+                readability_score: number;
+            };
+            lighthouse_mobile: {
+                url: string;
+                metrics: {
+                    speed_index: number;
+                    first_input_delay: number;
+                    time_to_interactive: number;
+                    total_blocking_time: number;
+                    first_contentful_paint: number;
+                    cumulative_layout_shift: number;
+                    largest_contentful_paint: number;
+                };
+                pwa_score: number;
+                seo_score: number;
+                diagnostics: Array<{
+                    id: string;
+                    title: string;
+                    impact: string;
+                    description: string;
+                    score_display_mode: string;
+                }>;
+                opportunities: any[];
+                core_web_vitals: {
+                    cls_status: string;
+                    fid_status: string;
+                    lcp_status: string;
+                };
+                mobile_friendly: boolean;
+                performance_score: number;
+                accessibility_score: number;
+                best_practices_score: number;
+            };
+            lighthouse_desktop: {
+                url: string;
+                metrics: {
+                    speed_index: number;
+                    first_input_delay: number;
+                    time_to_interactive: number;
+                    total_blocking_time: number;
+                    first_contentful_paint: number;
+                    cumulative_layout_shift: number;
+                    largest_contentful_paint: number;
+                };
+                pwa_score: number;
+                seo_score: number;
+                diagnostics: Array<{
+                    id: string;
+                    title: string;
+                    impact: string;
+                    description: string;
+                    score_display_mode: string;
+                }>;
+                opportunities: any[];
+                core_web_vitals: {
+                    cls_status: string;
+                    fid_status: string;
+                    lcp_status: string;
+                };
+                mobile_friendly: boolean;
+                performance_score: number;
+                accessibility_score: number;
+                best_practices_score: number;
+            };
         }>;
-        broken_external_links: Array<{
-            url: string;
-            status_code: number;
-            found_on_pages: string[];
-        }>;
-    };
-    image_analysis: {
-        large_images: Array<{
-            url: string;
-            size_kb: number;
-            dimensions: string;
-            recommendations: string[];
-        }>;
-        missing_alt_text: Array<{
-            url: string;
-            found_on_pages: string[];
-        }>;
+        processing_time: number;
+        completed_at: string;
     };
 }
 
@@ -672,15 +737,71 @@ export interface AuditComparison {
 }
 
 export interface AuditSummaryDashboard {
-    total_audits: number;
-    last_audit_date?: string;
-    average_score: number;
-    trending_issues: Array<{
-        type: string;
-        count: number;
-        trend: "up" | "down" | "stable";
-    }>;
-    critical_issues_count: number;
+    id: string;
+    projectId?: string;
+    status: "running" | "completed" | "failed";
+    createdAt: string;
+    completedAt?: string | null;
+    latestAudit: {
+        results: {
+            overview: {
+                score: number;
+                total_issues: number;
+                critical_issues: number;
+                warnings: number;
+                passed_checks: number;
+                pages_analyzed: number;
+                total_response_time: number;
+            };
+            performance: {
+                score: number;
+                issues: any[];
+                metrics: {
+                    avg_page_speed: number;
+                    core_web_vitals: {
+                        cls: number;
+                        fid: number;
+                        lcp: number;
+                    };
+                    mobile_friendly: boolean;
+                };
+            };
+            accessibility: {
+                score: number;
+                issues: any[];
+                wcag_compliance: "A" | "AA" | "AAA";
+            };
+            technical_seo: {
+                score: number;
+                issues: any[];
+                robots_txt: {
+                    exists: boolean;
+                    issues: string[];
+                };
+                sitemap: {
+                    exists: boolean;
+                    url_count: number;
+                };
+            };
+            content_analysis: {
+                score: number;
+                issues: Array<{
+                    type: "info" | "warning" | "error";
+                    title: string;
+                    impact: "low" | "medium" | "high";
+                    description: string;
+                    recommendation: string;
+                }>;
+                avg_word_count: number;
+                duplicate_content: any[];
+            };
+            processing_time: number;
+            completed_at: string;
+        };
+        status: string
+        createdAt: string
+    }
+    stats: any
 }
 
 export interface SiteIssue {
@@ -1377,8 +1498,35 @@ export interface TopPagesParams {
     sortBy?: 'traffic' | 'keywords' | 'value';
 }
 
+// =============================================================================
+// 🔧 BACKLINK ANALYTICS TYPES (INTEGRATION)
+// =============================================================================
+
+// Re-export backlink types from backlink.type.ts for easier imports
+export type {
+    Backlink as BacklinkType,
+    CreateBacklinkRequest,
+    UpdateBacklinkRequest,
+    BacklinkAnalytics,
+    BacklinkProfile as BacklinkProfileType,
+    BacklinkQueryParams,
+    BacklinksResponse,
+} from './backlink.type';
+
 export interface ApiLimitsResponse {
-    semrush: number;
-    ahrefs: number;
-    moz: number;
+    semrush: {
+        remaining: number;
+        total: number;
+        resetDate: string;
+    };
+    ahrefs: {
+        remaining: number;
+        total: number;
+        resetDate: string;
+    };
+    moz: {
+        remaining: number;
+        total: number;
+        resetDate: string;
+    };
 }

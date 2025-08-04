@@ -97,9 +97,18 @@ export const fetchRankingHistory = createAsyncThunk(
  */
 export const fetchProjectRankingsOverview = createAsyncThunk(
     'positionTracking/fetchProjectOverview',
-    async (projectId: string, { rejectWithValue }) => {
+    async (projectId: string, { rejectWithValue, getState }) => {
         try {
-            const overview = await seoService.getProjectRankingsOverview(projectId);
+            const state = getState() as any;
+            const filters = state.positionTracking.filters;
+
+            // Pass filters as query parameters
+            const overview = await seoService.getProjectRankingsOverview(projectId, {
+                period: filters.period,
+                searchEngine: filters.searchEngine,
+                location: filters.location,
+                device: filters.device,
+            });
             return overview;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch project rankings overview');

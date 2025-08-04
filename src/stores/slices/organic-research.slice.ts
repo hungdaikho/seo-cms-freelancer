@@ -9,7 +9,7 @@ import {
     TopPagesParams,
     ApiLimitsResponse,
 } from '@/types/api.type';
-import { seoService } from '@/services/seo.service';
+import { organicResearchService } from '@/services/organic-research.service';
 
 // State interface
 export interface OrganicResearchState {
@@ -65,9 +65,9 @@ const initialState: OrganicResearchState = {
 // Async thunks
 export const analyzeDomain = createAsyncThunk(
     'organicResearch/analyzeDomain',
-    async ({ domain, country }: { domain: string; country: string }, { rejectWithValue }) => {
+    async ({ domain, country, database }: { domain: string; country: string; database?: string }, { rejectWithValue }) => {
         try {
-            const response = await seoService.analyzeDomain(domain, country);
+            const response = await organicResearchService.analyzeDomain(domain, country, database);
             return { response, domain, country };
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to analyze domain');
@@ -79,7 +79,7 @@ export const fetchOrganicKeywords = createAsyncThunk(
     'organicResearch/fetchOrganicKeywords',
     async ({ domain, params }: { domain: string; params: OrganicKeywordsParams }, { rejectWithValue }) => {
         try {
-            const response = await seoService.getOrganicKeywords(domain, params);
+            const response = await organicResearchService.getOrganicKeywords(domain, params);
             return response;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to fetch organic keywords');
@@ -91,7 +91,7 @@ export const fetchCompetitors = createAsyncThunk(
     'organicResearch/fetchCompetitors',
     async ({ domain, params }: { domain: string; params: CompetitorsParams }, { rejectWithValue }) => {
         try {
-            const response = await seoService.getDomainCompetitors(domain, params);
+            const response = await organicResearchService.getCompetitors(domain, params);
             return response;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to fetch competitors');
@@ -103,7 +103,7 @@ export const fetchTopPages = createAsyncThunk(
     'organicResearch/fetchTopPages',
     async ({ domain, params }: { domain: string; params: TopPagesParams }, { rejectWithValue }) => {
         try {
-            const response = await seoService.getDomainTopPages(domain, params);
+            const response = await organicResearchService.getTopPages(domain, params);
             return response;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to fetch top pages');
@@ -115,7 +115,7 @@ export const fetchApiLimits = createAsyncThunk(
     'organicResearch/fetchApiLimits',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await seoService.getApiLimits();
+            const response = await organicResearchService.getApiLimits();
             return response;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to fetch API limits');

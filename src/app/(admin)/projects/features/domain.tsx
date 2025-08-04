@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Input,
   Select,
@@ -25,7 +25,6 @@ import {
 import { useDomain } from "@/stores/hooks";
 import styles from "./domain.module.scss";
 
-const { Option } = Select;
 const { Title, Text } = Typography;
 
 // Define countries array
@@ -175,10 +174,7 @@ const Domain = (props: Props) => {
     competitorsLoading,
     topKeywordsLoading,
     authorityLoading,
-    overviewError,
     competitorsError,
-    topKeywordsError,
-    authorityError,
     monitoredDomains,
     analyzeDomain,
     addDomain,
@@ -190,10 +186,16 @@ const Domain = (props: Props) => {
   const handleAddDomain = async () => {
     if (domain.trim()) {
       try {
+        // Remove protocol and www. from the start
+        let cleanedDomain = domain
+          .trim()
+          .replace(/^https?:\/\//i, "")
+          .replace(/^www\./i, "");
+
         // Validate domain format
         const domainRegex =
           /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-        if (!domainRegex.test(domain.trim())) {
+        if (!domainRegex.test(cleanedDomain)) {
           message.error(
             "Please enter a valid domain format (e.g., example.com)"
           );
@@ -201,16 +203,16 @@ const Domain = (props: Props) => {
         }
 
         // Set selected domain and country
-        setSelectedDomain(domain.trim());
+        setSelectedDomain(cleanedDomain);
         setSelectedCountry(country);
 
         // Add to monitored domains
-        addDomain(domain.trim());
+        addDomain(cleanedDomain);
 
         // Analyze the domain
-        await analyzeDomain(domain.trim(), country);
+        await analyzeDomain(cleanedDomain, country);
 
-        message.success(`Domain ${domain.trim()} added successfully!`);
+        message.success(`Domain ${cleanedDomain} added successfully!`);
         setDomain(""); // Clear input
       } catch (error) {
         message.error("Failed to analyze domain. Please try again.");
