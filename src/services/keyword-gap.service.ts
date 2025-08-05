@@ -56,7 +56,7 @@ export interface CompetitorDiscoveryRequest {
 
 export interface CompetitorDiscoveryResponse {
     domain: string;
-    competitors: CompetitorDomain[];
+    data: CompetitorDomain[];
     totalCompetitors: number;
     analysisDate: string;
 }
@@ -96,7 +96,8 @@ export interface CompetitorRecommendation {
 
 class KeywordGapService extends BaseService {
     constructor() {
-        super("/api/v1");
+        const config = require('@/config/server.config.json');
+        super(config.HTTP_SERVER_URL + "/api/v1");
     }
 
     /**

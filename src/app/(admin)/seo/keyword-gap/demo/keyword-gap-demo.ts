@@ -1,11 +1,21 @@
 /**
  * Keyword Gap Analysis Demo
- * 
- * This file demonstrates how to use the Keyword Gap Analysis feature
+ *         const competitorData = await keywordGapService.discoverCompetitors(
+            "yoursite.com",
+            "US",
+            20
+        );
+
+        console.log('Discovered competitors:', competitorData);
+
+        // Get top competitors by overlap score
+        const topCompetitors = competitorData.data
+            .sort((a, b) => b.overlapScore - a.overlapScore)
+            .slice(0, 5);e demonstrates how to use the Keyword Gap Analysis feature
  * with real API integration.
  */
 
-import { keywordGapService } from '@/services/keyword-gap.service';
+import { keywordGapService, CompetitorDomain } from '@/services/keyword-gap.service';
 import { useKeywordGap } from '@/stores/hooks/useKeywordGap';
 
 // Example: Basic keyword gap analysis
@@ -37,17 +47,17 @@ export const demoBasicAnalysis = async () => {
 // Example: Competitor discovery
 export const demoCompetitorDiscovery = async () => {
     try {
-        const competitors = await keywordGapService.discoverCompetitors(
+        const competitorData = await keywordGapService.discoverCompetitors(
             "yoursite.com",
             "US",
             20
         );
 
-        console.log('Discovered competitors:', competitors);
+        console.log('Discovered competitors:', competitorData);
 
         // Get top competitors by overlap score
-        const topCompetitors = competitors.competitors
-            .sort((a, b) => b.overlapScore - a.overlapScore)
+        const topCompetitors = competitorData.data
+            .sort((a: CompetitorDomain, b: CompetitorDomain) => b.overlapScore - a.overlapScore)
             .slice(0, 5);
 
         console.log('Top 5 competitors by overlap:', topCompetitors);

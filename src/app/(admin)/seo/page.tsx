@@ -26,6 +26,8 @@ import KeywordGapAnalyzer from "./keyword-gap/features/keyword_gap_analyzer";
 import OrganicResearchPage from "./organic-research/page";
 import DomainOverviewDashboard from "./domain-overview/components/DomainOverviewDashboard";
 import TopicResearchPage from "./topic-research/page";
+import ContentTemplateManager from "./content-template/components/ContentTemplateManager";
+import OnPageSEOManager from "./on-page-seo-checker/components/OnPageSEOManager";
 import styles from "./page.module.scss";
 import PositionTracking from "./features/position-tracking";
 import OrganicResearchWidget from "./features/organic-research-widget";
@@ -190,42 +192,18 @@ const SeoPage: React.FC = () => {
                   SEO Content Template
                 </span>
               ),
-              children: (
-                <div className={styles.comingSoon}>
-                  <Title level={3}>SEO Content Template</Title>
-                  <Text type="secondary">
-                    Create SEO-optimized content templates
-                  </Text>
-                  <div style={{ marginTop: 16 }}>
-                    <Button type="primary" icon={<PlusOutlined />}>
-                      Create Template
-                    </Button>
-                  </div>
-                </div>
-              ),
+              children: <ContentTemplateManager projectId={selectedProject} />,
             },
-            {
-              key: "on-page-seo-checker",
-              label: (
-                <span>
-                  <BulbOutlined />
-                  On-Page SEO Checker
-                </span>
-              ),
-              children: (
-                <div className={styles.comingSoon}>
-                  <Title level={3}>On-Page SEO Checker</Title>
-                  <Text type="secondary">
-                    Analyze and optimize your pages for better SEO
-                  </Text>
-                  <div style={{ marginTop: 16 }}>
-                    <Button type="primary" icon={<PlusOutlined />}>
-                      Check Page
-                    </Button>
-                  </div>
-                </div>
-              ),
-            },
+            // {
+            //   key: "on-page-seo-checker",
+            //   label: (
+            //     <span>
+            //       <BulbOutlined />
+            //       On-Page SEO Checker
+            //     </span>
+            //   ),
+            //   children: <OnPageSEOManager projectId={selectedProject} />,
+            // },
           ]}
         />
       ) : (

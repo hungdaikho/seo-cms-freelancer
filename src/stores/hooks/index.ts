@@ -20,3 +20,4 @@ export {
 export { useGlobalSearch } from './useGlobalSearch';
 export { useKeywordGap } from './useKeywordGap';
 export { useBacklink } from './useBacklink';
+export { useTopicResearch } from './useTopicResearch';

@@ -1,856 +1,1149 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Card,
-  Table,
-  Button,
-  Select,
-  DatePicker,
-  Input,
   Row,
   Col,
-  Tag,
   Tabs,
+  Button,
+  Table,
+  Tag,
   Space,
+  Dropdown,
   Modal,
   Form,
+  Input,
+  Select,
+  DatePicker,
+  InputNumber,
   message,
-  Calendar,
-  Badge,
-  Statistic,
-  Progress,
-  Tooltip,
-  Avatar,
   Spin,
+  Statistic,
+  List,
+  Typography,
+  Empty,
+  Checkbox,
 } from "antd";
 import {
-  CalendarOutlined,
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
-  EyeOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  FileTextOutlined,
-  BulbOutlined,
+  CalendarOutlined,
   BarChartOutlined,
+  BulbOutlined,
+  SearchOutlined,
+  MoreOutlined,
+  EyeOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  SwapOutlined,
 } from "@ant-design/icons";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "@/stores/store";
+import type { RootState, AppDispatch } from "@/stores/store";
 import {
-  fetchProjects,
-  setCurrentProject,
-} from "@/stores/slices/project.slice";
-import { seoService } from "@/services/seo.service";
-import styles from "./content_planning_manager.module.scss";
-import type { Dayjs } from "dayjs";
+  fetchCalendarItems,
+  createCalendarItem,
+  updateCalendarItem,
+  deleteCalendarItem,
+  bulkUpdateCalendarItems,
+  generateContentIdeas,
+  generateTopicIdeas,
+  getTopicQuestions,
+  fetchContentPerformance,
+  fetchCategories,
+  setCalendarFilters,
+  setSelectedCalendarItem,
+  clearError,
+  clearContentIdeas,
+  clearTopicResearch,
+} from "@/stores/slices/content-planning.slice";
+import {
+  CalendarItem,
+  CreateCalendarItemRequest,
+  ContentIdeaRequest,
+  TopicResearchRequest,
+  CalendarFilters,
+  BulkUpdateItem,
+} from "@/types/content-planning.type";
+import { Project } from "@/types/api.type";
+import { useProject } from "@/stores/hooks/useProject";
 import dayjs from "dayjs";
 
+const { TabPane } = Tabs;
 const { Option } = Select;
 const { TextArea } = Input;
+const { Title, Text, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
 
-interface ContentItem {
-  id: string;
-  title: string;
-  type:
-    | "blog-post"
-    | "social-media"
-    | "email"
-    | "landing-page"
-    | "video"
-    | "infographic";
-  status: "planned" | "in-progress" | "review" | "published" | "archived";
-  priority: "high" | "medium" | "low";
-  publishDate: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  targetKeywords: string[];
-  estimatedWordCount: number;
-  actualWordCount?: number;
-  brief: string;
-  notes: string;
-  tags: string[];
-  seoScore?: number;
-  readabilityScore?: number;
-  performance?: {
-    views: number;
-    shares: number;
-    engagement: number;
-  };
-}
+interface ContentPlanningManagerProps {}
 
-interface ContentCalendar {
-  month: string;
-  items: ContentItem[];
-  metrics: {
-    planned: number;
-    published: number;
-    draft: number;
-    overdue: number;
-  };
-}
-
-const ContentPlanningManager: React.FC = () => {
+const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const selectedProject = useSelector(
-    (state: RootState) => state.project.currentProject
-  );
-  const { projects, loading: projectsLoading } = useSelector(
-    (state: RootState) => state.project
-  );
-  const [contentData, setContentData] = useState<ContentCalendar | null>(null);
-  const [loading, setLoading] = useState(false);
+
+  // Project management
+  const { projects, currentProject, setCurrentProject, fetchProjects } =
+    useProject();
+  const [selectedProject, setSelectedProject] = useState<string>("");
+
+  const {
+    calendarItems,
+    calendarMetrics,
+    calendarFilters,
+    contentIdeas,
+    topicIdeas,
+    topicQuestions,
+    performance,
+    categories,
+    loading,
+    error,
+    selectedCalendarItem,
+  } = useSelector((state: RootState) => state.contentPlanning);
+
   const [activeTab, setActiveTab] = useState("calendar");
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState<
+    "create" | "edit" | "ideas" | "topic-research"
+  >("create");
   const [form] = Form.useForm();
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [filterType, setFilterType] = useState<string>("all");
+  const [ideaForm] = Form.useForm();
+  const [topicForm] = Form.useForm();
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
+  // Load projects on mount
   useEffect(() => {
-    // Load projects on component mount
-    dispatch(fetchProjects());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (selectedProject?.id) {
-      loadContentData();
+    console.log("🔄 Content Planning: Loading projects...", projects.length);
+    if (projects.length === 0) {
+      console.log("� Fetching projects...");
+      fetchProjects();
     }
-  }, [selectedProject]);
+  }, [projects.length, fetchProjects]);
 
-  const loadContentData = async () => {
-    if (!selectedProject?.id) return;
+  // Auto-select first project if available and no current project
+  useEffect(() => {
+    console.log("📋 Content Planning - Project Selection Debug:", {
+      selectedProject,
+      projectsLength: projects.length,
+      firstProjectId: projects[0]?.id,
+      currentProject: currentProject?.id,
+    });
 
-    setLoading(true);
+    // Use currentProject from Redux if available
+    if (!selectedProject && currentProject?.id) {
+      console.log("✅ Using current project from Redux:", currentProject.id);
+      setSelectedProject(currentProject.id);
+    } else if (!selectedProject && !currentProject && projects.length > 0) {
+      console.log("✅ Auto-selecting first project:", projects[0].id);
+      setSelectedProject(projects[0].id);
+      setCurrentProject(projects[0]);
+    }
+  }, [projects, selectedProject, currentProject, setCurrentProject]);
+
+  useEffect(() => {
+    console.log(
+      "🚀 Content Planning - API Calls with projectId:",
+      selectedProject
+    );
+    if (
+      selectedProject &&
+      selectedProject.trim() !== "" &&
+      selectedProject !== "undefined" &&
+      selectedProject !== "null"
+    ) {
+      console.log("📤 Making API calls for project:", selectedProject);
+      console.log("🔍 Project validation:", {
+        length: selectedProject.length,
+        type: typeof selectedProject,
+        value: selectedProject,
+      });
+      dispatch(fetchCalendarItems({ projectId: selectedProject }));
+      dispatch(fetchCategories(selectedProject));
+      dispatch(fetchContentPerformance({ projectId: selectedProject }));
+    } else {
+      console.log("⏸️ Skipping API calls - invalid project:", {
+        selectedProject,
+        type: typeof selectedProject,
+        length: selectedProject?.length,
+      });
+    }
+  }, [dispatch, selectedProject]);
+
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
+
+  // Calendar Operations
+  const handleCreateItem = async (values: any) => {
+    console.log("📝 Creating calendar item with projectId:", selectedProject);
+    console.log("📝 Full form values:", values);
+
+    if (!selectedProject) {
+      console.error("❌ No project selected!");
+      message.error("Please select a project first");
+      return;
+    }
+
+    if (selectedProject === "undefined" || selectedProject === "null") {
+      console.error("❌ Invalid project ID:", selectedProject);
+      message.error("Invalid project selected");
+      return;
+    }
+
     try {
-      // Get content calendar from API
-      const calendarResponse = await seoService.getContentCalendar(
-        selectedProject.id,
-        {
-          month: dayjs().format("YYYY-MM"),
-          year: dayjs().format("YYYY"),
-        }
-      );
-
-      // Get content performance data
-      const performanceResponse = await seoService.getContentPerformance(
-        selectedProject.id,
-        {
-          limit: 20,
-        }
-      );
-
-      // Convert API data to local format
-      const convertedItems: ContentItem[] = (calendarResponse.items || []).map(
-        (item) => ({
-          id: item.id,
-          title: item.title,
-          type: item.type as any, // Type assertion for compatibility
-          status:
-            item.status === "draft" ? "in-progress" : (item.status as any),
-          priority: "medium" as const, // Default priority since API doesn't provide this
-          publishDate: item.publishDate,
-          author: {
-            name: item.author,
-            avatar: "/default-avatar.jpg", // Default avatar
-          },
-          targetKeywords: item.targetKeywords,
-          estimatedWordCount: 1500, // Default estimate
-          actualWordCount: undefined,
-          brief: `Content brief for ${item.title}`, // Default brief
-          notes: `Category: ${item.category}`, // Use category as notes
-          tags: [item.category], // Use category as tag
-          seoScore: Math.floor(Math.random() * 40) + 60, // Random score between 60-100
-          readabilityScore: Math.floor(Math.random() * 30) + 70, // Random score between 70-100
-        })
-      );
-
-      const convertedData: ContentCalendar = {
-        month: calendarResponse.month || dayjs().format("YYYY-MM"),
-        metrics: calendarResponse.metrics || {
-          planned: 0,
-          published: 0,
-          draft: 0,
-          overdue: 0,
-        },
-        items: convertedItems,
+      const data: CreateCalendarItemRequest = {
+        ...values,
+        publishDate: values.publishDate?.toISOString(),
+        targetKeywords:
+          values.targetKeywords?.split(",").map((k: string) => k.trim()) || [],
+        tags: values.tags?.split(",").map((t: string) => t.trim()) || [],
       };
 
-      setContentData(convertedData);
+      console.log("📤 API Call - createCalendarItem:", {
+        projectId: selectedProject,
+        data,
+        projectIdType: typeof selectedProject,
+        projectIdLength: selectedProject.length,
+      });
+
+      const result = await dispatch(
+        createCalendarItem({ projectId: selectedProject, data })
+      ).unwrap();
+
+      console.log("✅ Calendar item created successfully:", result);
+      message.success("Calendar item created successfully");
+      setModalVisible(false);
+      form.resetFields();
     } catch (error) {
-      console.error("Error loading content data:", error);
-      // Fallback to empty data structure
-      const fallbackData: ContentCalendar = {
-        month: dayjs().format("YYYY-MM"),
-        metrics: {
-          planned: 0,
-          published: 0,
-          draft: 0,
-          overdue: 0,
-        },
-        items: [],
-      };
-      setContentData(fallbackData);
-    } finally {
-      setLoading(false);
+      console.error("❌ Failed to create calendar item:", error);
+      message.error("Failed to create calendar item");
     }
   };
 
-  const getStatusColor = (status: string) => {
-    const colors = {
-      planned: "blue",
-      "in-progress": "orange",
-      review: "purple",
-      published: "green",
-      archived: "default",
-    };
-    return colors[status as keyof typeof colors] || "default";
+  const handleEditItem = async (values: any) => {
+    if (!selectedCalendarItem || !selectedProject) return;
+
+    try {
+      const data = {
+        ...values,
+        publishDate: values.publishDate?.toISOString(),
+        targetKeywords:
+          values.targetKeywords?.split(",").map((k: string) => k.trim()) || [],
+        tags: values.tags?.split(",").map((t: string) => t.trim()) || [],
+      };
+
+      await dispatch(
+        updateCalendarItem({
+          projectId: selectedProject,
+          itemId: selectedCalendarItem.id,
+          data,
+        })
+      ).unwrap();
+      message.success("Calendar item updated successfully");
+      setModalVisible(false);
+      form.resetFields();
+    } catch (error) {
+      message.error("Failed to update calendar item");
+    }
   };
 
-  const getPriorityColor = (priority: string) => {
-    const colors = {
-      high: "red",
-      medium: "orange",
-      low: "green",
-    };
-    return colors[priority as keyof typeof colors] || "default";
+  const handleDeleteItem = (itemId: string) => {
+    if (!selectedProject) return;
+
+    Modal.confirm({
+      title: "Are you sure you want to delete this item?",
+      content: "This action cannot be undone.",
+      onOk: async () => {
+        try {
+          await dispatch(
+            deleteCalendarItem({ projectId: selectedProject, itemId })
+          ).unwrap();
+          message.success("Calendar item deleted successfully");
+        } catch (error) {
+          message.error("Failed to delete calendar item");
+        }
+      },
+    });
   };
 
-  const getTypeIcon = (type: string) => {
-    const icons = {
-      "blog-post": <FileTextOutlined />,
-      "social-media": <BarChartOutlined />,
-      email: <FileTextOutlined />,
-      "landing-page": <FileTextOutlined />,
-      video: <FileTextOutlined />,
-      infographic: <FileTextOutlined />,
-    };
-    return icons[type as keyof typeof icons] || <FileTextOutlined />;
+  const handleBulkStatusUpdate = async (
+    status: "planned" | "in_progress" | "review" | "published" | "archived"
+  ) => {
+    if (selectedRowKeys.length === 0) {
+      message.warning("Please select items to update");
+      return;
+    }
+
+    if (!selectedProject) {
+      message.error("Please select a project first");
+      return;
+    }
+
+    try {
+      const items: BulkUpdateItem[] = selectedRowKeys.map((id) => ({
+        id: id.toString(),
+        status,
+      }));
+      await dispatch(
+        bulkUpdateCalendarItems({ projectId: selectedProject, data: { items } })
+      ).unwrap();
+      message.success(`Updated ${selectedRowKeys.length} items to ${status}`);
+      setSelectedRowKeys([]);
+    } catch (error) {
+      message.error("Failed to update items");
+    }
   };
 
-  const filteredItems =
-    contentData?.items.filter((item) => {
-      const matchesStatus =
-        filterStatus === "all" || item.status === filterStatus;
-      const matchesType = filterType === "all" || item.type === filterType;
-      return matchesStatus && matchesType;
-    }) || [];
+  // Content Ideas Operations
+  const handleGenerateIdeas = async (values: any) => {
+    try {
+      const data: ContentIdeaRequest = values;
+      await dispatch(generateContentIdeas(data)).unwrap();
+      message.success("Content ideas generated successfully");
+    } catch (error) {
+      message.error("Failed to generate content ideas");
+    }
+  };
 
-  const handleAddContent = () => {
-    setEditingItem(null);
+  // Topic Research Operations
+  const handleTopicResearch = async (values: any) => {
+    try {
+      const data: TopicResearchRequest = values;
+      await dispatch(generateTopicIdeas(data)).unwrap();
+      if (values.includeQuestions) {
+        await dispatch(getTopicQuestions(values.seedKeyword)).unwrap();
+      }
+      message.success("Topic research completed successfully");
+    } catch (error) {
+      message.error("Failed to complete topic research");
+    }
+  };
+
+  // Filter Operations
+  const handleFilterChange = (filters: Partial<CalendarFilters>) => {
+    if (!selectedProject) return;
+
+    const newFilters = { ...calendarFilters, ...filters };
+    dispatch(setCalendarFilters(newFilters));
+    dispatch(
+      fetchCalendarItems({ projectId: selectedProject, filters: newFilters })
+    );
+  };
+
+  // Project Operations
+  const handleProjectChange = (projectId: string) => {
+    console.log("🔄 Changing project from", selectedProject, "to", projectId);
+    setSelectedProject(projectId);
+    const project = projects.find((p) => p.id === projectId);
+    if (project) {
+      console.log("✅ Found project:", project.name, project.id);
+      setCurrentProject(project);
+    } else {
+      console.error("❌ Project not found with ID:", projectId);
+    }
+  };
+
+  // Modal Operations
+  const openCreateModal = () => {
+    setModalType("create");
+    setModalVisible(true);
     form.resetFields();
-    setShowAddModal(true);
   };
 
-  const handleEditContent = (item: ContentItem) => {
-    setEditingItem(item);
+  const openEditModal = (item: CalendarItem) => {
+    setModalType("edit");
+    setSelectedCalendarItem(item);
+    setModalVisible(true);
     form.setFieldsValue({
       ...item,
       publishDate: dayjs(item.publishDate),
       targetKeywords: item.targetKeywords.join(", "),
+      tags: item.tags.join(", "),
     });
-    setShowAddModal(true);
   };
 
-  const handleSaveContent = async (values: any) => {
-    if (!selectedProject?.id) {
-      message.error("No project selected");
-      return;
-    }
-
-    try {
-      const contentData = {
-        title: values.title,
-        type: values.type,
-        status: values.status,
-        publishDate: values.publishDate.format("YYYY-MM-DD"),
-        targetKeywords: values.targetKeywords
-          .split(",")
-          .map((k: string) => k.trim()),
-        brief: values.brief || "",
-        notes: values.notes || "",
-        tags: values.tags || [],
-        priority: values.priority || "medium",
-        estimatedWordCount: values.estimatedWordCount || 1500,
-      };
-
-      if (editingItem) {
-        // Update existing content via content calendar API
-        await seoService.scheduleContent(selectedProject.id, {
-          ...contentData,
-          id: editingItem.id,
-          action: "update",
-        });
-        message.success("Content updated successfully");
-      } else {
-        // Create new content via content calendar API
-        await seoService.scheduleContent(selectedProject.id, {
-          ...contentData,
-          action: "create",
-        });
-        message.success("Content created successfully");
-      }
-
-      // Reload content data
-      await loadContentData();
-
-      setShowAddModal(false);
-      setEditingItem(null);
-      form.resetFields();
-    } catch (error) {
-      console.error("Error saving content:", error);
-      message.error("Failed to save content");
-    }
+  const openIdeasModal = () => {
+    setModalType("ideas");
+    setModalVisible(true);
+    ideaForm.resetFields();
   };
 
-  const handleGenerateContentIdeas = async () => {
-    if (!selectedProject?.id) {
-      message.error("No project selected");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const ideas = await seoService.getContentIdeas(selectedProject.id, {
-        topics: ["SEO", "Content Marketing", "Digital Marketing"],
-      });
-
-      console.log("Generated content ideas:", ideas);
-      message.success(`Generated ${ideas.length} content ideas`);
-    } catch (error) {
-      console.error("Error generating content ideas:", error);
-      message.error("Failed to generate content ideas");
-    } finally {
-      setLoading(false);
-    }
+  const openTopicResearchModal = () => {
+    setModalType("topic-research");
+    setModalVisible(true);
+    topicForm.resetFields();
   };
 
-  const handleGenerateContentBrief = async (
-    topic: string,
-    keywords: string[]
-  ) => {
-    if (!selectedProject?.id) {
-      message.error("No project selected");
-      return;
-    }
-
-    try {
-      const brief = await seoService.generateContentBrief(selectedProject.id, {
-        topic,
-        keywords,
-      });
-
-      console.log("Generated content brief:", brief);
-      message.success("Content brief generated successfully");
-      return brief;
-    } catch (error) {
-      console.error("Error generating content brief:", error);
-      message.error("Failed to generate content brief");
-    }
-  };
-
-  const handleAnalyzeContentSEO = async (contentId: string) => {
-    if (!selectedProject?.id) {
-      message.error("No project selected");
-      return;
-    }
-
-    try {
-      const analysis = await seoService.analyzeContentSEO(
-        selectedProject.id,
-        contentId
-      );
-      console.log("SEO Analysis:", analysis);
-      message.success("SEO analysis completed");
-      return analysis;
-    } catch (error) {
-      console.error("Error analyzing content SEO:", error);
-      message.error("Failed to analyze content SEO");
-    }
-  };
-
-  const contentColumns = [
+  // Table Columns
+  const calendarColumns = [
     {
-      title: "Content",
-      key: "content",
-      render: (record: ContentItem) => (
-        <div className={styles.contentCell}>
-          <div className={styles.contentHeader}>
-            {getTypeIcon(record.type)}
-            <span className={styles.contentTitle}>{record.title}</span>
-          </div>
-          <div className={styles.contentMeta}>
-            <Tag color={getStatusColor(record.status)}>{record.status}</Tag>
-            <Tag color={getPriorityColor(record.priority)}>
-              {record.priority}
-            </Tag>
-            <span className={styles.publishDate}>
-              {dayjs(record.publishDate).format("MMM DD")}
-            </span>
-          </div>
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
+      width: 250,
+      render: (text: string, record: CalendarItem) => (
+        <div>
+          <Text strong>{text}</Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {record.type.replace("_", " ")}
+          </Text>
         </div>
       ),
     },
     {
-      title: "Author",
-      dataIndex: "author",
-      key: "author",
-      render: (author: ContentItem["author"]) => (
-        <div className={styles.authorCell}>
-          <Avatar size="small" src={author.avatar} />
-          <span className={styles.authorName}>{author.name}</span>
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: 120,
+      render: (status: string) => {
+        const colorMap = {
+          planned: "blue",
+          in_progress: "orange",
+          review: "purple",
+          published: "green",
+          archived: "gray",
+        };
+        return (
+          <Tag color={colorMap[status as keyof typeof colorMap]}>
+            {status.replace("_", " ")}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "Priority",
+      dataIndex: "priority",
+      key: "priority",
+      width: 100,
+      render: (priority: string) => {
+        const colorMap = { low: "green", medium: "orange", high: "red" };
+        return (
+          <Tag color={colorMap[priority as keyof typeof colorMap]}>
+            {priority}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "Publish Date",
+      dataIndex: "publishDate",
+      key: "publishDate",
+      width: 120,
+      render: (date: string) => dayjs(date).format("MMM DD, YYYY"),
+    },
+    {
+      title: "Keywords",
+      dataIndex: "targetKeywords",
+      key: "targetKeywords",
+      width: 200,
+      render: (keywords: string[]) => (
+        <div>
+          {keywords.slice(0, 2).map((keyword) => (
+            <Tag key={keyword}>{keyword}</Tag>
+          ))}
+          {keywords.length > 2 && <Tag>+{keywords.length - 2} more</Tag>}
         </div>
       ),
     },
     {
-      title: "Progress",
-      key: "progress",
-      render: (record: ContentItem) => {
-        const progress =
-          record.actualWordCount && record.estimatedWordCount
-            ? (record.actualWordCount / record.estimatedWordCount) * 100
-            : 0;
-
-        return (
-          <div className={styles.progressCell}>
-            <Progress
-              percent={progress}
-              size="small"
-              format={(percent) =>
-                `${record.actualWordCount || 0}/${record.estimatedWordCount}`
-              }
-            />
-          </div>
-        );
-      },
-    },
-    {
-      title: "SEO Score",
-      dataIndex: "seoScore",
-      key: "seoScore",
-      render: (score?: number) => {
-        if (!score) return "-";
-        return (
-          <div className={styles.scoreCell}>
-            <span
-              style={{
-                color:
-                  score >= 80 ? "#52c41a" : score >= 60 ? "#faad14" : "#ff4d4f",
-              }}
-            >
-              {score}%
-            </span>
-          </div>
-        );
-      },
-    },
-    {
-      title: "Performance",
-      key: "performance",
-      render: (record: ContentItem) => {
-        if (!record.performance) return "-";
-        return (
-          <div className={styles.performanceCell}>
-            <Tooltip
-              title={`${record.performance.views} views, ${record.performance.shares} shares`}
-            >
-              <span>{record.performance.views} views</span>
-            </Tooltip>
-          </div>
-        );
-      },
+      title: "Word Count",
+      dataIndex: "estimatedWordCount",
+      key: "estimatedWordCount",
+      width: 100,
+      render: (count: number, record: CalendarItem) => (
+        <div>
+          <Text>{count || "-"}</Text>
+          {record.actualWordCount && (
+            <>
+              <br />
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Actual: {record.actualWordCount}
+              </Text>
+            </>
+          )}
+        </div>
+      ),
     },
     {
       title: "Actions",
       key: "actions",
-      render: (record: ContentItem) => (
-        <Space size="small">
+      width: 100,
+      render: (_: any, record: CalendarItem) => (
+        <Space>
           <Button
+            type="text"
             icon={<EyeOutlined />}
             size="small"
-            onClick={() => {
-              /* View details */
-            }}
+            onClick={() => dispatch(setSelectedCalendarItem(record))}
           />
           <Button
+            type="text"
             icon={<EditOutlined />}
             size="small"
-            onClick={() => handleEditContent(record)}
+            onClick={() => openEditModal(record)}
           />
           <Button
+            type="text"
             icon={<DeleteOutlined />}
             size="small"
             danger
-            onClick={() => {
-              /* Delete content */
-            }}
+            onClick={() => handleDeleteItem(record.id)}
           />
         </Space>
       ),
     },
   ];
 
-  const handleProjectSelect = (projectId: string) => {
-    const project = projects.find((p) => p.id === projectId);
-    if (project) {
-      dispatch(setCurrentProject(project));
-    }
+  // Row Selection
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys: React.Key[]) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
   };
 
-  const getListData = (value: Dayjs) => {
-    const dateStr = value.format("YYYY-MM-DD");
-    const items =
-      contentData?.items.filter((item) => item.publishDate === dateStr) || [];
+  // Render Project Selector
+  const renderProjectSelector = () => (
+    <div
+      style={{
+        marginBottom: 16,
+        padding: "0 16px",
+        background: "#fafafa",
+        borderRadius: 8,
+      }}
+    >
+      <Space
+        align="center"
+        style={{
+          width: "100%",
+          justifyContent: "space-between",
+          padding: "12px 0",
+        }}
+      >
+        <Typography.Text strong>
+          <SwapOutlined style={{ marginRight: 8 }} />
+          Current Project:
+        </Typography.Text>
+        <Select
+          value={selectedProject}
+          onChange={handleProjectChange}
+          placeholder="Select a project"
+          style={{ minWidth: 250 }}
+          size="small"
+          loading={projects.length === 0}
+          disabled={projects.length === 0}
+        >
+          {projects.map((project: Project) => (
+            <Option key={project.id} value={project.id}>
+              {project.name} ({project.domain})
+            </Option>
+          ))}
+        </Select>
+      </Space>
+    </div>
+  );
 
-    return items.map((item) => ({
-      type: getStatusColor(item.status),
-      content: item.title,
-    }));
-  };
-
-  const dateCellRender = (value: Dayjs) => {
-    const listData = getListData(value);
+  // Show empty state if no project selected
+  if (!selectedProject) {
     return (
-      <ul className={styles.calendarEvents}>
-        {listData.map((item, index) => (
-          <li key={index}>
-            <Badge status={item.type as any} text={item.content} />
-          </li>
-        ))}
-      </ul>
-    );
-  };
+      <div style={{ padding: "24px" }}>
+        {renderProjectSelector()}
 
-  const overviewStats = [
-    {
-      title: "Total Content",
-      value: contentData?.items.length || 0,
-      prefix: <FileTextOutlined />,
-      suffix: "pieces",
-    },
-    {
-      title: "Published",
-      value: contentData?.metrics.published || 0,
-      prefix: <CheckCircleOutlined />,
-      valueStyle: { color: "#52c41a" },
-    },
-    {
-      title: "In Progress",
-      value: contentData?.metrics.draft || 0,
-      prefix: <ClockCircleOutlined />,
-      valueStyle: { color: "#1890ff" },
-    },
-    {
-      title: "Overdue",
-      value: contentData?.metrics.overdue || 0,
-      prefix: <ExclamationCircleOutlined />,
-      valueStyle: { color: "#ff4d4f" },
-    },
-  ];
-
-  const tabItems = [
-    {
-      key: "calendar",
-      label: "Calendar View",
-      children: (
-        <div className={styles.calendarTab}>
-          <Calendar
-            dateCellRender={dateCellRender}
-            value={selectedDate}
-            onSelect={setSelectedDate}
-          />
-        </div>
-      ),
-    },
-    {
-      key: "content-list",
-      label: "Content List",
-      children: (
-        <div className={styles.contentListTab}>
-          <div className={styles.filtersSection}>
-            <Row gutter={16}>
-              <Col xs={24} sm={8}>
-                <Select
-                  placeholder="Filter by status"
-                  value={filterStatus}
-                  onChange={setFilterStatus}
-                  style={{ width: "100%" }}
-                >
-                  <Option value="all">All Status</Option>
-                  <Option value="planned">Planned</Option>
-                  <Option value="in-progress">In Progress</Option>
-                  <Option value="review">Review</Option>
-                  <Option value="published">Published</Option>
-                </Select>
-              </Col>
-              <Col xs={24} sm={8}>
-                <Select
-                  placeholder="Filter by type"
-                  value={filterType}
-                  onChange={setFilterType}
-                  style={{ width: "100%" }}
-                >
-                  <Option value="all">All Types</Option>
-                  <Option value="blog-post">Blog Post</Option>
-                  <Option value="social-media">Social Media</Option>
-                  <Option value="email">Email</Option>
-                  <Option value="landing-page">Landing Page</Option>
-                </Select>
-              </Col>
-              <Col xs={24} sm={8}>
-                <RangePicker style={{ width: "100%" }} />
-              </Col>
-            </Row>
-          </div>
-
-          <Table
-            columns={contentColumns}
-            dataSource={filteredItems}
-            rowKey="id"
-            loading={loading}
-            pagination={{
-              pageSize: 20,
-              showSizeChanger: true,
-              showTotal: (total) => `Total ${total} content pieces`,
-            }}
-          />
-        </div>
-      ),
-    },
-    {
-      key: "ideas",
-      label: "Content Ideas",
-      children: (
-        <div className={styles.ideasTab}>
+        {/* Debug Info in Development */}
+        {process.env.NODE_ENV === "development" && (
           <Card
-            title="AI-Generated Content Ideas"
-            extra={
-              <Button type="primary" icon={<BulbOutlined />}>
-                Generate More Ideas
-              </Button>
-            }
+            title="🐛 Debug Information"
+            style={{ marginBottom: 16, border: "2px solid #ff4d4f" }}
+            size="small"
           >
-            <div className={styles.ideasList}>
-              <Card size="small" style={{ marginBottom: 8 }}>
-                <div className={styles.ideaItem}>
-                  <span className={styles.ideaTitle}>
-                    10 Common SEO Mistakes and How to Fix Them
-                  </span>
-                  <div className={styles.ideaMeta}>
-                    <Tag>High Volume</Tag>
-                    <Tag>Easy Win</Tag>
-                    <span>Est. 2,500 words</span>
-                  </div>
-                </div>
-              </Card>
-              <Card size="small" style={{ marginBottom: 8 }}>
-                <div className={styles.ideaItem}>
-                  <span className={styles.ideaTitle}>
-                    Complete Guide to Local SEO for Small Businesses
-                  </span>
-                  <div className={styles.ideaMeta}>
-                    <Tag>Medium Volume</Tag>
-                    <Tag>Competitive</Tag>
-                    <span>Est. 3,000 words</span>
-                  </div>
-                </div>
-              </Card>
-            </div>
+            <pre style={{ fontSize: 12, background: "#f5f5f5", padding: 8 }}>
+              {JSON.stringify(
+                {
+                  selectedProject,
+                  currentProject: currentProject?.id,
+                  projectsCount: projects.length,
+                  projectsLoaded: projects.length > 0,
+                  firstProject: projects[0]?.id,
+                },
+                null,
+                2
+              )}
+            </pre>
           </Card>
+        )}
+
+        <div style={{ textAlign: "center", padding: "60px 0" }}>
+          <Empty
+            description="Please select a project to manage content planning"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          >
+            <Typography.Text type="secondary">
+              Choose a project from the dropdown above to get started
+            </Typography.Text>
+          </Empty>
         </div>
-      ),
-    },
-  ];
-
-  if (!selectedProject || projectsLoading) {
-    return (
-      <div className={styles.noProject}>
-        <Card>
-          <div style={{ textAlign: "center", padding: "40px 0" }}>
-            {projectsLoading ? (
-              <Spin size="large" />
-            ) : (
-              <CalendarOutlined
-                style={{ fontSize: "48px", color: "#d9d9d9" }}
-              />
-            )}
-            <h3 style={{ marginTop: "16px" }}>
-              {projectsLoading ? "Loading Projects..." : "No Project Selected"}
-            </h3>
-            <p>
-              {projectsLoading
-                ? "Please wait while we load your projects."
-                : "Please select a project to view content planning."}
-            </p>
-
-            {!projectsLoading && projects.length > 0 ? (
-              <div
-                style={{
-                  marginTop: "24px",
-                  maxWidth: "300px",
-                  margin: "24px auto 0",
-                }}
-              >
-                <Select
-                  placeholder="Select a project"
-                  style={{ width: "100%" }}
-                  size="large"
-                  loading={projectsLoading}
-                  onChange={handleProjectSelect}
-                  showSearch
-                  filterOption={(input, option) =>
-                    (option?.children as unknown as string)
-                      ?.toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0
-                  }
-                >
-                  {projects.map((project) => (
-                    <Option key={project.id} value={project.id}>
-                      {project.name}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-            ) : !projectsLoading && projects.length === 0 ? (
-              <div style={{ marginTop: "24px" }}>
-                <p style={{ color: "#666", marginBottom: "16px" }}>
-                  No projects available. Please create a project first.
-                </p>
-                <Button type="primary" href="/projects">
-                  Go to Projects
-                </Button>
-              </div>
-            ) : null}
-          </div>
-        </Card>
       </div>
     );
   }
 
   return (
-    <div className={styles.contentPlanningManager}>
-      <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <h1>Content Planning</h1>
-          <p>Plan, schedule, and track your content creation process</p>
-        </div>
-        <div className={styles.headerActions}>
-          <Space>
-            <Select
-              placeholder="Select project"
-              style={{ width: 200 }}
-              value={selectedProject?.id}
-              onChange={handleProjectSelect}
-              showSearch
-              filterOption={(input, option) =>
-                (option?.children as unknown as string)
-                  ?.toLowerCase()
-                  .indexOf(input.toLowerCase()) >= 0
-              }
-            >
-              {projects.map((project) => (
-                <Option key={project.id} value={project.id}>
-                  {project.name}
-                </Option>
-              ))}
-            </Select>
-            <Button
-              icon={<BulbOutlined />}
-              onClick={handleGenerateContentIdeas}
-              loading={loading}
-            >
-              Generate Ideas
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAddContent}
-            >
-              Add Content
-            </Button>
-          </Space>
-        </div>
-      </div>
+    <div style={{ padding: "24px" }}>
+      {renderProjectSelector()}
 
-      <Row gutter={[16, 16]} className={styles.statsRow}>
-        {overviewStats.map((stat, index) => (
-          <Col xs={24} sm={12} lg={6} key={index}>
-            <Card>
-              <Statistic {...stat} />
-            </Card>
-          </Col>
-        ))}
+      {/* Debug Info in Development */}
+      {process.env.NODE_ENV === "development" && (
+        <Card
+          title="🐛 Debug Information"
+          style={{ marginBottom: 16, border: "2px solid #52c41a" }}
+          size="small"
+        >
+          <pre style={{ fontSize: 12, background: "#f5f5f5", padding: 8 }}>
+            {JSON.stringify(
+              {
+                selectedProject,
+                selectedProjectType: typeof selectedProject,
+                selectedProjectLength: selectedProject.length,
+                currentProject: currentProject?.id,
+                projectsCount: projects.length,
+                apiCallsWillBeMadeWith: selectedProject,
+              },
+              null,
+              2
+            )}
+          </pre>
+        </Card>
+      )}
+
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col span={24}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Title level={2}>Content Planning</Title>
+            <Space>
+              <Button
+                type="primary"
+                icon={<BulbOutlined />}
+                onClick={openIdeasModal}
+                disabled={!selectedProject}
+              >
+                Generate Ideas
+              </Button>
+              <Button
+                icon={<SearchOutlined />}
+                onClick={openTopicResearchModal}
+                disabled={!selectedProject}
+              >
+                Topic Research
+              </Button>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={openCreateModal}
+                disabled={!selectedProject}
+              >
+                Add Content
+              </Button>
+            </Space>
+          </div>
+        </Col>
       </Row>
 
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={tabItems}
-        size="large"
-        className={styles.mainTabs}
-      />
+      {/* Metrics Cards */}
+      {calendarMetrics && (
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col span={5}>
+            <Card>
+              <Statistic
+                title="Planned"
+                value={calendarMetrics.planned}
+                prefix={<ClockCircleOutlined style={{ color: "#1890ff" }} />}
+              />
+            </Card>
+          </Col>
+          <Col span={5}>
+            <Card>
+              <Statistic
+                title="In Progress"
+                value={calendarMetrics.in_progress}
+                prefix={
+                  <ExclamationCircleOutlined style={{ color: "#fa8c16" }} />
+                }
+              />
+            </Card>
+          </Col>
+          <Col span={5}>
+            <Card>
+              <Statistic
+                title="In Review"
+                value={calendarMetrics.review}
+                prefix={<EyeOutlined style={{ color: "#722ed1" }} />}
+              />
+            </Card>
+          </Col>
+          <Col span={5}>
+            <Card>
+              <Statistic
+                title="Published"
+                value={calendarMetrics.published}
+                prefix={<CheckCircleOutlined style={{ color: "#52c41a" }} />}
+              />
+            </Card>
+          </Col>
+          <Col span={4}>
+            <Card>
+              <Statistic
+                title="Overdue"
+                value={calendarMetrics.overdue}
+                prefix={
+                  <ExclamationCircleOutlined style={{ color: "#ff4d4f" }} />
+                }
+              />
+            </Card>
+          </Col>
+        </Row>
+      )}
 
-      <Modal
-        title={editingItem ? "Edit Content" : "Add New Content"}
-        open={showAddModal}
-        onCancel={() => setShowAddModal(false)}
-        footer={null}
-        width={600}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSaveContent}>
-          <Form.Item
-            name="title"
-            label="Content Title"
-            rules={[{ required: true, message: "Please enter content title" }]}
+      <Card>
+        <Tabs activeKey={activeTab} onChange={setActiveTab}>
+          <TabPane tab="Calendar" key="calendar" icon={<CalendarOutlined />}>
+            <div style={{ marginBottom: 16 }}>
+              <Row gutter={[16, 16]}>
+                <Col span={6}>
+                  <Select
+                    placeholder="Filter by status"
+                    allowClear
+                    style={{ width: "100%" }}
+                    onChange={(status) => handleFilterChange({ status })}
+                  >
+                    <Option value="planned">Planned</Option>
+                    <Option value="in_progress">In Progress</Option>
+                    <Option value="review">Review</Option>
+                    <Option value="published">Published</Option>
+                    <Option value="archived">Archived</Option>
+                  </Select>
+                </Col>
+                <Col span={6}>
+                  <Select
+                    placeholder="Filter by type"
+                    allowClear
+                    style={{ width: "100%" }}
+                    onChange={(type) => handleFilterChange({ type })}
+                  >
+                    <Option value="blog_post">Blog Post</Option>
+                    <Option value="social_media">Social Media</Option>
+                    <Option value="email">Email</Option>
+                    <Option value="landing_page">Landing Page</Option>
+                    <Option value="video">Video</Option>
+                    <Option value="infographic">Infographic</Option>
+                  </Select>
+                </Col>
+                <Col span={8}>
+                  <RangePicker
+                    style={{ width: "100%" }}
+                    onChange={(dates) => {
+                      if (dates) {
+                        handleFilterChange({
+                          startDate: dates[0]?.toISOString(),
+                          endDate: dates[1]?.toISOString(),
+                        });
+                      } else {
+                        handleFilterChange({
+                          startDate: undefined,
+                          endDate: undefined,
+                        });
+                      }
+                    }}
+                  />
+                </Col>
+                <Col span={4}>
+                  {selectedRowKeys.length > 0 && (
+                    <Dropdown
+                      menu={{
+                        items: [
+                          {
+                            key: "planned",
+                            label: "Set to Planned",
+                            onClick: () => handleBulkStatusUpdate("planned"),
+                          },
+                          {
+                            key: "in_progress",
+                            label: "Set to In Progress",
+                            onClick: () =>
+                              handleBulkStatusUpdate("in_progress"),
+                          },
+                          {
+                            key: "review",
+                            label: "Set to Review",
+                            onClick: () => handleBulkStatusUpdate("review"),
+                          },
+                          {
+                            key: "published",
+                            label: "Set to Published",
+                            onClick: () => handleBulkStatusUpdate("published"),
+                          },
+                        ],
+                      }}
+                    >
+                      <Button>
+                        Bulk Actions ({selectedRowKeys.length}) <MoreOutlined />
+                      </Button>
+                    </Dropdown>
+                  )}
+                </Col>
+              </Row>
+            </div>
+
+            <Table
+              rowSelection={rowSelection}
+              columns={calendarColumns}
+              dataSource={calendarItems}
+              rowKey="id"
+              loading={loading.calendarItems}
+              pagination={{
+                pageSize: 10,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} items`,
+              }}
+            />
+          </TabPane>
+
+          <TabPane
+            tab="Performance"
+            key="performance"
+            icon={<BarChartOutlined />}
           >
-            <Input placeholder="Enter content title" />
-          </Form.Item>
+            {performance ? (
+              <Row gutter={[16, 16]}>
+                <Col span={24}>
+                  <Card title="Performance Overview">
+                    <Row gutter={[16, 16]}>
+                      <Col span={6}>
+                        <Statistic
+                          title="Total Views"
+                          value={performance.overview?.totalViews}
+                          precision={0}
+                        />
+                      </Col>
+                      <Col span={6}>
+                        <Statistic
+                          title="Total Engagement"
+                          value={performance.overview?.totalEngagement}
+                          precision={0}
+                        />
+                      </Col>
+                      <Col span={6}>
+                        <Statistic
+                          title="Avg. Time on Page"
+                          value={performance.overview?.averageTimeOnPage}
+                          suffix="s"
+                          precision={0}
+                        />
+                      </Col>
+                      <Col span={6}>
+                        <Statistic
+                          title="Conversion Rate"
+                          value={performance.overview?.conversionRate * 100}
+                          suffix="%"
+                          precision={2}
+                        />
+                      </Col>
+                    </Row>
+                  </Card>
+                </Col>
+                <Col span={24}>
+                  <Card title="Top Performing Content">
+                    <List
+                      dataSource={performance.topPerforming}
+                      renderItem={(item) => (
+                        <List.Item
+                          actions={[
+                            <Text key="views">{item.views} views</Text>,
+                            <Text key="engagement">
+                              {item.engagement} engagements
+                            </Text>,
+                            <Text key="conversion">
+                              {(item.conversionRate * 100).toFixed(2)}% CVR
+                            </Text>,
+                          ]}
+                        >
+                          <List.Item.Meta
+                            title={item.title}
+                            description={`Content ID: ${item.contentId}`}
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  </Card>
+                </Col>
+              </Row>
+            ) : (
+              <div style={{ textAlign: "center", padding: "48px" }}>
+                <Spin spinning={loading.performance}>
+                  <Empty description="No performance data available" />
+                </Spin>
+              </div>
+            )}
+          </TabPane>
 
+          <TabPane
+            tab="Ideas & Research"
+            key="research"
+            icon={<BulbOutlined />}
+          >
+            <Row gutter={[16, 16]}>
+              {contentIdeas && (
+                <Col span={12}>
+                  <Card
+                    title="Content Ideas"
+                    extra={
+                      <Button
+                        size="small"
+                        onClick={() => dispatch(clearContentIdeas())}
+                      >
+                        Clear
+                      </Button>
+                    }
+                  >
+                    <List
+                      dataSource={contentIdeas.ideas}
+                      renderItem={(idea: any) => (
+                        <List.Item
+                          actions={[
+                            <Tag
+                              key="difficulty"
+                              color={
+                                idea.difficulty === "easy"
+                                  ? "green"
+                                  : idea.difficulty === "medium"
+                                  ? "orange"
+                                  : "red"
+                              }
+                            >
+                              {idea.difficulty}
+                            </Tag>,
+                            <Text key="traffic">
+                              {idea.estimatedTraffic} traffic
+                            </Text>,
+                          ]}
+                        >
+                          <List.Item.Meta
+                            title={idea.title}
+                            description={
+                              <div>
+                                <Paragraph ellipsis={{ rows: 2 }}>
+                                  {idea.description}
+                                </Paragraph>
+                                <div>
+                                  {idea.targetKeywords
+                                    .slice(0, 3)
+                                    .map((keyword: any) => (
+                                      <Tag key={keyword}>{keyword}</Tag>
+                                    ))}
+                                </div>
+                              </div>
+                            }
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  </Card>
+                </Col>
+              )}
+
+              {topicIdeas && (
+                <Col span={12}>
+                  <Card
+                    title="Topic Research"
+                    extra={
+                      <Button
+                        size="small"
+                        onClick={() => dispatch(clearTopicResearch())}
+                      >
+                        Clear
+                      </Button>
+                    }
+                  >
+                    <List
+                      dataSource={topicIdeas.topicIdeas}
+                      renderItem={(topic) => (
+                        <List.Item
+                          actions={[
+                            <Text key="volume">{topic.searchVolume} vol</Text>,
+                            <Text key="difficulty">
+                              Diff: {topic.difficulty}
+                            </Text>,
+                            <Text key="opportunity">
+                              Opp: {topic.opportunity}
+                            </Text>,
+                          ]}
+                        >
+                          <List.Item.Meta
+                            title={topic.keyword}
+                            description={
+                              <div>
+                                {topic.relatedTopics
+                                  .slice(0, 3)
+                                  .map((related) => (
+                                    <Tag key={related}>{related}</Tag>
+                                  ))}
+                              </div>
+                            }
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  </Card>
+                </Col>
+              )}
+
+              {topicQuestions && (
+                <Col span={24}>
+                  <Card title="Related Questions">
+                    <List
+                      dataSource={topicQuestions.questions}
+                      renderItem={(question) => (
+                        <List.Item
+                          actions={[
+                            <Tag key="type" color="blue">
+                              {question.contentType}
+                            </Tag>,
+                            <Tag
+                              key="difficulty"
+                              color={
+                                question.difficulty === "low"
+                                  ? "green"
+                                  : question.difficulty === "medium"
+                                  ? "orange"
+                                  : "red"
+                              }
+                            >
+                              {question.difficulty}
+                            </Tag>,
+                            <Text key="volume">
+                              {question.searchVolume} searches
+                            </Text>,
+                          ]}
+                        >
+                          <List.Item.Meta title={question.question} />
+                        </List.Item>
+                      )}
+                    />
+                  </Card>
+                </Col>
+              )}
+
+              {!contentIdeas && !topicIdeas && !topicQuestions && (
+                <Col span={24}>
+                  <div style={{ textAlign: "center", padding: "48px" }}>
+                    <Empty
+                      description="No research data available"
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    >
+                      <Space>
+                        <Button type="primary" onClick={openIdeasModal}>
+                          Generate Ideas
+                        </Button>
+                        <Button onClick={openTopicResearchModal}>
+                          Start Research
+                        </Button>
+                      </Space>
+                    </Empty>
+                  </div>
+                </Col>
+              )}
+            </Row>
+          </TabPane>
+        </Tabs>
+      </Card>
+
+      {/* Create/Edit Modal */}
+      <Modal
+        title={
+          modalType === "create" ? "Create Content Item" : "Edit Content Item"
+        }
+        open={modalVisible && (modalType === "create" || modalType === "edit")}
+        onCancel={() => setModalVisible(false)}
+        onOk={() => form.submit()}
+        confirmLoading={loading.calendarItems}
+        width={800}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={modalType === "create" ? handleCreateItem : handleEditItem}
+        >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="type"
-                label="Content Type"
-                rules={[
-                  { required: true, message: "Please select content type" },
-                ]}
+                label="Title"
+                name="title"
+                rules={[{ required: true, message: "Please enter title" }]}
               >
-                <Select placeholder="Select type">
-                  <Option value="blog-post">Blog Post</Option>
-                  <Option value="social-media">Social Media</Option>
-                  <Option value="email">Email</Option>
-                  <Option value="landing-page">Landing Page</Option>
-                  <Option value="video">Video</Option>
-                  <Option value="infographic">Infographic</Option>
-                </Select>
+                <Input placeholder="Enter content title" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="priority"
-                label="Priority"
-                rules={[{ required: true, message: "Please select priority" }]}
+                label="Type"
+                name="type"
+                rules={[{ required: true, message: "Please select type" }]}
               >
-                <Select placeholder="Select priority">
-                  <Option value="high">High</Option>
-                  <Option value="medium">Medium</Option>
-                  <Option value="low">Low</Option>
+                <Select placeholder="Select content type">
+                  <Option value="blog_post">Blog Post</Option>
+                  <Option value="social_media">Social Media</Option>
+                  <Option value="email">Email</Option>
+                  <Option value="landing_page">Landing Page</Option>
+                  <Option value="video">Video</Option>
+                  <Option value="infographic">Infographic</Option>
                 </Select>
               </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
-                name="publishDate"
+                label="Status"
+                name="status"
+                rules={[{ required: true, message: "Please select status" }]}
+              >
+                <Select placeholder="Select status">
+                  <Option value="planned">Planned</Option>
+                  <Option value="in_progress">In Progress</Option>
+                  <Option value="review">Review</Option>
+                  <Option value="published">Published</Option>
+                  <Option value="archived">Archived</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label="Priority"
+                name="priority"
+                rules={[{ required: true, message: "Please select priority" }]}
+              >
+                <Select placeholder="Select priority">
+                  <Option value="low">Low</Option>
+                  <Option value="medium">Medium</Option>
+                  <Option value="high">High</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
                 label="Publish Date"
+                name="publishDate"
                 rules={[
                   { required: true, message: "Please select publish date" },
                 ]}
@@ -858,36 +1151,156 @@ const ContentPlanningManager: React.FC = () => {
                 <DatePicker style={{ width: "100%" }} />
               </Form.Item>
             </Col>
+          </Row>
+
+          <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="estimatedWordCount" label="Estimated Word Count">
-                <Input type="number" placeholder="e.g., 1500" />
+              <Form.Item
+                label="Target Keywords"
+                name="targetKeywords"
+                help="Separate keywords with commas"
+              >
+                <Input placeholder="keyword1, keyword2, keyword3" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Estimated Word Count" name="estimatedWordCount">
+                <InputNumber
+                  style={{ width: "100%" }}
+                  min={0}
+                  placeholder="Enter word count"
+                />
               </Form.Item>
             </Col>
           </Row>
 
-          <Form.Item name="targetKeywords" label="Target Keywords">
-            <Input placeholder="Enter keywords separated by commas" />
+          <Form.Item label="Brief" name="brief">
+            <TextArea rows={3} placeholder="Content brief or description" />
+          </Form.Item>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Tags"
+                name="tags"
+                help="Separate tags with commas"
+              >
+                <Input placeholder="tag1, tag2, tag3" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Notes" name="notes">
+                <Input placeholder="Additional notes" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+
+      {/* Content Ideas Modal */}
+      <Modal
+        title="Generate Content Ideas"
+        open={modalVisible && modalType === "ideas"}
+        onCancel={() => setModalVisible(false)}
+        onOk={() => ideaForm.submit()}
+        confirmLoading={loading.contentIdeas}
+      >
+        <Form form={ideaForm} layout="vertical" onFinish={handleGenerateIdeas}>
+          <Form.Item
+            label="Topic"
+            name="topic"
+            rules={[{ required: true, message: "Please enter topic" }]}
+          >
+            <Input placeholder="e.g., email marketing" />
           </Form.Item>
 
           <Form.Item
-            name="brief"
-            label="Content Brief"
-            rules={[{ required: true, message: "Please enter content brief" }]}
+            label="Target Audience"
+            name="audience"
+            rules={[{ required: true, message: "Please enter audience" }]}
           >
-            <TextArea rows={3} placeholder="Describe the content brief..." />
+            <Input placeholder="e.g., small business owners" />
           </Form.Item>
 
-          <Form.Item name="notes" label="Notes">
-            <TextArea rows={2} placeholder="Additional notes..." />
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Content Format"
+                name="format"
+                rules={[{ required: true, message: "Please select format" }]}
+              >
+                <Select placeholder="Select format">
+                  <Option value="blog">Blog Post</Option>
+                  <Option value="video">Video</Option>
+                  <Option value="infographic">Infographic</Option>
+                  <Option value="social">Social Media</Option>
+                  <Option value="email">Email</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Number of Ideas" name="count" initialValue={10}>
+                <InputNumber min={5} max={50} style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+
+      {/* Topic Research Modal */}
+      <Modal
+        title="Topic Research"
+        open={modalVisible && modalType === "topic-research"}
+        onCancel={() => setModalVisible(false)}
+        onOk={() => topicForm.submit()}
+        confirmLoading={loading.topicResearch}
+      >
+        <Form form={topicForm} layout="vertical" onFinish={handleTopicResearch}>
+          <Form.Item
+            label="Seed Keyword"
+            name="seedKeyword"
+            rules={[{ required: true, message: "Please enter seed keyword" }]}
+          >
+            <Input placeholder="e.g., content marketing" />
           </Form.Item>
 
-          <Form.Item>
-            <Space>
-              <Button onClick={() => setShowAddModal(false)}>Cancel</Button>
-              <Button type="primary" htmlType="submit">
-                {editingItem ? "Update" : "Create"} Content
-              </Button>
-            </Space>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Country" name="country" initialValue="US">
+                <Select>
+                  <Option value="US">United States</Option>
+                  <Option value="UK">United Kingdom</Option>
+                  <Option value="CA">Canada</Option>
+                  <Option value="AU">Australia</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Limit" name="limit" initialValue={30}>
+                <InputNumber min={10} max={100} style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            label="Content Type"
+            name="contentType"
+            initialValue="blog"
+          >
+            <Select>
+              <Option value="blog">Blog</Option>
+              <Option value="video">Video</Option>
+              <Option value="social">Social Media</Option>
+              <Option value="email">Email</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="includeQuestions"
+            valuePropName="checked"
+            initialValue={true}
+          >
+            <Checkbox>Include related questions</Checkbox>
           </Form.Item>
         </Form>
       </Modal>

@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/stores/store";
 import { useDomainAnalysis } from "@/stores/hooks/useOrganicResearch";
+import { getSortedCountries } from "@/utils/countries";
 import styles from "./organic-research-widget.module.scss";
 
 const { Option } = Select;
@@ -39,6 +40,9 @@ const OrganicResearchWidget: React.FC<OrganicResearchWidgetProps> = ({
   const router = useRouter();
   const [selectedDomain, setSelectedDomain] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("US");
+
+  // Get sorted countries list
+  const sortedCountries = getSortedCountries();
 
   // Get projects from Redux store
   const { projects } = useSelector((state: RootState) => state.project);
@@ -179,86 +183,18 @@ const OrganicResearchWidget: React.FC<OrganicResearchWidgetProps> = ({
               style={{ width: "100%" }}
               size="small"
               showSearch
+              placeholder="Select country"
+              filterOption={(input, option) =>
+                (option?.children as unknown as string)
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
             >
-              <Option value="US">United States</Option>
-              <Option value="UK">United Kingdom</Option>
-              <Option value="CA">Canada</Option>
-              <Option value="AU">Australia</Option>
-              <Option value="DE">Germany</Option>
-              <Option value="FR">France</Option>
-              <Option value="ES">Spain</Option>
-              <Option value="IT">Italy</Option>
-              <Option value="NL">Netherlands</Option>
-              <Option value="SE">Sweden</Option>
-              <Option value="NO">Norway</Option>
-              <Option value="DK">Denmark</Option>
-              <Option value="FI">Finland</Option>
-              <Option value="CH">Switzerland</Option>
-              <Option value="AT">Austria</Option>
-              <Option value="BE">Belgium</Option>
-              <Option value="PL">Poland</Option>
-              <Option value="CZ">Czech Republic</Option>
-              <Option value="PT">Portugal</Option>
-              <Option value="GR">Greece</Option>
-              <Option value="HU">Hungary</Option>
-              <Option value="RO">Romania</Option>
-              <Option value="BG">Bulgaria</Option>
-              <Option value="HR">Croatia</Option>
-              <Option value="SK">Slovakia</Option>
-              <Option value="SI">Slovenia</Option>
-              <Option value="EE">Estonia</Option>
-              <Option value="LV">Latvia</Option>
-              <Option value="LT">Lithuania</Option>
-              <Option value="IE">Ireland</Option>
-              <Option value="LU">Luxembourg</Option>
-              <Option value="MT">Malta</Option>
-              <Option value="CY">Cyprus</Option>
-              <Option value="JP">Japan</Option>
-              <Option value="KR">South Korea</Option>
-              <Option value="SG">Singapore</Option>
-              <Option value="HK">Hong Kong</Option>
-              <Option value="TW">Taiwan</Option>
-              <Option value="TH">Thailand</Option>
-              <Option value="MY">Malaysia</Option>
-              <Option value="PH">Philippines</Option>
-              <Option value="ID">Indonesia</Option>
-              <Option value="VN">Vietnam</Option>
-              <Option value="IN">India</Option>
-              <Option value="CN">China</Option>
-              <Option value="AE">UAE</Option>
-              <Option value="SA">Saudi Arabia</Option>
-              <Option value="IL">Israel</Option>
-              <Option value="TR">Turkey</Option>
-              <Option value="ZA">South Africa</Option>
-              <Option value="EG">Egypt</Option>
-              <Option value="NG">Nigeria</Option>
-              <Option value="BR">Brazil</Option>
-              <Option value="MX">Mexico</Option>
-              <Option value="AR">Argentina</Option>
-              <Option value="CL">Chile</Option>
-              <Option value="CO">Colombia</Option>
-              <Option value="PE">Peru</Option>
-              <Option value="UY">Uruguay</Option>
-              <Option value="EC">Ecuador</Option>
-              <Option value="VE">Venezuela</Option>
-              <Option value="BO">Bolivia</Option>
-              <Option value="PY">Paraguay</Option>
-              <Option value="CR">Costa Rica</Option>
-              <Option value="PA">Panama</Option>
-              <Option value="GT">Guatemala</Option>
-              <Option value="HN">Honduras</Option>
-              <Option value="SV">El Salvador</Option>
-              <Option value="NI">Nicaragua</Option>
-              <Option value="DO">Dominican Republic</Option>
-              <Option value="CU">Cuba</Option>
-              <Option value="JM">Jamaica</Option>
-              <Option value="TT">Trinidad and Tobago</Option>
-              <Option value="RU">Russia</Option>
-              <Option value="UA">Ukraine</Option>
-              <Option value="BY">Belarus</Option>
-              <Option value="KZ">Kazakhstan</Option>
-              <Option value="UZ">Uzbekistan</Option>
-              <Option value="NZ">New Zealand</Option>
+              {sortedCountries.map((country) => (
+                <Option key={country.code} value={country.code}>
+                  {country.flag} {country.name}
+                </Option>
+              ))}
             </Select>
           </div>
         </div>

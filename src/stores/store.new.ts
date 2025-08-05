@@ -16,6 +16,7 @@ import organicResearchSlice from './slices/organic-research.slice';
 import globalSearchSlice from './slices/global-search.slice';
 import backlinkSlice from './slices/backlink.slice';
 import keywordGapSlice from './slices/keyword-gap.slice';
+import topicResearchSlice from './slices/topic-research.slice';
 
 const store = configureStore({
     reducer: {
@@ -35,6 +36,7 @@ const store = configureStore({
         globalSearch: globalSearchSlice,
         backlink: backlinkSlice,
         keywordGap: keywordGapSlice,
+        topicResearch: topicResearchSlice,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiEventMiddleware),
     // middleware mặc định đã hỗ trợ thunk, có thể custom thêm nếu cần

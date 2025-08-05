@@ -1,11 +1,15 @@
 "use client";
 
 import { Input, Button, Select } from "antd";
+import { getSortedCountries } from "@/utils/countries";
 import styles from "./how-to-use-section.module.scss";
 
 const { Option } = Select;
 
 const HowToUseSection = () => {
+  // Get sorted countries list
+  const sortedCountries = getSortedCountries();
+
   return (
     <div className={styles.howToUseSection}>
       <div className={styles.sectionHeader}>
@@ -77,10 +81,19 @@ const HowToUseSection = () => {
                 defaultValue="US"
                 className={styles.countrySelect}
                 suffixIcon={<span>🇺🇸</span>}
+                showSearch
+                placeholder="Select country"
+                filterOption={(input, option) =>
+                  (option?.children as unknown as string)
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
               >
-                <Option value="US">🇺🇸 US</Option>
-                <Option value="UK">🇬🇧 UK</Option>
-                <Option value="CA">🇨🇦 CA</Option>
+                {sortedCountries.map((country) => (
+                  <Option key={country.code} value={country.code}>
+                    {country.flag} {country.code}
+                  </Option>
+                ))}
               </Select>
 
               <Select

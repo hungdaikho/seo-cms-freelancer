@@ -141,16 +141,21 @@ const keywordGapSlice = createSlice({
             state.filters = { ...state.filters, ...action.payload };
             // Re-apply filters to keyword opportunities
             if (state.analysisResult) {
-                state.keywordOpportunities = keywordGapService.getKeywordOpportunities(
-                    state.analysisResult,
-                    state.filters
-                );
-                // Update meta data
-                state.totalOpportunities = state.keywordOpportunities.length;
-                state.potentialTraffic = state.keywordOpportunities.reduce(
-                    (sum, keyword) => sum + keyword.potentialTraffic,
-                    0
-                );
+                try {
+                    state.keywordOpportunities = keywordGapService.getKeywordOpportunities(
+                        state.analysisResult,
+                        state.filters
+                    );
+                    // Update meta data
+                    state.totalOpportunities = state.keywordOpportunities.length;
+                    state.potentialTraffic = state.keywordOpportunities.reduce(
+                        (sum, keyword) => sum + (keyword.potentialTraffic || 0),
+                        0
+                    );
+                } catch (error) {
+                    // If filtering fails, keep existing data
+                    console.warn('Failed to apply filters to keyword opportunities:', error);
+                }
             }
         },
 
@@ -191,20 +196,36 @@ const keywordGapSlice = createSlice({
             })
             .addCase(analyzeKeywordGaps.fulfilled, (state, action) => {
                 state.isAnalyzing = false;
-                state.analysisResult = action.payload;
+                // Extract the result from the nested payload structure
+                const payload = action.payload as any;
+                const analysisData = payload?.result || payload;
+                state.analysisResult = analysisData;
 
                 // Process keyword opportunities with current filters
-                state.keywordOpportunities = keywordGapService.getKeywordOpportunities(
-                    action.payload,
-                    state.filters
-                );
-
-                // Update meta data
-                state.totalOpportunities = state.keywordOpportunities.length;
-                state.potentialTraffic = state.keywordOpportunities.reduce(
-                    (sum, keyword) => sum + keyword.potentialTraffic,
-                    0
-                );
+                // Only process if we have valid analysis data
+                if (analysisData && typeof analysisData === 'object') {
+                    try {
+                        state.keywordOpportunities = keywordGapService.getKeywordOpportunities(
+                            analysisData,
+                            state.filters
+                        );
+                        // Update meta data
+                        state.totalOpportunities = state.keywordOpportunities.length;
+                        state.potentialTraffic = state.keywordOpportunities.reduce(
+                            (sum, keyword) => sum + (keyword.potentialTraffic || 0),
+                            0
+                        );
+                    } catch (error) {
+                        // If getKeywordOpportunities fails, set empty arrays
+                        state.keywordOpportunities = [];
+                        state.totalOpportunities = 0;
+                        state.potentialTraffic = 0;
+                    }
+                } else {
+                    state.keywordOpportunities = [];
+                    state.totalOpportunities = 0;
+                    state.potentialTraffic = 0;
+                }
                 state.lastAnalysisDate = new Date().toISOString();
             })
             .addCase(analyzeKeywordGaps.rejected, (state, action) => {

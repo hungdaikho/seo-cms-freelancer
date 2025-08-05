@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { seoService } from '@/services/seo.service';
 
-// Traffic Analytics Types (tạm thời, sẽ mở rộng sau khi có API thực tế)
+// Legacy Traffic Types for backward compatibility
 export interface TrafficData {
     id: string;
     projectId: string;
@@ -98,16 +98,16 @@ export const fetchTrafficData = createAsyncThunk(
             });
 
             // Convert API response to TrafficData format
-            if (trafficOverview && trafficOverview.trends.length > 0) {
-                const trafficData: TrafficData[] = trafficOverview.trends.map((trend, index) => ({
+            if (trafficOverview && trafficOverview.trends && trafficOverview.trends.length > 0) {
+                const trafficData: TrafficData[] = trafficOverview.trends.map((trend: any, index: number) => ({
                     id: `traffic-${index}`,
                     projectId: params.projectId,
                     date: trend.date,
                     pageViews: trend.sessions, // Using sessions as pageviews
                     uniqueVisitors: trend.users,
-                    bounceRate: trafficOverview.bounceRate,
-                    avgSessionDuration: trafficOverview.avgSessionDuration,
-                    organicTraffic: trend.organicSessions,
+                    bounceRate: trafficOverview.bounceRate || 0,
+                    avgSessionDuration: trafficOverview.avgSessionDuration || 0,
+                    organicTraffic: trend.organicSessions || 0,
                     paidTraffic: Math.floor(trend.sessions * 0.15), // Estimated 15% paid
                     socialTraffic: Math.floor(trend.sessions * 0.10), // Estimated 10% social
                     referralTraffic: Math.floor(trend.sessions * 0.08), // Estimated 8% referral
@@ -155,9 +155,9 @@ export const fetchTrafficSources = createAsyncThunk(
 
             // Convert API response to local format
             if (trafficSources && trafficSources.length > 0) {
-                const totalSessions = trafficSources.reduce((sum, source) => sum + source.sessions, 0);
+                const totalSessions = trafficSources.reduce((sum: number, source: any) => sum + source.sessions, 0);
 
-                const sourcesData: TrafficSource[] = trafficSources.map(source => ({
+                const sourcesData: TrafficSource[] = trafficSources.map((source: any) => ({
                     source: `${source.source} (${source.medium})`,
                     visits: source.sessions,
                     percentage: totalSessions > 0 ? Math.round((source.sessions / totalSessions) * 100) : 0,
@@ -194,14 +194,14 @@ export const fetchTopPages = createAsyncThunk(
             });
 
             // Convert API response to local format
-            if (pagePerformance && pagePerformance.data.length > 0) {
-                const topPagesData: TopPage[] = pagePerformance.data.map(page => ({
+            if (pagePerformance && pagePerformance.data && pagePerformance.data.length > 0) {
+                const topPagesData: TopPage[] = pagePerformance.data.map((page: any) => ({
                     url: page.url,
                     pageTitle: page.url.split('/').pop()?.replace(/-/g, ' ') || page.url, // Generate title from URL
-                    pageViews: page.pageViews,
-                    uniquePageViews: page.uniquePageViews,
-                    avgTimeOnPage: page.avgTimeOnPage,
-                    bounceRate: page.exitRate / 100, // Convert percentage to decimal
+                    pageViews: page.pageViews || 0,
+                    uniquePageViews: page.uniquePageViews || 0,
+                    avgTimeOnPage: page.avgTimeOnPage || 0,
+                    bounceRate: (page.exitRate || 0) / 100, // Convert percentage to decimal
                 }));
 
                 return topPagesData;

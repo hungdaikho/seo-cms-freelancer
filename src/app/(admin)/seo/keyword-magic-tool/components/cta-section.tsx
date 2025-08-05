@@ -1,11 +1,15 @@
 "use client";
 
 import { Button, Input, Select } from "antd";
+import { getSortedCountries } from "@/utils/countries";
 import styles from "./cta-section.module.scss";
 
 const { Option } = Select;
 
 const CTASection = () => {
+  // Get sorted countries list
+  const sortedCountries = getSortedCountries();
+
   return (
     <div className={styles.ctaSection}>
       <div className={styles.ctaContainer}>
@@ -39,10 +43,19 @@ const CTASection = () => {
                 defaultValue="US"
                 className={styles.countrySelect}
                 suffixIcon={<span>🇺🇸</span>}
+                showSearch
+                placeholder="Select country"
+                filterOption={(input, option) =>
+                  (option?.children as unknown as string)
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
               >
-                <Option value="US">🇺🇸 US</Option>
-                <Option value="UK">🇬🇧 UK</Option>
-                <Option value="CA">🇨🇦 CA</Option>
+                {sortedCountries.map((country) => (
+                  <Option key={country.code} value={country.code}>
+                    {country.flag} {country.code}
+                  </Option>
+                ))}
               </Select>
 
               <Button

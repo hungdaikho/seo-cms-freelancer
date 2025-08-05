@@ -7,6 +7,7 @@ import keywordSlice from './slices/keyword.slice';
 import auditSlice from './slices/audit.slice';
 import seoSlice from './slices/seo.slice';
 import trafficSlice from './slices/traffic.slice';
+import trafficAnalyticsSlice from './slices/traffic-analytics.slice';
 import contentSlice from './slices/content.slice';
 import aiSlice from './slices/ai.slice';
 import copilotAISlice from './slices/copilot_ai.slice';
@@ -16,6 +17,10 @@ import organicResearchSlice from './slices/organic-research.slice';
 import globalSearchSlice from './slices/global-search.slice';
 import backlinkSlice from './slices/backlink.slice';
 import keywordGapSlice from './slices/keyword-gap.slice';
+import topicResearchSlice from './slices/topic-research.slice';
+import contentTemplateSlice from './slices/content-template.slice';
+import onPageSEOSlice from './slices/on-page-seo.slice';
+import contentPlanningSlice from './slices/content-planning.slice';
 
 const store = configureStore({
   reducer: {
@@ -26,6 +31,7 @@ const store = configureStore({
     audit: auditSlice,
     seo: seoSlice,
     traffic: trafficSlice,
+    trafficAnalytics: trafficAnalyticsSlice,
     content: contentSlice,
     ai: aiSlice,
     copilotAI: copilotAISlice,
@@ -35,6 +41,10 @@ const store = configureStore({
     globalSearch: globalSearchSlice,
     backlink: backlinkSlice,
     keywordGap: keywordGapSlice,
+    topicResearch: topicResearchSlice,
+    contentTemplate: contentTemplateSlice,
+    onPageSEO: onPageSEOSlice,
+    contentPlanning: contentPlanningSlice,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiEventMiddleware),
   // middleware mặc định đã hỗ trợ thunk, có thể custom thêm nếu cần

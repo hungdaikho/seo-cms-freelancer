@@ -2,6 +2,7 @@
 
 import { Input, Button, Select } from "antd";
 import { AiOutlineSearch } from "react-icons/ai";
+import { getSortedCountries } from "@/utils/countries";
 import styles from "./search-section.module.scss";
 
 const { Option } = Select;
@@ -11,6 +12,9 @@ interface SearchSectionProps {
 }
 
 const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
+  // Get sorted countries list
+  const sortedCountries = getSortedCountries();
+
   const handleSearch = () => {
     // Implement search logic
     console.log("Searching keyword...");
@@ -70,10 +74,19 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
             defaultValue="US"
             className={styles.countrySelect}
             suffixIcon={<span>🇺🇸</span>}
+            showSearch
+            placeholder="Select country"
+            filterOption={(input, option) =>
+              (option?.children as unknown as string)
+                .toLowerCase()
+                .includes(input.toLowerCase())
+            }
           >
-            <Option value="US">🇺🇸 US</Option>
-            <Option value="UK">🇬🇧 UK</Option>
-            <Option value="CA">🇨🇦 CA</Option>
+            {sortedCountries.map((country) => (
+              <Option key={country.code} value={country.code}>
+                {country.flag} {country.code}
+              </Option>
+            ))}
           </Select>
 
           <Select

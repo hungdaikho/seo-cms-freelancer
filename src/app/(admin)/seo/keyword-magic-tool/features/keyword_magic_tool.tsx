@@ -43,6 +43,7 @@ import { useKeyword } from "@/stores/hooks/useKeyword";
 import { useKeywordMagic } from "@/stores/hooks/useKeywordMagic";
 import { seoService } from "@/services/seo.service";
 import { OrganicKeyword, OrganicKeywordsParams } from "@/types/api.type";
+import { getSortedCountries } from "@/utils/countries";
 import styles from "./keyword_magic_tool.module.scss";
 
 const { Option } = Select;
@@ -112,6 +113,9 @@ const KeywordMagicTool: React.FC<KeywordMagicToolProps> = ({
     getRelatedTopics,
     getTopicQuestions,
   } = useKeywordMagic();
+
+  // Get sorted countries list
+  const sortedCountries = getSortedCountries();
 
   // Component state
   const [keywords, setKeywords] = useState<KeywordData[]>([]);
@@ -1060,80 +1064,21 @@ const KeywordMagicTool: React.FC<KeywordMagicToolProps> = ({
           <div className={styles.searchOptions}>
             <Select
               value={filters.country}
-              style={{ width: 120 }}
+              style={{ width: 180 }}
               onChange={handleCountryChange}
               showSearch
               placeholder="Select country"
+              filterOption={(input, option) =>
+                (option?.children as unknown as string)
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
             >
-              <Option value="US">🇺🇸 United States</Option>
-              <Option value="UK">🇬🇧 United Kingdom</Option>
-              <Option value="CA">🇨🇦 Canada</Option>
-              <Option value="AU">🇦🇺 Australia</Option>
-              <Option value="DE">🇩🇪 Germany</Option>
-              <Option value="FR">🇫🇷 France</Option>
-              <Option value="ES">🇪🇸 Spain</Option>
-              <Option value="IT">🇮🇹 Italy</Option>
-              <Option value="NL">🇳🇱 Netherlands</Option>
-              <Option value="BR">🇧🇷 Brazil</Option>
-              <Option value="JP">🇯🇵 Japan</Option>
-              <Option value="KR">🇰🇷 South Korea</Option>
-              <Option value="CN">🇨🇳 China</Option>
-              <Option value="IN">🇮🇳 India</Option>
-              <Option value="MX">🇲🇽 Mexico</Option>
-              <Option value="AR">🇦🇷 Argentina</Option>
-              <Option value="CL">🇨🇱 Chile</Option>
-              <Option value="CO">🇨🇴 Colombia</Option>
-              <Option value="PE">🇵🇪 Peru</Option>
-              <Option value="VE">🇻🇪 Venezuela</Option>
-              <Option value="RU">🇷🇺 Russia</Option>
-              <Option value="PL">🇵🇱 Poland</Option>
-              <Option value="CZ">🇨🇿 Czech Republic</Option>
-              <Option value="SE">🇸🇪 Sweden</Option>
-              <Option value="NO">🇳🇴 Norway</Option>
-              <Option value="DK">🇩🇰 Denmark</Option>
-              <Option value="FI">🇫🇮 Finland</Option>
-              <Option value="BE">🇧🇪 Belgium</Option>
-              <Option value="CH">🇨🇭 Switzerland</Option>
-              <Option value="AT">🇦🇹 Austria</Option>
-              <Option value="PT">🇵🇹 Portugal</Option>
-              <Option value="GR">🇬🇷 Greece</Option>
-              <Option value="TR">🇹🇷 Turkey</Option>
-              <Option value="IL">🇮🇱 Israel</Option>
-              <Option value="AE">🇦🇪 UAE</Option>
-              <Option value="SA">🇸🇦 Saudi Arabia</Option>
-              <Option value="EG">🇪🇬 Egypt</Option>
-              <Option value="ZA">🇿🇦 South Africa</Option>
-              <Option value="NG">🇳🇬 Nigeria</Option>
-              <Option value="TH">🇹🇭 Thailand</Option>
-              <Option value="VN">🇻🇳 Vietnam</Option>
-              <Option value="SG">🇸🇬 Singapore</Option>
-              <Option value="MY">🇲🇾 Malaysia</Option>
-              <Option value="ID">🇮🇩 Indonesia</Option>
-              <Option value="PH">🇵🇭 Philippines</Option>
-              <Option value="NZ">🇳🇿 New Zealand</Option>
-              <Option value="IE">🇮🇪 Ireland</Option>
-              <Option value="HU">🇭🇺 Hungary</Option>
-              <Option value="RO">🇷🇴 Romania</Option>
-              <Option value="BG">🇧🇬 Bulgaria</Option>
-              <Option value="HR">🇭🇷 Croatia</Option>
-              <Option value="SI">🇸🇮 Slovenia</Option>
-              <Option value="SK">🇸🇰 Slovakia</Option>
-              <Option value="LT">🇱🇹 Lithuania</Option>
-              <Option value="LV">🇱🇻 Latvia</Option>
-              <Option value="EE">🇪🇪 Estonia</Option>
-              <Option value="UA">🇺🇦 Ukraine</Option>
-              <Option value="BY">🇧🇾 Belarus</Option>
-              <Option value="KZ">🇰🇿 Kazakhstan</Option>
-              <Option value="UZ">🇺🇿 Uzbekistan</Option>
-              <Option value="BD">🇧🇩 Bangladesh</Option>
-              <Option value="PK">🇵🇰 Pakistan</Option>
-              <Option value="LK">🇱🇰 Sri Lanka</Option>
-              <Option value="MM">🇲🇲 Myanmar</Option>
-              <Option value="KH">🇰🇭 Cambodia</Option>
-              <Option value="LA">🇱🇦 Laos</Option>
-              <Option value="HK">🇭🇰 Hong Kong</Option>
-              <Option value="TW">🇹🇼 Taiwan</Option>
-              <Option value="MO">🇲🇴 Macau</Option>
+              {sortedCountries.map((country) => (
+                <Option key={country.code} value={country.code}>
+                  {country.flag} {country.name}
+                </Option>
+              ))}
             </Select>
             <Select
               value={filters.searchEngine}

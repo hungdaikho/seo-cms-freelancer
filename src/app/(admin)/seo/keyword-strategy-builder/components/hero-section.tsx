@@ -1,6 +1,7 @@
 "use client";
 
 import { Input, Button, Select } from "antd";
+import { getSortedCountries } from "@/utils/countries";
 import styles from "./hero-section.module.scss";
 
 const { TextArea } = Input;
@@ -10,6 +11,9 @@ const HeroSection = () => {
   const handleCreate = () => {
     console.log("Creating keyword strategy...");
   };
+
+  // Get sorted countries list
+  const sortedCountries = getSortedCountries();
 
   return (
     <div className={styles.heroSection}>
@@ -48,10 +52,19 @@ const HeroSection = () => {
                 defaultValue="US"
                 className={styles.countrySelect}
                 suffixIcon={<span>🇺🇸</span>}
+                showSearch
+                placeholder="Select country"
+                filterOption={(input, option) =>
+                  (option?.children as unknown as string)
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
               >
-                <Option value="US">🇺🇸 US</Option>
-                <Option value="UK">🇬🇧 UK</Option>
-                <Option value="CA">🇨🇦 CA</Option>
+                {sortedCountries.map((country) => (
+                  <Option key={country.code} value={country.code}>
+                    {country.flag} {country.code}
+                  </Option>
+                ))}
               </Select>
 
               <Button

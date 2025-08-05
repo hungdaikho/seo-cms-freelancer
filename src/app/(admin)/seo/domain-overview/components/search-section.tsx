@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Input, Button, Select } from "antd";
 import { FiGlobe } from "react-icons/fi";
+import { getSortedCountries } from "@/utils/countries";
 import styles from "./search-section.module.scss";
 
 const { Option } = Select;
@@ -13,6 +14,9 @@ interface SearchSectionProps {
 const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
   const [domain, setDomain] = useState("");
   const [location, setLocation] = useState("Worldwide");
+
+  // Get sorted countries list
+  const sortedCountries = getSortedCountries();
 
   const handleSearch = () => {
     onSearch(domain, location);
@@ -40,11 +44,20 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
           onChange={setLocation}
           className={styles.locationSelect}
           suffixIcon={<FiGlobe />}
+          showSearch
+          placeholder="Select location"
+          filterOption={(input, option) =>
+            (option?.children as unknown as string)
+              .toLowerCase()
+              .includes(input.toLowerCase())
+          }
         >
-          <Option value="Worldwide">Worldwide</Option>
-          <Option value="US">United States</Option>
-          <Option value="UK">United Kingdom</Option>
-          <Option value="CA">Canada</Option>
+          <Option value="Worldwide">🌍 Worldwide</Option>
+          {sortedCountries.map((country) => (
+            <Option key={country.code} value={country.code}>
+              {country.flag} {country.name}
+            </Option>
+          ))}
         </Select>
         <Button
           type="primary"
