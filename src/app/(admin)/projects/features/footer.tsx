@@ -45,7 +45,7 @@ const FooterProject = (props: Props) => {
               See plans and pricing
             </Button>
             <Button type="primary" className={styles.startButton}>
-              Get started with Semrush
+              Get started with SEO BOOST
             </Button>
           </Space>
         </div>

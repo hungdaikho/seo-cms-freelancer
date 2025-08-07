@@ -12,7 +12,7 @@ const Enterprise = ({}: Props) => {
       <div className={styles.container}>
         <div className={styles.item}>
           <div className={styles.logo}>
-            <img src="/enterprise-logo.svg" alt="" />
+            {/* <img src="/enterprise-logo.svg" alt="" /> */}
           </div>
           <div className={styles.title}>
             {t("enterprise_title")} <span>Enterprise</span>

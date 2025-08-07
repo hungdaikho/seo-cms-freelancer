@@ -8,6 +8,8 @@ import HeaderSite from "@/components/layout/header/header.site";
 import FooterSite from "@/components/layout/footer/footer.site";
 import { useEffect } from "react";
 import suppressAntdReact19Warning from "@/utils/suppress-warnings";
+import { ConfigProvider } from "antd";
+import { antdConfig } from "@/config/antd.config";
 
 export default function RootLayout({
   children,
@@ -27,11 +29,13 @@ export default function RootLayout({
         style={{ fontSize: "16px", fontFamily: "inherit", background: "#000" }}
       >
         <ReduxProvider>
-          <AuthGuard requireAuth={false} redirectTo="/projects">
-            <HeaderSite />
-            {children}
-            <FooterSite />
-          </AuthGuard>
+          <ConfigProvider {...antdConfig}>
+            <AuthGuard requireAuth={false} redirectTo="/projects">
+              <HeaderSite />
+              {children}
+              <FooterSite />
+            </AuthGuard>
+          </ConfigProvider>
         </ReduxProvider>
       </body>
     </html>

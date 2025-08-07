@@ -235,14 +235,14 @@ export default function Hero() {
         </Swiper>
       </div>
 
-      <div className={styles.brands}>
+      {/* <div className={styles.brands}>
         <div className={styles.brandsTitle}>{t("brandTitle")}</div>
         <div className={styles.brandsLogos}>
           {brands.map((img: any) => {
             return <img src={img.img}></img>;
           })}
         </div>
-      </div>
+      </div> */}
     </section>
   );
 }

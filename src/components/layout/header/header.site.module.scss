@@ -1,10 +1,10 @@
 .headerSite {
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #004AAC 0%, #13124D 100%);
   height: 56px;
   padding: 0 32px;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 74, 172, 0.2);
   position: relative;
   z-index: 10;
 }
@@ -16,11 +16,12 @@
   margin-right: 16px;
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(90deg, #f093fb, #f5576c);
+  background: linear-gradient(90deg, #FF914D, #004AAC);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   cursor: pointer;
-  text-shadow: 0 0 30px rgba(245, 87, 108, 0.3);
+  text-shadow: 0 0 30px rgba(255, 145, 77, 0.3);
 }
 
 .navMenu {
@@ -53,7 +54,7 @@
       }
     }
     .tag {
-      background: linear-gradient(135deg, #fa709a, #fee140);
+      background: linear-gradient(135deg, #FF914D, #004AAC);
       color: #fff;
       font-size: 11px;
       border-radius: 12px;
@@ -100,18 +101,18 @@
 }
 
 .signupBtn {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+  background: linear-gradient(135deg, #FF914D 0%, #004AAC 100%) !important;
   border: none;
   font-weight: 700;
   padding: 0 24px;
   height: 38px;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+  box-shadow: 0 4px 15px rgba(255, 145, 77, 0.4);
   color: #fff !important;
   transition: all 0.3s ease;
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(250, 112, 154, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 145, 77, 0.6);
   }
 }
 

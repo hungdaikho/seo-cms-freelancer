@@ -53,8 +53,9 @@ const Page = (props: Props) => {
       style={{
         marginBottom: 16,
         padding: "0 16px",
-        background: "#fafafa",
+        background: "linear-gradient(135deg, rgba(0, 74, 172, 0.05) 0%, rgba(255, 145, 77, 0.05) 100%)",
         borderRadius: 8,
+        border: "1px solid rgba(0, 74, 172, 0.1)",
       }}
     >
       <Space
@@ -222,7 +223,7 @@ const Page = (props: Props) => {
   ];
 
   return (
-    <div style={{ padding: "0", minHeight: "100vh", background: "#f5f5f5" }}>
+    <div style={{ padding: "0", minHeight: "100vh", background: "linear-gradient(135deg, #f8f9ff 0%, rgba(255, 145, 77, 0.02) 100%)" }}>
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}

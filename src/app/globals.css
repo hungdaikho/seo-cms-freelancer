@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+:root {
+  /* Brand Colors */
+  --primary-blue: #004AAC;
+  --secondary-purple: #13124D;
+  --accent-orange: #FF914D;
+  
+  /* Color Variations */
+  --primary-blue-light: #1a92ff;
+  --primary-blue-dark: #003176;
+  --secondary-purple-light: #585394;
+  --secondary-purple-dark: #0a092c;
+  --accent-orange-light: #ffa41a;
+  --accent-orange-dark: #cc732d;
+  
+  /* Gradients */
+  --primary-gradient: linear-gradient(135deg, #004AAC 0%, #13124D 100%);
+  --secondary-gradient: linear-gradient(135deg, #13124D 0%, #004AAC 100%);
+  --accent-gradient: linear-gradient(135deg, #FF914D 0%, #004AAC 100%);
+  --hero-gradient: linear-gradient(135deg, #004AAC 0%, #13124D 50%, #FF914D 100%);
+  
+  /* Background Colors */
+  --bg-primary: #000;
+  --bg-secondary: #13124D;
+  --bg-accent: rgba(255, 145, 77, 0.1);
+}

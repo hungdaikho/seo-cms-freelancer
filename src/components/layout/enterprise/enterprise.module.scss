@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   min-height: 700px;
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  background: linear-gradient(135deg, #13124D 0%, #004AAC 100%);
   margin-top: 80px;
   overflow: hidden;
   display: flex;
@@ -23,7 +23,7 @@
     height: 800px;
     background: radial-gradient(
       circle,
-      rgba(240, 147, 251, 0.2) 0%,
+      rgba(255, 145, 77, 0.2) 0%,
       transparent 70%
     );
     border-radius: 50%;
@@ -61,14 +61,15 @@
         line-height: 1.2;
         text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         span {
-          background: linear-gradient(90deg, #f093fb, #f5576c);
+          background: linear-gradient(90deg, #FF914D, #004AAC);
+          background-clip: text;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
       }
       .btn {
         Button {
-          background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+          background: linear-gradient(135deg, #FF914D 0%, #004AAC 100%);
           border: none;
           color: #fff;
           padding: 16px 40px;
@@ -78,10 +79,10 @@
           border-radius: 12px;
           cursor: pointer;
           transition: all 0.3s ease;
-          box-shadow: 0 8px 25px rgba(250, 112, 154, 0.4);
+          box-shadow: 0 8px 25px rgba(255, 145, 77, 0.4);
           &:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(250, 112, 154, 0.6);
+            box-shadow: 0 12px 35px rgba(255, 145, 77, 0.6);
           }
         }
       }
@@ -107,10 +108,10 @@
         align-items: flex-start;
         gap: 16px;
         .icon {
-          color: #f093fb;
+          color: #FF914D;
           font-size: 20px;
           margin-top: 2px;
-          filter: drop-shadow(0 0 10px rgba(240, 147, 251, 0.5));
+          filter: drop-shadow(0 0 10px rgba(255, 145, 77, 0.5));
         }
         .text {
           color: #fff;

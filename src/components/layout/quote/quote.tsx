@@ -8,7 +8,7 @@ const Quote = (props: Props) => {
   const { t } = useTranslation();
   return (
     <div className={styles.quote}>
-      <div className={styles.feedBack}>
+      {/* <div className={styles.feedBack}>
         <div className={styles.title}>
           “Semrush is like a keyword research tool, Google Trends, Moz,
           Hootsuite and SimilarWeb in one.”
@@ -21,7 +21,7 @@ const Quote = (props: Props) => {
           <span>Performance Marketing Specialist, Banco del Sol</span>
           <span style={{ opacity: 0.8 }}>Source: Semrush G2 reviews</span>
         </div>
-      </div>
+      </div> */}
       {/* <div className={styles.figures}>
         <div className={styles.title}>{t("figures")}</div>
         <div className={styles.content}>
