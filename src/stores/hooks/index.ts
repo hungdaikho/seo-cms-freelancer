@@ -18,6 +18,7 @@ export {
     useApiLimits
 } from './useOrganicResearch';
 export { useGlobalSearch } from './useGlobalSearch';
+export { useUserManager } from './useUserManager';
 export { useKeywordGap } from './useKeywordGap';
 export { useBacklink } from './useBacklink';
 export { useTopicResearch } from './useTopicResearch';

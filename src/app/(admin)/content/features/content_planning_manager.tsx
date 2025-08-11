@@ -95,12 +95,10 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
     topicIdeas,
     topicQuestions,
     performance,
-    categories,
     loading,
     error,
     selectedCalendarItem,
   } = useSelector((state: RootState) => state.contentPlanning);
-
   const [activeTab, setActiveTab] = useState("calendar");
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<
@@ -113,59 +111,33 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
 
   // Load projects on mount
   useEffect(() => {
-    console.log("🔄 Content Planning: Loading projects...", projects.length);
     if (projects.length === 0) {
-      console.log("� Fetching projects...");
       fetchProjects();
     }
-  }, [projects.length, fetchProjects]);
+  }, []);
 
   // Auto-select first project if available and no current project
   useEffect(() => {
-    console.log("📋 Content Planning - Project Selection Debug:", {
-      selectedProject,
-      projectsLength: projects.length,
-      firstProjectId: projects[0]?.id,
-      currentProject: currentProject?.id,
-    });
-
     // Use currentProject from Redux if available
     if (!selectedProject && currentProject?.id) {
-      console.log("✅ Using current project from Redux:", currentProject.id);
       setSelectedProject(currentProject.id);
     } else if (!selectedProject && !currentProject && projects.length > 0) {
-      console.log("✅ Auto-selecting first project:", projects[0].id);
       setSelectedProject(projects[0].id);
       setCurrentProject(projects[0]);
     }
   }, [projects, selectedProject, currentProject, setCurrentProject]);
 
   useEffect(() => {
-    console.log(
-      "🚀 Content Planning - API Calls with projectId:",
-      selectedProject
-    );
     if (
       selectedProject &&
       selectedProject.trim() !== "" &&
       selectedProject !== "undefined" &&
       selectedProject !== "null"
     ) {
-      console.log("📤 Making API calls for project:", selectedProject);
-      console.log("🔍 Project validation:", {
-        length: selectedProject.length,
-        type: typeof selectedProject,
-        value: selectedProject,
-      });
       dispatch(fetchCalendarItems({ projectId: selectedProject }));
       dispatch(fetchCategories(selectedProject));
       dispatch(fetchContentPerformance({ projectId: selectedProject }));
     } else {
-      console.log("⏸️ Skipping API calls - invalid project:", {
-        selectedProject,
-        type: typeof selectedProject,
-        length: selectedProject?.length,
-      });
     }
   }, [dispatch, selectedProject]);
 
@@ -178,17 +150,12 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
 
   // Calendar Operations
   const handleCreateItem = async (values: any) => {
-    console.log("📝 Creating calendar item with projectId:", selectedProject);
-    console.log("📝 Full form values:", values);
-
     if (!selectedProject) {
-      console.error("❌ No project selected!");
       message.error("Please select a project first");
       return;
     }
 
     if (selectedProject === "undefined" || selectedProject === "null") {
-      console.error("❌ Invalid project ID:", selectedProject);
       message.error("Invalid project selected");
       return;
     }
@@ -201,24 +168,13 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
           values.targetKeywords?.split(",").map((k: string) => k.trim()) || [],
         tags: values.tags?.split(",").map((t: string) => t.trim()) || [],
       };
-
-      console.log("📤 API Call - createCalendarItem:", {
-        projectId: selectedProject,
-        data,
-        projectIdType: typeof selectedProject,
-        projectIdLength: selectedProject.length,
-      });
-
-      const result = await dispatch(
+      await dispatch(
         createCalendarItem({ projectId: selectedProject, data })
       ).unwrap();
-
-      console.log("✅ Calendar item created successfully:", result);
       message.success("Calendar item created successfully");
       setModalVisible(false);
       form.resetFields();
     } catch (error) {
-      console.error("❌ Failed to create calendar item:", error);
       message.error("Failed to create calendar item");
     }
   };
@@ -303,6 +259,9 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
       const data: ContentIdeaRequest = values;
       await dispatch(generateContentIdeas(data)).unwrap();
       message.success("Content ideas generated successfully");
+      setModalVisible(false);
+      setActiveTab("research");
+      ideaForm.resetFields();
     } catch (error) {
       message.error("Failed to generate content ideas");
     }
@@ -311,12 +270,16 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
   // Topic Research Operations
   const handleTopicResearch = async (values: any) => {
     try {
-      const data: TopicResearchRequest = values;
+      const { includeQuestions, ...rest } = values;
+      const data: TopicResearchRequest = rest;
       await dispatch(generateTopicIdeas(data)).unwrap();
       if (values.includeQuestions) {
         await dispatch(getTopicQuestions(values.seedKeyword)).unwrap();
       }
       message.success("Topic research completed successfully");
+      setModalVisible(false);
+      setActiveTab("research");
+      topicForm.resetFields();
     } catch (error) {
       message.error("Failed to complete topic research");
     }
@@ -335,14 +298,10 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
 
   // Project Operations
   const handleProjectChange = (projectId: string) => {
-    console.log("🔄 Changing project from", selectedProject, "to", projectId);
     setSelectedProject(projectId);
     const project = projects.find((p) => p.id === projectId);
     if (project) {
-      console.log("✅ Found project:", project.name, project.id);
       setCurrentProject(project);
-    } else {
-      console.error("❌ Project not found with ID:", projectId);
     }
   };
 
@@ -976,27 +935,46 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
                   >
                     <List
                       dataSource={topicIdeas.topicIdeas}
-                      renderItem={(topic) => (
+                      renderItem={(topic: any) => (
                         <List.Item
                           actions={[
-                            <Text key="volume">{topic.searchVolume} vol</Text>,
+                            <Text key="volume">{topic.volume} vol</Text>,
                             <Text key="difficulty">
                               Diff: {topic.difficulty}
                             </Text>,
                             <Text key="opportunity">
                               Opp: {topic.opportunity}
                             </Text>,
+                            <Text key="competitiveness">
+                              Comp: {topic.competitiveness}
+                            </Text>,
                           ]}
                         >
                           <List.Item.Meta
-                            title={topic.keyword}
+                            title={topic.topic}
                             description={
                               <div>
-                                {topic.relatedTopics
-                                  .slice(0, 3)
-                                  .map((related) => (
-                                    <Tag key={related}>{related}</Tag>
-                                  ))}
+                                <Space wrap>
+                                  <Tag color="blue">
+                                    Questions: {topic.questions}
+                                  </Tag>
+                                  <Tag color="green">
+                                    Content Gap: {topic.contentGap}%
+                                  </Tag>
+                                  <Tag color="orange">
+                                    Seasonality: {topic.seasonality}
+                                  </Tag>
+                                </Space>
+                                {topic.relatedKeywords &&
+                                  topic.relatedKeywords.length > 0 && (
+                                    <div style={{ marginTop: 8 }}>
+                                      {topic.relatedKeywords
+                                        .slice(0, 3)
+                                        .map((related: any) => (
+                                          <Tag key={related}>{related}</Tag>
+                                        ))}
+                                    </div>
+                                  )}
                               </div>
                             }
                           />
@@ -1074,7 +1052,11 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
         }
         open={modalVisible && (modalType === "create" || modalType === "edit")}
         onCancel={() => setModalVisible(false)}
-        onOk={() => form.submit()}
+        onOk={() => {
+          form.submit();
+          setModalVisible(false);
+          setActiveTab("calendar");
+        }}
         confirmLoading={loading.calendarItems}
         width={800}
       >
@@ -1100,10 +1082,10 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
                 rules={[{ required: true, message: "Please select type" }]}
               >
                 <Select placeholder="Select content type">
-                  <Option value="blog_post">Blog Post</Option>
-                  <Option value="social_media">Social Media</Option>
+                  <Option value="blog-post">Blog Post</Option>
+                  <Option value="social-media">Social Media</Option>
                   <Option value="email">Email</Option>
-                  <Option value="landing_page">Landing Page</Option>
+                  <Option value="landing-page">Landing Page</Option>
                   <Option value="video">Video</Option>
                   <Option value="infographic">Infographic</Option>
                 </Select>
@@ -1120,7 +1102,7 @@ const ContentPlanningManager: React.FC<ContentPlanningManagerProps> = () => {
               >
                 <Select placeholder="Select status">
                   <Option value="planned">Planned</Option>
-                  <Option value="in_progress">In Progress</Option>
+                  <Option value="in-progress">In Progress</Option>
                   <Option value="review">Review</Option>
                   <Option value="published">Published</Option>
                   <Option value="archived">Archived</Option>

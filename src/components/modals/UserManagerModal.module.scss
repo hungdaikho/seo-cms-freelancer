@@ -1,0 +1,66 @@
+.userManagerModal {
+  .tabContent {
+    padding: 16px 0;
+  }
+
+  .usageCard {
+    .ant-card-body {
+      padding: 16px;
+    }
+  }
+
+  .progressCard {
+    text-align: center;
+
+    .ant-progress-text {
+      font-size: 12px;
+    }
+  }
+
+  .sessionTable {
+    .currentSession {
+      background-color: #f6ffed;
+    }
+  }
+
+  .dangerZone {
+    .ant-card {
+      border-color: #ff4d4f;
+    }
+
+    .ant-card-head {
+      background-color: #fff2f0;
+      border-bottom-color: #ff4d4f;
+    }
+  }
+
+  .exportAlert {
+    .ant-alert-message {
+      font-weight: 600;
+    }
+  }
+}
+
+.userManagerTabs {
+  .ant-tabs-card > .ant-tabs-content {
+    height: auto;
+    margin-top: -16px;
+  }
+
+  .ant-tabs-card > .ant-tabs-content > .ant-tabs-tabpane {
+    background: #fafafa;
+    border: 1px solid #d9d9d9;
+    border-top: 0;
+    padding: 16px;
+  }
+
+  .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active {
+    border-color: #d9d9d9;
+    background: #fafafa;
+  }
+}

@@ -21,6 +21,7 @@ import topicResearchSlice from './slices/topic-research.slice';
 import contentTemplateSlice from './slices/content-template.slice';
 import onPageSEOSlice from './slices/on-page-seo.slice';
 import contentPlanningSlice from './slices/content-planning.slice';
+import userManagerSlice from './slices/userManagerSlice';
 
 const store = configureStore({
   reducer: {
@@ -45,6 +46,7 @@ const store = configureStore({
     contentTemplate: contentTemplateSlice,
     onPageSEO: onPageSEOSlice,
     contentPlanning: contentPlanningSlice,
+    userManager: userManagerSlice,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiEventMiddleware),
   // middleware mặc định đã hỗ trợ thunk, có thể custom thêm nếu cần

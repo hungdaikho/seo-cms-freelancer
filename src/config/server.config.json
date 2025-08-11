@@ -1,6 +1,6 @@
 {
-  "HTTP_SERVER_URL": "http://148.230.96.201:3001",
-  "HTTPS_SERVER_URL": "https://148.230.96.201:3001",
-  "HTTP_SOCKER_URL": "http://148.230.96.201:3001",
-  "HTTPS_SOCKER_URL": "https://148.230.96.201:3001"
+  "HTTP_SERVER_URL": "http://localhost:3001",
+  "HTTPS_SERVER_URL": "https://localhost:3001",
+  "HTTP_SOCKER_URL": "http://localhost:3001",
+  "HTTPS_SOCKER_URL": "https://localhost:3001"
 }

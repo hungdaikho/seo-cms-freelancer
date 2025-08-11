@@ -283,26 +283,35 @@ const Domain = (props: Props) => {
                 <List
                   dataSource={competitors.data.slice(0, 5)}
                   renderItem={(competitor) => (
-                    <List.Item>
+                    <List.Item style={{ padding: 0, border: "none" }}>
                       <div className={styles.domainItem}>
                         <div className={styles.domainInfo}>
                           <Text className={styles.domainName}>
                             {competitor.domain}
                           </Text>
-                          <Text className={styles.domainStats}>
-                            {formatNumber(competitor.estimatedTraffic)}
-                          </Text>
-                          <Tag
-                            color={
-                              competitor.competitionLevel > 80
-                                ? "red"
-                                : competitor.competitionLevel > 60
-                                ? "orange"
-                                : "green"
-                            }
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                              marginTop: "4px",
+                            }}
                           >
-                            {competitor.competitionLevel}% competition
-                          </Tag>
+                            <Text className={styles.domainStats}>
+                              {formatNumber(competitor.estimatedTraffic)}
+                            </Text>
+                            <Tag
+                              color={
+                                competitor.competitionLevel > 80
+                                  ? "red"
+                                  : competitor.competitionLevel > 60
+                                  ? "orange"
+                                  : "green"
+                              }
+                            >
+                              {competitor.competitionLevel}% competition
+                            </Tag>
+                          </div>
                         </div>
                         <div className={styles.chartPlaceholder}>
                           <svg width="100" height="40" viewBox="0 0 100 40">

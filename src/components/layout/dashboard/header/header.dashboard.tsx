@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./header.dashboard.module.scss";
 import { Button, Dropdown, MenuProps } from "antd";
 import { IoPauseCircle } from "react-icons/io5";
@@ -6,10 +6,23 @@ import { FaUser } from "react-icons/fa";
 import { LiaHireAHelper } from "react-icons/lia";
 import { useAuth } from "@/stores/hooks/useAuth";
 import GlobalSearch from "@/components/ui/global-search/global-search";
+import UserManagerModal from "@/components/modals/UserManagerModal";
 type Props = {};
 
 const HeaderDashBorad = ({}: Props) => {
   const { user } = useAuth();
+  const [userManagerModalOpen, setUserManagerModalOpen] = useState(false);
+
+  const handleMenuClick = (key: string) => {
+    switch (key) {
+      case "3":
+        setUserManagerModalOpen(true);
+        break;
+      default:
+        break;
+    }
+  };
+
   const userAction: MenuProps["items"] = [
     {
       key: "1",
@@ -26,12 +39,9 @@ const HeaderDashBorad = ({}: Props) => {
       ),
     },
     {
-      key: "2",
-      label: "Subscription info",
-    },
-    {
       key: "3",
       label: "Manage users",
+      onClick: () => handleMenuClick("3"),
     },
     {
       key: "4",
@@ -67,8 +77,6 @@ const HeaderDashBorad = ({}: Props) => {
       children: [
         { key: "4-1", label: "Help Center" },
         { key: "4-2", label: "What's News" },
-        { key: "4-3", label: "Webinars" },
-        { key: "4-4", label: "Insights" },
         { key: "4-5", label: "Hire a Trusted Agency" },
       ],
     },
@@ -94,7 +102,7 @@ const HeaderDashBorad = ({}: Props) => {
   return (
     <div className={styles.headerDashBoard}>
       <div className={styles.headerItem}>
-        <span className={styles.logo}>SEOCMS</span>
+        <span className={styles.logo}>SEO BOOST</span>
       </div>
       <div className={styles.headerItem}>
         <div className={styles.searchContainer}>
@@ -106,9 +114,6 @@ const HeaderDashBorad = ({}: Props) => {
       </div>
       <div className={styles.headerItem}>
         <div className={styles.menu}>
-          <div className={styles.menuItem}>
-            <Button className={styles.upgrage}>Upgrade</Button>
-          </div>
           <div className={styles.menuItem}>
             <Button className={styles.btn}>Pricing</Button>
           </div>
@@ -124,6 +129,11 @@ const HeaderDashBorad = ({}: Props) => {
           </div>
         </div>
       </div>
+
+      <UserManagerModal
+        open={userManagerModalOpen}
+        onCancel={() => setUserManagerModalOpen(false)}
+      />
     </div>
   );
 };

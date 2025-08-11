@@ -29,6 +29,12 @@ export class BaseService {
         // Có thể custom xử lý lỗi ở đây
         if (error.response) {
           // Xử lý lỗi trả về từ server
+          if (error.response.status === 401) {
+            // Nếu gặp lỗi 401 (Unauthorized), chuyển hướng về trang chủ
+            if (typeof window !== "undefined") {
+              window.location.href = "/";
+            }
+          }
           // Ví dụ: thông báo lỗi, redirect, ...
         } else if (error.request) {
           // Không nhận được phản hồi từ server

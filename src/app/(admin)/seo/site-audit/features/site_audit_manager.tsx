@@ -478,7 +478,7 @@ const SiteAuditManager: React.FC = () => {
                             currentRealAudit?.results.performance?.metrics
                               ?.core_web_vitals?.lcp
                               ? (
-                                  currentRealAudit.results.performance.metrics
+                                  currentRealAudit?.results.performance.metrics
                                     .core_web_vitals.lcp / 1000
                                 ).toFixed(1)
                               : "0.0"
@@ -1454,7 +1454,7 @@ const SiteAuditManager: React.FC = () => {
             //               Completed:{" "}
             //               {currentRealAudit?.results?.completed_at
             //                 ? new Date(
-            //                     currentRealAudit.results.completed_at
+            //                     currentRealAudit?.results.completed_at
             //                   ).toLocaleString()
             //                 : "N/A"}
             //             </Text>
@@ -1661,15 +1661,15 @@ const SiteAuditManager: React.FC = () => {
               <Statistic
                 title="Performance"
                 value={
-                  auditSummary?.latestAudit.results?.performance?.score || 0
+                  auditSummary?.latestAudit?.results?.performance?.score || 0
                 }
                 suffix="/100"
                 valueStyle={{
                   color:
-                    (auditSummary?.latestAudit.results?.performance?.score ||
+                    (auditSummary?.latestAudit?.results?.performance?.score ||
                       0) >= 80
                       ? "#52c41a"
-                      : (auditSummary?.latestAudit.results?.performance
+                      : (auditSummary?.latestAudit?.results?.performance
                           ?.score || 0) >= 60
                       ? "#faad14"
                       : "#ff4d4f",
@@ -1680,15 +1680,15 @@ const SiteAuditManager: React.FC = () => {
               <Statistic
                 title="Technical SEO"
                 value={
-                  auditSummary?.latestAudit.results?.technical_seo?.score || 0
+                  auditSummary?.latestAudit?.results?.technical_seo?.score || 0
                 }
                 suffix="/100"
                 valueStyle={{
                   color:
-                    (auditSummary?.latestAudit.results?.technical_seo?.score ||
+                    (auditSummary?.latestAudit?.results?.technical_seo?.score ||
                       0) >= 80
                       ? "#52c41a"
-                      : (auditSummary?.latestAudit.results?.technical_seo
+                      : (auditSummary?.latestAudit?.results?.technical_seo
                           ?.score || 0) >= 60
                       ? "#faad14"
                       : "#ff4d4f",
@@ -1699,16 +1699,16 @@ const SiteAuditManager: React.FC = () => {
               <Statistic
                 title="Content Score"
                 value={
-                  auditSummary?.latestAudit.results?.content_analysis?.score ||
+                  auditSummary?.latestAudit?.results?.content_analysis?.score ||
                   0
                 }
                 suffix="/100"
                 valueStyle={{
                   color:
-                    (auditSummary?.latestAudit.results?.content_analysis
+                    (auditSummary?.latestAudit?.results?.content_analysis
                       ?.score || 0) >= 80
                       ? "#52c41a"
-                      : (auditSummary?.latestAudit.results?.content_analysis
+                      : (auditSummary?.latestAudit?.results?.content_analysis
                           ?.score || 0) >= 60
                       ? "#faad14"
                       : "#ff4d4f",
@@ -1719,15 +1719,15 @@ const SiteAuditManager: React.FC = () => {
               <Statistic
                 title="Accessibility"
                 value={
-                  auditSummary?.latestAudit.results?.accessibility?.score || 0
+                  auditSummary?.latestAudit?.results?.accessibility?.score || 0
                 }
                 suffix="/100"
                 valueStyle={{
                   color:
-                    (auditSummary?.latestAudit.results?.accessibility?.score ||
+                    (auditSummary?.latestAudit?.results?.accessibility?.score ||
                       0) >= 80
                       ? "#52c41a"
-                      : (auditSummary?.latestAudit.results?.accessibility
+                      : (auditSummary?.latestAudit?.results?.accessibility
                           ?.score || 0) >= 60
                       ? "#faad14"
                       : "#ff4d4f",
@@ -1758,7 +1758,7 @@ const SiteAuditManager: React.FC = () => {
               <div>
                 <Text strong>Pages Analyzed: </Text>
                 <Text>
-                  {auditSummary?.latestAudit.results?.overview
+                  {auditSummary?.latestAudit?.results?.overview
                     ?.pages_analyzed || 0}
                 </Text>
               </div>
@@ -1767,9 +1767,9 @@ const SiteAuditManager: React.FC = () => {
               <div>
                 <Text strong>Processing Time: </Text>
                 <Text>
-                  {auditSummary?.latestAudit.results?.processing_time
+                  {auditSummary?.latestAudit?.results?.processing_time
                     ? `${(
-                        auditSummary.latestAudit.results.processing_time / 1000
+                        auditSummary.latestAudit?.results.processing_time / 1000
                       ).toFixed(1)}s`
                     : "N/A"}
                 </Text>

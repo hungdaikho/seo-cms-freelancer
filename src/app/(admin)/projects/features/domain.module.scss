@@ -59,6 +59,13 @@
   .ant-card-body {
     padding: 16px;
   }
+
+  .ant-list {
+    .ant-list-item {
+      padding: 0 !important;
+      border: none !important;
+    }
+  }
 }
 
 .cardHeader {
@@ -73,34 +80,48 @@
 
 .domainItem {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .domainInfo {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0; // Prevent overflow
 }
 
 .domainName {
   font-size: 14px;
   color: #262626;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .domainStats {
   font-size: 16px;
   color: #1890ff;
   font-weight: 600;
+  margin: 4px 0;
 }
 
 .chartPlaceholder {
-  width: 100%;
+  width: 100px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  margin-left: 16px;
 }
 
 .description {
@@ -192,6 +213,22 @@
     .countrySelect,
     .addButton {
       width: 100%;
+    }
+  }
+
+  .domainItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+
+    .domainInfo {
+      width: 100%;
+    }
+
+    .chartPlaceholder {
+      margin-left: 0;
+      align-self: center;
     }
   }
 }
