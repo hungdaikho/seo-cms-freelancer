@@ -1,13 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { seoService } from '@/services/seo.service';
+import { searchFeatures, NavigationFeature } from '@/utils/navigation-features';
 
 // Types
 export interface SearchResult {
     id: string;
-    type: 'keyword' | 'domain' | 'project' | 'task';
+    type: 'feature' | 'domain' | 'project' | 'task';
     title: string;
     description?: string;
     url?: string;
+    category?: string;
     metadata?: any;
 }
 
@@ -40,27 +41,19 @@ export const performGlobalSearch = createAsyncThunk(
 
             const results: SearchResult[] = [];
 
-            // Search keywords
-            try {
-                const keywordSuggestions = await seoService.aiKeywordSuggestions({
-                    seedKeyword: query,
-                    location: 'US'
-                });
+            // Search navigation features
+            const navigationResults = searchFeatures(query);
+            const featureResults = navigationResults.map((feature: NavigationFeature) => ({
+                id: feature.id,
+                type: 'feature' as const,
+                title: feature.title,
+                description: feature.description,
+                url: feature.route,
+                category: feature.category,
+                metadata: { feature }
+            }));
 
-                if (keywordSuggestions) {
-                    const keywordResults = keywordSuggestions.slice(0, 3).map((suggestion: any) => ({
-                        id: `keyword-${suggestion.keyword || suggestion.text}`,
-                        type: 'keyword' as const,
-                        title: suggestion.keyword || suggestion.text,
-                        description: `Search Volume: ${suggestion.volume || 'N/A'}`,
-                        url: `/seo/keyword-magic-tool?keyword=${encodeURIComponent(suggestion.keyword || suggestion.text)}`,
-                        metadata: suggestion
-                    }));
-                    results.push(...keywordResults);
-                }
-            } catch (error) {
-                console.warn('Keyword search failed:', error);
-            }
+            results.push(...featureResults);
 
             // Search domains (if query looks like a domain)
             if (query.includes('.') && !query.includes(' ')) {
@@ -73,26 +66,6 @@ export const performGlobalSearch = createAsyncThunk(
                     metadata: { domain: query }
                 });
             }
-
-            // Add quick actions
-            const quickActions = [
-                {
-                    id: `action-keyword-research-${query}`,
-                    type: 'task' as const,
-                    title: `Research keywords for "${query}"`,
-                    description: 'Open Keyword Magic Tool',
-                    url: `/seo/keyword-magic-tool?keyword=${encodeURIComponent(query)}`,
-                },
-                {
-                    id: `action-topic-research-${query}`,
-                    type: 'task' as const,
-                    title: `Find topics about "${query}"`,
-                    description: 'Open Topic Research',
-                    url: `/seo/topic-research?topic=${encodeURIComponent(query)}`,
-                }
-            ];
-
-            results.push(...quickActions);
 
             return results;
         } catch (error: any) {

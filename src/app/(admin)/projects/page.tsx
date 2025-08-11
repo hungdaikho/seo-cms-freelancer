@@ -12,6 +12,7 @@ import {
   DashboardOutlined,
   SwapOutlined,
 } from "@ant-design/icons";
+import { useSearchParams } from "next/navigation";
 import ProjectManager from "./features/project_manager";
 import ProjectDashboard from "./features/project_dashboard";
 import KeywordManager from "./features/keyword_manager";
@@ -27,6 +28,18 @@ type Props = {};
 const Page = (props: Props) => {
   const { currentProject, projects, setCurrentProject } = useProject();
   const [activeTab, setActiveTab] = useState("projects");
+  const searchParams = useSearchParams();
+
+  // Tab mapping for URL parameters
+  const tabMapping: { [key: string]: string } = {
+    "project-manager": "projects",
+    "project-dashboard": "dashboard",
+    "keyword-manager": "keywords",
+    "audit-manager": "audits",
+    "list-tools": "tools",
+    "copilot-ai": "ai",
+    "domain-analysis": "domain",
+  };
 
   // Auto-select first project if available and no current project
   useEffect(() => {
@@ -35,6 +48,14 @@ const Page = (props: Props) => {
       setActiveTab("dashboard");
     }
   }, [projects, currentProject, setCurrentProject]);
+
+  // Handle tab parameter from URL
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam && tabMapping[tabParam]) {
+      setActiveTab(tabMapping[tabParam]);
+    }
+  }, [searchParams]);
 
   const handleProjectSelect = (project: any) => {
     setCurrentProject(project);

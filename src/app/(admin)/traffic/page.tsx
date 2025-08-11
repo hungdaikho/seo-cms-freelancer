@@ -33,6 +33,7 @@ import {
   SettingOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
+import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { fetchProjects } from "@/stores/slices/project.slice";
 import {
@@ -64,6 +65,7 @@ const { Option } = Select;
 const TrafficPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { projects } = useAppSelector((state) => state.project);
+  const searchParams = useSearchParams();
 
   // New traffic analytics selectors
   const overview = useAppSelector(selectTrafficOverview);
@@ -76,6 +78,26 @@ const TrafficPage: React.FC = () => {
   const filters = useAppSelector(selectTrafficAnalyticsFilters);
 
   const [selectedProject, setSelectedProject] = useState<string>("");
+
+  // Tab mapping for URL parameters (for navigation features)
+  const tabMapping: { [key: string]: boolean } = {
+    "traffic-get-started": true,
+    analytics: true,
+    "traffic-journey": true,
+    "market-explorer": true,
+    "advertising-research": true,
+    "social-media-analytics": true,
+  };
+
+  // Handle tab parameter from URL - just acknowledge it exists
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam && tabMapping[tabParam]) {
+      // Tab parameter recognized, show the analytics dashboard
+      // No need to change UI since all traffic features use the same dashboard
+      console.log(`Navigated to Traffic feature: ${tabParam}`);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Load projects on component mount

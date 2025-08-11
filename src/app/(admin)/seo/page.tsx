@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, Tabs, Select, Typography, Button } from "antd";
+import { useSearchParams } from "next/navigation";
 import {
   BarChartOutlined,
   SearchOutlined,
@@ -37,10 +38,27 @@ const { Option } = Select;
 
 const SeoPage: React.FC = () => {
   const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
   const { projects, loading: projectsLoading } = useAppSelector(
     (state) => state.project
   );
   const [selectedProject, setSelectedProject] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string>("keywords");
+
+  // Tab mapping for URL parameters
+  const tabMapping: { [key: string]: string } = {
+    "keyword-management": "keywords",
+    "position-tracking": "tracking",
+    "organic-research": "organic-research",
+    "site-audit": "audit",
+    "keyword-magic-tool": "keyword-magic",
+    "domain-overview": "domain-overview",
+    "backlink-analytics": "backlink-analytics",
+    "keyword-gap": "keyword-gap",
+    "topic-research": "topic-research",
+    "seo-content-template": "seo-content-template",
+    "on-page-seo-checker": "on-page-seo-checker",
+  };
 
   useEffect(() => {
     // Load projects on component mount
@@ -52,6 +70,14 @@ const SeoPage: React.FC = () => {
       setSelectedProject(projects[0].id);
     }
   }, [projects, selectedProject]);
+
+  // Handle tab parameter from URL
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam && tabMapping[tabParam]) {
+      setActiveTab(tabMapping[tabParam]);
+    }
+  }, [searchParams]);
 
   return (
     <div className={styles.seoPage}>
@@ -83,7 +109,8 @@ const SeoPage: React.FC = () => {
 
       {selectedProject ? (
         <Tabs
-          defaultActiveKey="keywords"
+          activeKey={activeTab}
+          onChange={setActiveTab}
           className={styles.seoTabs}
           items={[
             {

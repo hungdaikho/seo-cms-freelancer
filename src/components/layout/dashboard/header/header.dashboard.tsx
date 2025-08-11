@@ -107,7 +107,7 @@ const HeaderDashBorad = ({}: Props) => {
       <div className={styles.headerItem}>
         <div className={styles.searchContainer}>
           <GlobalSearch
-            placeholder="Enter your task, website, or keyword"
+            placeholder="Search features: SEO, Traffic, Content, AI..."
             className={styles.globalSearchWrapper}
           />
         </div>

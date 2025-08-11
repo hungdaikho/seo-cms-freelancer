@@ -1,9 +1,18 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { Input, Spin, Empty, Typography } from "antd";
+import { Input, Spin, Empty, Typography, Tag } from "antd";
 import { IoSearchOutline, IoTimeOutline } from "react-icons/io5";
-import { FaKeyboard, FaGlobe, FaTasks } from "react-icons/fa";
+import {
+  FaKeyboard,
+  FaGlobe,
+  FaTasks,
+  FaChartLine,
+  FaFileAlt,
+  FaCogs,
+  FaBrain,
+  FaRocket,
+} from "react-icons/fa";
 import { useGlobalSearch } from "@/stores/hooks/useGlobalSearch";
 import styles from "./global-search.module.scss";
 
@@ -59,10 +68,20 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
   };
 
   // Get icon for result type
-  const getResultIcon = (type: string) => {
+  const getResultIcon = (type: string, category?: string) => {
     switch (type) {
-      case "keyword":
-        return <FaKeyboard className={styles.resultIcon} />;
+      case "feature":
+        // Return different icons based on category
+        if (category?.toLowerCase().includes("seo")) {
+          return <FaRocket className={styles.resultIcon} />;
+        } else if (category?.toLowerCase().includes("traffic")) {
+          return <FaChartLine className={styles.resultIcon} />;
+        } else if (category?.toLowerCase().includes("content")) {
+          return <FaFileAlt className={styles.resultIcon} />;
+        } else if (category?.toLowerCase().includes("ai")) {
+          return <FaBrain className={styles.resultIcon} />;
+        }
+        return <FaCogs className={styles.resultIcon} />;
       case "domain":
         return <FaGlobe className={styles.resultIcon} />;
       case "task":
@@ -138,21 +157,42 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
                         className={styles.searchItem}
                         onClick={() => selectResult(result)}
                       >
-                        {getResultIcon(result.type)}
+                        {getResultIcon(result.type, result.category)}
                         <div className={styles.resultContent}>
-                          <Text className={styles.resultTitle}>
-                            {result.title}
-                          </Text>
+                          <div className={styles.resultHeader}>
+                            <Text className={styles.resultTitle}>
+                              {result.title}
+                            </Text>
+                            {result.category && (
+                              <Tag
+                                className={styles.categoryTag}
+                                color={
+                                  result.category.toLowerCase().includes("seo")
+                                    ? "green"
+                                    : result.category
+                                        .toLowerCase()
+                                        .includes("traffic")
+                                    ? "blue"
+                                    : result.category
+                                        .toLowerCase()
+                                        .includes("content")
+                                    ? "orange"
+                                    : result.category
+                                        .toLowerCase()
+                                        .includes("ai")
+                                    ? "purple"
+                                    : "default"
+                                }
+                              >
+                                {result.category}
+                              </Tag>
+                            )}
+                          </div>
                           {result.description && (
                             <Text className={styles.resultDescription}>
                               {result.description}
                             </Text>
                           )}
-                        </div>
-                        <div className={styles.resultType}>
-                          <Text className={styles.typeLabel}>
-                            {result.type}
-                          </Text>
                         </div>
                       </div>
                     ))}
@@ -177,13 +217,17 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
                 </div>
                 <div className={styles.tipsList}>
                   <Text className={styles.tip}>
-                    • Type keywords to find related SEO data
+                    • Search for features like "keyword research" or "traffic
+                    analytics"
+                  </Text>
+                  <Text className={styles.tip}>
+                    • Type tool names like "position tracking" or "site audit"
                   </Text>
                   <Text className={styles.tip}>
                     • Enter domains (e.g., example.com) to analyze
                   </Text>
                   <Text className={styles.tip}>
-                    • Search for topics to get content ideas
+                    • Search by category like "SEO", "Content", or "Traffic"
                   </Text>
                 </div>
               </div>
