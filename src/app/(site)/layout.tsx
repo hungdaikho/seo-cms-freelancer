@@ -2,6 +2,7 @@
 import "../../config/i18n";
 import ReduxProvider from "@/provider/redux_provider";
 import AuthGuard from "@/components/layout/auth_guard";
+import AdminRedirect from "@/components/auth/AdminRedirect";
 import "../globals.css";
 import { useTranslation } from "react-i18next";
 import HeaderSite from "@/components/layout/header/header.site";
@@ -31,9 +32,11 @@ export default function RootLayout({
         <ReduxProvider>
           <ConfigProvider {...antdConfig}>
             <AuthGuard requireAuth={false} redirectTo="/projects">
-              <HeaderSite />
-              {children}
-              <FooterSite />
+              <AdminRedirect>
+                <HeaderSite />
+                {children}
+                <FooterSite />
+              </AdminRedirect>
             </AuthGuard>
           </ConfigProvider>
         </ReduxProvider>

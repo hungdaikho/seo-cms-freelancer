@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/stores/store";
 import { checkAuthToken } from "@/stores/slices/auth.slice";
 import { Spin } from "antd";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -18,24 +19,31 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
 }) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated, isLoading, user } = useSelector(
-    (state: RootState) => state.auth
-  );
-
+  const { user, isAuthenticated, isSuperAdmin, isLoading }: any = useAuth();
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-
     if (token && !isAuthenticated && !user) {
       // Have token but not authenticated, check if token is valid
       dispatch(checkAuthToken());
     } else if (!token && requireAuth) {
       // No token and require auth, redirect to home
       router.push(redirectTo || "/");
+    } else if (token && isAuthenticated && isSuperAdmin) {
+      // Have valid token and is super admin, redirect to admin dashboard
+      router.push("/dashboard");
     } else if (token && isAuthenticated && !requireAuth) {
       // Have valid token but on guest page, redirect to projects
       router.push(redirectTo || "/projects");
     }
-  }, [dispatch, isAuthenticated, user, requireAuth, router, redirectTo]);
+  }, [
+    dispatch,
+    isAuthenticated,
+    user,
+    requireAuth,
+    router,
+    redirectTo,
+    isSuperAdmin,
+  ]);
 
   // Show loading spinner while checking auth
   if (isLoading) {

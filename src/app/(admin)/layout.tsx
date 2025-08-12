@@ -12,6 +12,7 @@ import SiderDashBoard from "@/components/layout/dashboard/sider/sider.dashboard"
 import { useEffect } from "react";
 import suppressAntdReact19Warning from "@/utils/suppress-warnings";
 import { antdConfig } from "@/config/antd.config";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function RootLayout({
   children,
@@ -19,7 +20,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { i18n } = useTranslation();
-
   // Suppress Ant Design React 19 compatibility warnings
   useEffect(() => {
     suppressAntdReact19Warning();
@@ -31,7 +31,8 @@ export default function RootLayout({
         style={{
           fontSize: "16px",
           fontFamily: "inherit",
-          background: "linear-gradient(135deg, #f8f9ff 0%, rgba(255, 145, 77, 0.05) 100%)",
+          background:
+            "linear-gradient(135deg, #f8f9ff 0%, rgba(255, 145, 77, 0.05) 100%)",
           color: "#000",
         }}
       >
@@ -39,7 +40,11 @@ export default function RootLayout({
           <ConfigProvider {...antdConfig}>
             <AuthGuard requireAuth={true} redirectTo="/">
               <Layout
-                style={{ width: "100vw", height: "100vh", position: "relative" }}
+                style={{
+                  width: "100vw",
+                  height: "100vh",
+                  position: "relative",
+                }}
               >
                 <Header
                   style={{
