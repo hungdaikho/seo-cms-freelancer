@@ -1,15 +1,13 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/stores/store";
-import { googleAuthSuccess } from "@/stores/slices/auth.slice";
 import { message, Spin, Result, Button } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
-const GoogleAuthCallback: React.FC = () => {
+const SimpleGoogleAuthCallback: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
   const [isProcessing, setIsProcessing] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,20 +25,16 @@ const GoogleAuthCallback: React.FC = () => {
 
         if (token) {
           try {
-            await dispatch(googleAuthSuccess(token)).unwrap();
+            // Đơn giản chỉ lưu token vào localStorage
+            localStorage.setItem("accessToken", token);
             message.success("Successfully logged in with Google!");
 
-            // Redirect with a small delay to ensure state is updated
+            // Redirect với delay nhỏ
             setTimeout(() => {
-              // Try to redirect to dashboard, fallback to home if not available
-              try {
-                router.push("/");
-              } catch (routerError) {
-                window.location.href = "/";
-              }
+              router.push("/");
             }, 1000);
           } catch (error: any) {
-            setError(error || "Authentication failed");
+            setError(error?.message || "Authentication failed");
             setIsProcessing(false);
           }
         } else {
@@ -54,7 +48,7 @@ const GoogleAuthCallback: React.FC = () => {
     };
 
     handleGoogleAuth();
-  }, [searchParams, router, dispatch]);
+  }, [searchParams, router]);
 
   const handleRetry = () => {
     router.push("/");
@@ -112,4 +106,4 @@ const GoogleAuthCallback: React.FC = () => {
   );
 };
 
-export default GoogleAuthCallback;
+export default SimpleGoogleAuthCallback;

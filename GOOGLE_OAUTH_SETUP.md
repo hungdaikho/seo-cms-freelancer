@@ -88,7 +88,7 @@ The frontend should:
 3. Enable Google+ API
 4. Create OAuth 2.0 credentials:
    - Application type: Web application
-   - Authorized redirect URIs: `http://localhost:3001/auth/google/callback`
+   - Authorized redirect URIs: `http://localhost:3001/api/v1/auth/google/callback`
 5. Copy Client ID and Client Secret to `.env` file
 
 ## Testing

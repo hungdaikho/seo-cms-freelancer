@@ -1,5 +1,5 @@
 import { seoService } from "@/services/seo.service"
-import { AuthResponse, LoginRequest, RegisterRequest } from "@/types/api.type"
+import { AuthResponse, LoginRequest, RegisterRequest, User } from "@/types/api.type"
 import { AuthState } from "@/types/auth.type"
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 
@@ -71,16 +71,26 @@ export const checkAuthToken = createAsyncThunk(
     }
 )
 
-export const googleAuthSuccess = createAsyncThunk<AuthResponse, string>(
+export const googleAuthSuccess = createAsyncThunk<{ user: User | null, accessToken: string }, string>(
     'auth/googleAuthSuccess',
     async (token: string, { rejectWithValue }) => {
         try {
             // Lưu token vào localStorage
             localStorage.setItem('accessToken', token)
 
-            // Gọi API để lấy thông tin user hiện tại
-            const user = await seoService.getUserProfile()
-            return { user, accessToken: token }
+            // Thử gọi API để lấy thông tin user hiện tại
+            try {
+                const user = await seoService.getUserProfile()
+                return { user, accessToken: token }
+            } catch (userProfileError) {
+                // Nếu không lấy được profile, vẫn return token
+                // User có thể được lấy từ token decode hoặc gọi API khác
+                console.warn('Could not fetch user profile:', userProfileError)
+                return {
+                    user: null, // Will be populated later
+                    accessToken: token
+                }
+            }
         } catch (error: any) {
             localStorage.removeItem('accessToken')
             return rejectWithValue(error.response?.data?.message || 'Google authentication failed')
@@ -172,7 +182,7 @@ const authSlice = createSlice({
                 state.isLoading = true
                 state.error = null
             })
-            .addCase(googleAuthSuccess.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
+            .addCase(googleAuthSuccess.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.user = action.payload.user
                 state.accessToken = action.payload.accessToken

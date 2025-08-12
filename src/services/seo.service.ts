@@ -144,7 +144,7 @@ export class SeoService extends BaseService {
    * Initiate Google OAuth authentication
    */
   initiateGoogleAuth(): void {
-    const googleAuthUrl = `${serverConfig.HTTP_SERVER_URL}/auth/google`;
+    const googleAuthUrl = `${serverConfig.HTTP_SERVER_URL}/api/v1/auth/google`;
     window.location.href = googleAuthUrl;
   }
 

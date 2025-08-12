@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import GoogleAuthCallback from "@/components/auth/GoogleAuthCallback";
+import SimpleGoogleAuthCallback from "@/components/auth/SimpleGoogleAuthCallback";
 
 const GoogleAuthSuccessPage: React.FC = () => {
-  return <GoogleAuthCallback />;
+  return <SimpleGoogleAuthCallback />;
 };
 
 export default GoogleAuthSuccessPage;
