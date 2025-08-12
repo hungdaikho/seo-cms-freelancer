@@ -1,12 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Card, Typography } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph } = Typography;
 
 const GoogleOAuthTest: React.FC = () => {
+  const [currentUrl, setCurrentUrl] = useState<string>("");
+
+  useEffect(() => {
+    // Set the current URL only on the client side
+    setCurrentUrl(window.location.href);
+  }, []);
+
   const handleTestGoogleAuth = () => {
     // Direct redirect to backend Google OAuth endpoint
     const googleAuthUrl = "http://localhost:3001/auth/google";
@@ -21,7 +28,7 @@ const GoogleOAuthTest: React.FC = () => {
           Click the button below to test Google OAuth authentication flow.
         </Paragraph>
         <Paragraph>
-          <strong>Current URL:</strong> {window.location.href}
+          <strong>Current URL:</strong> {currentUrl || "Loading..."}
         </Paragraph>
         <Paragraph>
           <strong>Expected flow:</strong>
