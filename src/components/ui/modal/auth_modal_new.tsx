@@ -19,6 +19,7 @@ import {
   clearError,
 } from "@/stores/slices/auth.slice";
 import { LoginRequest, RegisterRequest } from "@/types/api.type";
+import { seoService } from "@/services/seo.service";
 import styles from "./auth_modal.module.scss";
 
 interface AuthModalProps {
@@ -41,6 +42,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [activeTab, setActiveTab] = useState<"login" | "signup">(initialTab);
   const [loginForm] = Form.useForm();
   const [signupForm] = Form.useForm();
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   // Clear error when modal opens/closes
   useEffect(() => {
@@ -86,13 +88,26 @@ const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    message.info(`${t("login_with") || "Login with"} ${provider}`);
+  const handleSocialLogin = async (provider: string) => {
+    if (provider === "Google") {
+      try {
+        setGoogleLoading(true);
+        seoService.initiateGoogleAuth();
+      } catch (error) {
+        setGoogleLoading(false);
+        message.error("Failed to initialize Google authentication");
+      }
+    } else {
+      message.info(
+        `${t("login_with") || "Login with"} ${provider} - Coming soon!`
+      );
+    }
   };
 
   const handleModalClose = () => {
     loginForm.resetFields();
     signupForm.resetFields();
+    setGoogleLoading(false);
     dispatch(clearError());
     onClose();
   };
@@ -101,6 +116,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setActiveTab(tab);
     loginForm.resetFields();
     signupForm.resetFields();
+    setGoogleLoading(false);
     dispatch(clearError());
   };
 
@@ -409,18 +425,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           <div className={styles.socialButtons}>
             <Button
-              className={`${styles.socialButton} ${styles.google}`}
+              className={`${styles.socialButton} ${styles.google} ${
+                googleLoading ? styles.loading : ""
+              }`}
               onClick={() => handleSocialLogin("Google")}
+              disabled={googleLoading || isLoading}
+              loading={googleLoading}
             >
               <GoogleOutlined />
-              Google
-            </Button>
-            <Button
-              className={`${styles.socialButton} ${styles.facebook}`}
-              onClick={() => handleSocialLogin("Facebook")}
-            >
-              <FacebookOutlined />
-              Facebook
+              {googleLoading ? "Connecting..." : "Google"}
             </Button>
           </div>
 

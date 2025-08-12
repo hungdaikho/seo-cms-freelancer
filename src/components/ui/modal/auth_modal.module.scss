@@ -6,7 +6,7 @@
   }
 
   .authHeader {
-    background: linear-gradient(135deg, #004AAC 0%, #13124D 100%);
+    background: linear-gradient(135deg, #004aac 0%, #13124d 100%);
     padding: 24px;
     text-align: center;
     color: white;
@@ -50,7 +50,7 @@
 
         &.active {
           background: white;
-          color: #004AAC;
+          color: #004aac;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
@@ -96,7 +96,7 @@
           font-size: 14px;
 
           &:focus {
-            border-color: #004AAC;
+            border-color: #004aac;
             box-shadow: 0 0 0 2px rgba(0, 74, 172, 0.1);
           }
         }
@@ -114,7 +114,7 @@
       margin-bottom: 24px;
 
       a {
-        color: #FF914D;
+        color: #ff914d;
         text-decoration: none;
         font-size: 14px;
 
@@ -130,7 +130,7 @@
       border-radius: 8px;
       font-weight: 600;
       font-size: 16px;
-      background: linear-gradient(135deg, #004AAC 0%, #FF914D 100%);
+      background: linear-gradient(135deg, #004aac 0%, #ff914d 100%);
       border: none;
 
       &:hover {
@@ -177,23 +177,43 @@
         gap: 8px;
         font-weight: 500;
         transition: all 0.3s ease;
+        position: relative;
 
-        &:hover {
-          border-color: #004AAC;
-          color: #004AAC;
+        &:hover:not(:disabled) {
+          border-color: #004aac;
+          color: #004aac;
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
 
         &.google {
-          &:hover {
+          &:hover:not(:disabled) {
             border-color: #db4437;
             color: #db4437;
           }
         }
 
         &.facebook {
-          &:hover {
+          &:hover:not(:disabled) {
             border-color: #4267b2;
             color: #4267b2;
+          }
+        }
+
+        &.loading {
+          &::before {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #db4437;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
           }
         }
       }
@@ -208,7 +228,7 @@
       font-size: 14px;
 
       a {
-        color: #FF914D;
+        color: #ff914d;
         text-decoration: none;
         font-weight: 500;
 
@@ -217,6 +237,16 @@
         }
       }
     }
+  }
+}
+
+// Keyframes for loading spinner
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 

@@ -140,6 +140,14 @@ export class SeoService extends BaseService {
     return this.post<AuthResponse>("/auth/login", data);
   }
 
+  /**
+   * Initiate Google OAuth authentication
+   */
+  initiateGoogleAuth(): void {
+    const googleAuthUrl = `${serverConfig.HTTP_SERVER_URL}/auth/google`;
+    window.location.href = googleAuthUrl;
+  }
+
   // =============================================================================
   // 🔍 ORGANIC RESEARCH METHODS
   // =============================================================================

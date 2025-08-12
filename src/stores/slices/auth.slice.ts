@@ -71,6 +71,23 @@ export const checkAuthToken = createAsyncThunk(
     }
 )
 
+export const googleAuthSuccess = createAsyncThunk<AuthResponse, string>(
+    'auth/googleAuthSuccess',
+    async (token: string, { rejectWithValue }) => {
+        try {
+            // Lưu token vào localStorage
+            localStorage.setItem('accessToken', token)
+
+            // Gọi API để lấy thông tin user hiện tại
+            const user = await seoService.getUserProfile()
+            return { user, accessToken: token }
+        } catch (error: any) {
+            localStorage.removeItem('accessToken')
+            return rejectWithValue(error.response?.data?.message || 'Google authentication failed')
+        }
+    }
+)
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -148,6 +165,24 @@ const authSlice = createSlice({
                 state.accessToken = null
                 state.isAuthenticated = false
                 state.error = action.payload as string
+            })
+
+            // Google Auth Success
+            .addCase(googleAuthSuccess.pending, (state) => {
+                state.isLoading = true
+                state.error = null
+            })
+            .addCase(googleAuthSuccess.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
+                state.isLoading = false
+                state.user = action.payload.user
+                state.accessToken = action.payload.accessToken
+                state.isAuthenticated = true
+                state.error = null
+            })
+            .addCase(googleAuthSuccess.rejected, (state, action) => {
+                state.isLoading = false
+                state.error = action.payload as string
+                state.isAuthenticated = false
             })
     }
 })
