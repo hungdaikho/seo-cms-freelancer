@@ -33,7 +33,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
       router.push("/dashboard");
     } else if (token && isAuthenticated && !requireAuth) {
       // Have valid token but on guest page, redirect to projects
-      router.push(redirectTo || "/projects");
+      router.push(redirectTo || "/dashboard");
     }
   }, [
     dispatch,

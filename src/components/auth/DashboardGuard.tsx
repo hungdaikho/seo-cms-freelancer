@@ -29,7 +29,7 @@ const DashboardGuard: React.FC<DashboardGuardProps> = ({ children }) => {
         router.push("/");
         return;
       } else if (!canAccessDashboard()) {
-        router.push("/projects");
+        router.push("/dashboard");
         return;
       }
 

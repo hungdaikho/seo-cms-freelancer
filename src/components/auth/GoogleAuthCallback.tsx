@@ -34,7 +34,7 @@ const GoogleAuthCallback: React.FC = () => {
             setTimeout(() => {
               // Try to redirect to dashboard, fallback to home if not available
               try {
-                router.push("/projects");
+                router.push("/dashboard");
               } catch (routerError) {
                 window.location.href = "/";
               }

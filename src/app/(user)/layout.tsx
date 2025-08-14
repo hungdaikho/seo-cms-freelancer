@@ -63,7 +63,7 @@ export default function RootLayout({
                     overflow: "hidden",
                   }}
                 >
-                  <Sider width={76} style={{ background: "transparent" }}>
+                  <Sider width={320} style={{ background: "transparent" }}>
                     <SiderDashBoard />
                   </Sider>
                   <Content style={{ maxHeight: "100%", overflow: "auto" }}>

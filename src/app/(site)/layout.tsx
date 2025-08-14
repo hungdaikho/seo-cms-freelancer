@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <ReduxProvider>
           <ConfigProvider {...antdConfig}>
-            <AuthGuard requireAuth={false} redirectTo="/projects">
+            <AuthGuard requireAuth={false} redirectTo="/dashboard">
               <AdminRedirect>
                 <HeaderSite />
                 {children}
