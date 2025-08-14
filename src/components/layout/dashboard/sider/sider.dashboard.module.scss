@@ -55,6 +55,24 @@
       }
     }
 
+    &.subSubmenuItem {
+      font-size: 13px;
+      padding-left: 24px;
+      color: #8c8c8c;
+      font-weight: 400;
+
+      &:hover {
+        background-color: #fafafa;
+        color: #262626;
+      }
+
+      &.active {
+        background-color: #e6f7ff;
+        color: #1890ff;
+        font-weight: 500;
+      }
+    }
+
     span {
       display: block;
     }
@@ -100,6 +118,11 @@
 
       &.submenuItem {
         padding-left: 30px;
+      }
+
+      &.subSubmenuItem {
+        padding-left: 45px;
+        font-size: 12px;
       }
     }
 

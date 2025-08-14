@@ -1498,20 +1498,6 @@ export interface TopPagesParams {
     sortBy?: 'traffic' | 'keywords' | 'value';
 }
 
-// =============================================================================
-// 🔧 BACKLINK ANALYTICS TYPES (INTEGRATION)
-// =============================================================================
-
-// Re-export backlink types from backlink.type.ts for easier imports
-export type {
-    Backlink as BacklinkType,
-    CreateBacklinkRequest,
-    UpdateBacklinkRequest,
-    BacklinkAnalytics,
-    BacklinkProfile as BacklinkProfileType,
-    BacklinkQueryParams,
-    BacklinksResponse,
-} from './backlink.type';
 
 export interface ApiLimitsResponse {
     semrush: {

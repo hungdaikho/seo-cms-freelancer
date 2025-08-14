@@ -14,6 +14,10 @@ const SiderDashBoard = () => {
     return pathname.startsWith(path);
   };
 
+  const isCompetitiveResearchExpanded = () => {
+    return pathname.startsWith("/competitive-research");
+  };
+
   return (
     <div className={styles.sider}>
       {/* Dashboard Section */}
@@ -46,6 +50,43 @@ const SiderDashBoard = () => {
       >
         <span>Competitive Research</span>
       </div>
+
+      {/* Competitive Research Sub-submenu */}
+      {isCompetitiveResearchExpanded() && (
+        <>
+          <div
+            className={`${styles.menuItem} ${styles.subSubmenuItem} ${
+              pathname === "/competitive-research" ||
+              pathname === "/competitive-research/domain-overview"
+                ? styles.active
+                : ""
+            }`}
+            onClick={() => router.push("/competitive-research")}
+          >
+            <span>Domain Overview</span>
+          </div>
+
+          <div
+            className={`${styles.menuItem} ${styles.subSubmenuItem} ${
+              isActive("/competitive-research/keyword-gap") ? styles.active : ""
+            }`}
+            onClick={() => router.push("/competitive-research/keyword-gap")}
+          >
+            <span>Keyword Gap</span>
+          </div>
+
+          <div
+            className={`${styles.menuItem} ${styles.subSubmenuItem} ${
+              isActive("/competitive-research/backlink-gap")
+                ? styles.active
+                : ""
+            }`}
+            onClick={() => router.push("/competitive-research/backlink-gap")}
+          >
+            <span>Backlink Gap</span>
+          </div>
+        </>
+      )}
 
       <div
         className={`${styles.menuItem} ${styles.submenuItem} ${
