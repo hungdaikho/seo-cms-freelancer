@@ -1,4 +1,4 @@
-import { seoService } from "@/services/seo.service"
+import { authService } from "@/services/auth.service"
 import { AuthResponse, LoginRequest, RegisterRequest, User } from "@/types/api.type"
 import { AuthState } from "@/types/auth.type"
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
@@ -15,7 +15,7 @@ export const registerAccount = createAsyncThunk<AuthResponse, RegisterRequest>(
     'auth/registerAccount',
     async (data: RegisterRequest, { rejectWithValue }) => {
         try {
-            const response = await seoService.register(data)
+            const response = await authService.register(data)
             // Lưu token vào localStorage
             if (response.accessToken) {
                 localStorage.setItem('accessToken', response.accessToken)
@@ -31,7 +31,7 @@ export const loginAccount = createAsyncThunk<AuthResponse, LoginRequest>(
     'auth/loginAccount',
     async (data: LoginRequest, { rejectWithValue }) => {
         try {
-            const response = await seoService.login(data)
+            const response = await authService.login(data)
             // Lưu token vào localStorage
             if (response.accessToken) {
                 localStorage.setItem('accessToken', response.accessToken)
@@ -62,7 +62,7 @@ export const checkAuthToken = createAsyncThunk(
             }
 
             // Gọi API để lấy thông tin user hiện tại
-            const user = await seoService.getUserProfile()
+            const user = await authService.getUserProfile()
             return { user, accessToken: token }
         } catch (error: any) {
             localStorage.removeItem('accessToken')
@@ -80,7 +80,7 @@ export const googleAuthSuccess = createAsyncThunk<{ user: User | null, accessTok
 
             // Thử gọi API để lấy thông tin user hiện tại
             try {
-                const user = await seoService.getUserProfile()
+                const user = await authService.getUserProfile()
                 return { user, accessToken: token }
             } catch (userProfileError) {
                 // Nếu không lấy được profile, vẫn return token

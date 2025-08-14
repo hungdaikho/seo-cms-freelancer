@@ -1,26 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./header.dashboard.module.scss";
 import { Button, Dropdown, MenuProps, Input } from "antd";
-import { SearchOutlined, BellOutlined, DownOutlined } from "@ant-design/icons";
+import { SearchOutlined, BellOutlined } from "@ant-design/icons";
 import { FaUser } from "react-icons/fa";
 import { useAuth } from "@/stores/hooks/useAuth";
-import UserManagerModal from "@/components/modals/UserManagerModal";
 type Props = {};
 
 const HeaderDashBorad = ({}: Props) => {
   const { user } = useAuth();
-  const [userManagerModalOpen, setUserManagerModalOpen] = useState(false);
-
-  const handleMenuClick = (key: string) => {
-    switch (key) {
-      case "3":
-        setUserManagerModalOpen(true);
-        break;
-      default:
-        break;
-    }
-  };
-
   const userAction: MenuProps["items"] = [
     {
       key: "1",
@@ -38,7 +25,6 @@ const HeaderDashBorad = ({}: Props) => {
     {
       key: "3",
       label: "Manage users",
-      onClick: () => handleMenuClick("3"),
     },
     {
       key: "4",
@@ -95,11 +81,6 @@ const HeaderDashBorad = ({}: Props) => {
           <Button type="text" icon={<FaUser />} className={styles.userButton} />
         </Dropdown>
       </div>
-
-      <UserManagerModal
-        open={userManagerModalOpen}
-        onCancel={() => setUserManagerModalOpen(false)}
-      />
     </div>
   );
 };

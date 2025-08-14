@@ -1,26 +1,44 @@
-import React from 'react'
-import { Modal } from 'antd'
-import { EModalType, IModalType } from '@/types/modal.type';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/stores/store';
-import DefaultModal from './default.modal';
-export type ModalContent = {
-    key: string | number;
-    content: React.ReactNode;
-};
-const ModalComponent = () => {
-    const modal: IModalType = useSelector((state: RootState) => state.modal)
-    const renderContentModal = () => {
-        switch (modal.key) {
-            case EModalType.DEFAULT_MODAL:
-                return <DefaultModal />
-        }
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/stores/store";
+import { Modal } from "antd";
+import { EModalType, IModalType } from "@/types/modal.type";
+import { closeModal } from "@/stores/slices/modal.slice";
+
+const ModalComponent: React.FC = () => {
+  const dispatch = useDispatch();
+  const { modals } = useSelector((state: RootState) => state.modal);
+
+  const renderModalContent = (modalType: EModalType) => {
+    switch (modalType) {
+      case EModalType.DEFAULT_MODAL:
+        return <div>Default Modal Content</div>;
+      default:
+        return null;
     }
-    return (
-        <Modal open={modal.open} title={modal.title || ''} width={modal.width ?? 'auto'} className={modal.className ?? ''} >
-            {renderContentModal()}
+  };
+
+  const handleModalClose = (modalKey: EModalType) => {
+    dispatch(closeModal(modalKey));
+  };
+
+  return (
+    <>
+      {modals.map((modal: IModalType) => (
+        <Modal
+          key={modal.key}
+          open={modal.open}
+          width={modal.width}
+          className={modal.className}
+          title={modal.title}
+          footer={null}
+          onCancel={() => handleModalClose(modal.key)}
+        >
+          {renderModalContent(modal.key)}
         </Modal>
-    );
+      ))}
+    </>
+  );
 };
 
-export default ModalComponent
+export default ModalComponent;

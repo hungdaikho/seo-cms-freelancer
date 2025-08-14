@@ -16,7 +16,7 @@ const menu = [
 ];
 
 const HeaderSite = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<"login" | "signup">("login");
@@ -36,43 +36,6 @@ const HeaderSite = () => {
         </ul>
       </nav>
       <div className={styles.actions}>
-        {/* <Dropdown
-          menu={{
-            items: [
-              {
-                key: "en",
-                label: (
-                  <span onClick={() => i18n.changeLanguage("en")}>English</span>
-                ),
-              },
-              {
-                key: "ph",
-                label: (
-                  <span onClick={() => i18n.changeLanguage("ph")}>PH</span>
-                ),
-              },
-            ],
-          }}
-          placement="bottomRight"
-          trigger={["click"]}
-        >
-          <Button type="text" className={styles.langBtn}>
-            <Image src="/globe.svg" alt="Lang" width={20} height={20} />
-            <span
-              style={{
-                color: "#fff",
-                marginLeft: 4,
-                fontWeight: 500,
-                fontSize: 15,
-              }}
-            >
-              {i18n.language}
-            </span>
-            <DownOutlined
-              style={{ color: "#fff", fontSize: 10, marginLeft: 2 }}
-            />
-          </Button>
-        </Dropdown> */}
         <Button
           type="default"
           className={styles.loginBtn}
@@ -153,59 +116,6 @@ const HeaderSite = () => {
             >
               {t("signup")}
             </Button>
-            {/* <div style={{ marginTop: 16 }}>
-              <Dropdown
-                menu={{
-                  items: [
-                    {
-                      key: "en",
-                      label: (
-                        <span
-                          onClick={() => {
-                            i18n.changeLanguage("en");
-                            setMobileMenuOpen(false);
-                          }}
-                        >
-                          English
-                        </span>
-                      ),
-                    },
-                    {
-                      key: "ph",
-                      label: (
-                        <span
-                          onClick={() => {
-                            i18n.changeLanguage("ph");
-                            setMobileMenuOpen(false);
-                          }}
-                        >
-                          PH
-                        </span>
-                      ),
-                    },
-                  ],
-                }}
-                placement="bottomRight"
-                trigger={["click"]}
-              >
-                <Button type="text" className={styles.langBtn} block>
-                  <Image src="/globe.svg" alt="Lang" width={20} height={20} />
-                  <span
-                    style={{
-                      color: "#222",
-                      marginLeft: 4,
-                      fontWeight: 500,
-                      fontSize: 15,
-                    }}
-                  >
-                    {i18n.language}
-                  </span>
-                  <DownOutlined
-                    style={{ color: "#222", fontSize: 10, marginLeft: 2 }}
-                  />
-                </Button>
-              </Dropdown>
-            </div> */}
           </div>
         </div>
       )}

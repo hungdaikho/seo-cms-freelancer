@@ -1,19 +1,42 @@
-import { EModalType, IModalType } from "@/types/modal.type";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IModalType, EModalType } from '@/types/modal.type';
 
-const initialState: IModalType = {
-    key: EModalType.DEFAULT_MODAL,
-    open: false
+interface ModalState {
+    modals: IModalType[];
 }
+
+const initialState: ModalState = {
+    modals: []
+};
+
 const modalSlice = createSlice({
     name: 'modal',
     initialState,
     reducers: {
-        setModal: (state: IModalType, action: PayloadAction<IModalType>) => {
-            state = action.payload
-            return state
+        openModal: (state, action: PayloadAction<IModalType>) => {
+            const existingModal = state.modals.find(modal => modal.key === action.payload.key);
+            if (existingModal) {
+                existingModal.open = true;
+                existingModal.width = action.payload.width;
+                existingModal.className = action.payload.className;
+                existingModal.title = action.payload.title;
+            } else {
+                state.modals.push(action.payload);
+            }
+        },
+        closeModal: (state, action: PayloadAction<EModalType>) => {
+            const modal = state.modals.find(modal => modal.key === action.payload);
+            if (modal) {
+                modal.open = false;
+            }
+        },
+        closeAllModals: (state) => {
+            state.modals.forEach(modal => {
+                modal.open = false;
+            });
         }
     }
-})
-export default modalSlice.reducer
-export const { setModal } = modalSlice.actions
+});
+
+export const { openModal, closeModal, closeAllModals } = modalSlice.actions;
+export default modalSlice.reducer;

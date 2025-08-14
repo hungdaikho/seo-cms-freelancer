@@ -8,7 +8,6 @@ import {
   DownOutlined,
   FlagOutlined,
 } from "@ant-design/icons";
-import { useProject } from "@/stores/hooks/useProject";
 
 const { Search } = Input;
 const { Title, Text } = Typography;
@@ -16,15 +15,7 @@ const { Title, Text } = Typography;
 type Props = {};
 
 const Page = (props: Props) => {
-  const { currentProject, projects, setCurrentProject } = useProject();
   const [selectedCountry, setSelectedCountry] = useState("Nig");
-
-  // Auto-select first project if available and no current project
-  useEffect(() => {
-    if (!currentProject && projects.length > 0) {
-      setCurrentProject(projects[0]);
-    }
-  }, [projects, currentProject, setCurrentProject]);
 
   // Mock data for projects table
   const projectsData = [

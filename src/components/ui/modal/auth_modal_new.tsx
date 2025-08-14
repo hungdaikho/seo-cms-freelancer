@@ -7,7 +7,6 @@ import {
   EyeInvisibleOutlined,
   EyeTwoTone,
   GoogleOutlined,
-  FacebookOutlined,
   GlobalOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -19,7 +18,7 @@ import {
   clearError,
 } from "@/stores/slices/auth.slice";
 import { LoginRequest, RegisterRequest } from "@/types/api.type";
-import { seoService } from "@/services/seo.service";
+import { authService } from "@/services/auth.service";
 import styles from "./auth_modal.module.scss";
 
 interface AuthModalProps {
@@ -92,7 +91,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     if (provider === "Google") {
       try {
         setGoogleLoading(true);
-        seoService.initiateGoogleAuth();
+        authService.initiateGoogleAuth();
       } catch (error) {
         setGoogleLoading(false);
         message.error("Failed to initialize Google authentication");

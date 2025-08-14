@@ -1,0 +1,210 @@
+// Variables
+$primary-color: #4285f4;
+$primary-dark: #1a73e8;
+$white: #ffffff;
+$light-gray: #f8f9fa;
+
+// Mixins
+@mixin glass-effect($opacity: 0.15) {
+  background-color: rgba($white, $opacity);
+  backdrop-filter: blur(10px);
+}
+
+@mixin transition($property: all, $duration: 0.2s, $timing: ease) {
+  transition: $property $duration $timing;
+}
+
+@mixin gradient-background() {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+}
+
+// Modal styles
+.modal {
+  :global(.ant-modal-content) {
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  :global(.ant-modal-header) {
+    @include gradient-background();
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    padding: 24px 32px;
+  }
+
+  :global(.ant-modal-title) {
+    color: $white !important;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  :global(.ant-modal-close) {
+    color: $white;
+    font-size: 16px;
+
+    &:hover {
+      color: rgba($white, 0.8);
+    }
+  }
+
+  :global(.ant-modal-body) {
+    @include gradient-background();
+    color: $white;
+    padding: 32px;
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+// Steps container
+.stepsContainer {
+  margin-bottom: 32px;
+
+  :global(.ant-steps-item-title) {
+    color: rgba($white, 0.8) !important;
+  }
+
+  :global(.ant-steps-item-description) {
+    color: rgba($white, 0.6) !important;
+  }
+
+  :global(.ant-steps-item-process .ant-steps-item-title) {
+    color: $white !important;
+    font-weight: 600;
+  }
+
+  :global(.ant-steps-item-finish .ant-steps-item-icon) {
+    background-color: rgba($white, 0.2);
+    border-color: rgba($white, 0.4);
+  }
+
+  :global(.ant-steps-item-process .ant-steps-item-icon) {
+    background-color: $white;
+    border-color: $white;
+
+    :global(.ant-steps-icon) {
+      color: $primary-color;
+    }
+  }
+}
+
+// Form container
+.formContainer {
+  :global(.ant-form-item-label > label) {
+    color: $white !important;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  :global(.ant-form-item-extra) {
+    color: rgba($white, 0.7) !important;
+  }
+
+  // Input styles
+  :global(.ant-input) {
+    @include glass-effect();
+    border: 1px solid rgba($white, 0.3);
+    border-radius: 8px;
+    color: $white;
+
+    &::placeholder {
+      color: rgba($white, 0.6);
+    }
+
+    &:hover {
+      @include glass-effect(0.2);
+      border-color: rgba($white, 0.5);
+    }
+
+    &:focus,
+    &.ant-input-focused {
+      @include glass-effect(0.15);
+      border-color: rgba($white, 0.8) !important;
+      box-shadow: 0 0 0 2px rgba($white, 0.3) !important;
+    }
+  }
+
+  // Select styles
+  :global(.ant-select) {
+    :global(.ant-select-selector) {
+      @include glass-effect();
+      border: 1px solid rgba($white, 0.3) !important;
+      border-radius: 8px;
+    }
+
+    :global(.ant-select-selection-placeholder) {
+      color: rgba($white, 0.6);
+    }
+
+    :global(.ant-select-selection-item) {
+      color: $white;
+    }
+
+    &:hover {
+      :global(.ant-select-selector) {
+        @include glass-effect(0.2);
+        border-color: rgba($white, 0.5) !important;
+      }
+    }
+  }
+
+  :global(.ant-select-focused .ant-select-selector) {
+    @include glass-effect(0.15);
+    border-color: rgba($white, 0.8) !important;
+    box-shadow: 0 0 0 2px rgba($white, 0.3) !important;
+  }
+}
+
+// Content area
+.contentArea {
+  margin-bottom: 32px;
+  min-height: 200px;
+  padding: 20px 0;
+}
+
+// Footer area
+.footerArea {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 24px;
+  border-top: 1px solid rgba($white, 0.2);
+}
+
+// Button styles
+.secondaryButton {
+  margin-right: 8px;
+  @include glass-effect();
+  border: 1px solid rgba($white, 0.3);
+  color: $white;
+  border-radius: 8px;
+  font-weight: 500;
+  height: 40px;
+  padding: 0 24px;
+  @include transition();
+
+  &:hover {
+    @include glass-effect(0.25);
+    border-color: rgba($white, 0.5) !important;
+    color: $white !important;
+  }
+}
+
+.primaryButton {
+  background-color: $white;
+  color: $primary-color;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  height: 40px;
+  padding: 0 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  @include transition();
+
+  &:hover {
+    background-color: $light-gray !important;
+    color: $primary-color !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+}
