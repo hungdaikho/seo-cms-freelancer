@@ -361,7 +361,7 @@ const RankTrackingDashboard: React.FC<RankTrackingDashboardProps> = ({
                 <div style={{ textAlign: "center" }}>
                   <Text type="secondary">Keywords Up</Text>
                   <div style={{ fontSize: "24px", fontWeight: "bold" }}>
-                    {rankingStats.keywordsUp} ↗️
+                    {rankingStats?.keywordsUp} ↗️
                   </div>
                 </div>
               </Card>
@@ -371,7 +371,7 @@ const RankTrackingDashboard: React.FC<RankTrackingDashboardProps> = ({
                 <div style={{ textAlign: "center" }}>
                   <Text type="secondary">Keywords down</Text>
                   <div style={{ fontSize: "24px", fontWeight: "bold" }}>
-                    {rankingStats.keywordsDown} ↘️
+                    {rankingStats?.keywordsDown} ↘️
                   </div>
                 </div>
               </Card>

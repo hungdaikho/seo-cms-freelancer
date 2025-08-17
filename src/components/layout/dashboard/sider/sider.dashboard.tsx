@@ -18,6 +18,14 @@ const SiderDashBoard = () => {
     return pathname.startsWith("/competitive-research");
   };
 
+  const isKeywordResearchExpanded = () => {
+    return pathname.startsWith("/keyword-research");
+  };
+
+  const isBacklinkResearchExpanded = () => {
+    return pathname.startsWith("/backlink-research");
+  };
+
   return (
     <div className={styles.sider}>
       {/* Dashboard Section */}
@@ -97,6 +105,41 @@ const SiderDashBoard = () => {
         <span>Keyword Research</span>
       </div>
 
+      {/* Keyword Research Sub-submenu */}
+      {isKeywordResearchExpanded() && (
+        <>
+          <div
+            className={`${styles.menuItem} ${styles.subSubmenuItem} ${
+              pathname === "/keyword-research" ||
+              pathname === "/keyword-research/keyword-overview"
+                ? styles.active
+                : ""
+            }`}
+            onClick={() => router.push("/keyword-research")}
+          >
+            <span>Keyword Overview</span>
+          </div>
+
+          <div
+            className={`${styles.menuItem} ${styles.subSubmenuItem} ${
+              isActive("/keyword-research/keyword-ideas") ? styles.active : ""
+            }`}
+            onClick={() => router.push("/keyword-research/keyword-ideas")}
+          >
+            <span>Keyword Ideas</span>
+          </div>
+
+          <div
+            className={`${styles.menuItem} ${styles.subSubmenuItem} ${
+              isActive("/keyword-research/content-ideas") ? styles.active : ""
+            }`}
+            onClick={() => router.push("/keyword-research/content-ideas")}
+          >
+            <span>Content Ideas</span>
+          </div>
+        </>
+      )}
+
       <div
         className={`${styles.menuItem} ${styles.submenuItem} ${
           isActive("/backlink-research") ? styles.active : ""
@@ -105,7 +148,6 @@ const SiderDashBoard = () => {
       >
         <span>Backlink Research</span>
       </div>
-
       <div
         className={`${styles.menuItem} ${styles.submenuItem} ${
           isActive("/on-page-tech-audit") ? styles.active : ""

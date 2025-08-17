@@ -5,7 +5,7 @@ import AuthGuard from "@/components/layout/auth_guard";
 import "../globals.css";
 import { useTranslation } from "react-i18next";
 import { Content, Header } from "antd/es/layout/layout";
-import { Layout, ConfigProvider } from "antd";
+import { Layout, ConfigProvider, App } from "antd";
 import Sider from "antd/es/layout/Sider";
 import HeaderDashboard from "@/components/layout/dashboard/header/header.dashboard";
 import SiderDashBoard from "@/components/layout/dashboard/sider/sider.dashboard";
@@ -20,7 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { i18n } = useTranslation();
-  // Suppress Ant Design React 19 compatibility warnings
+
+  // Suppress Ant Design React 19 compatibility warnings immediately
+  if (typeof window !== "undefined") {
+    suppressAntdReact19Warning();
+  }
+
   useEffect(() => {
     suppressAntdReact19Warning();
   }, []);
@@ -38,40 +43,42 @@ export default function RootLayout({
       >
         <ReduxProvider>
           <ConfigProvider {...antdConfig}>
-            <AuthGuard requireAuth={true} redirectTo="/">
-              <Layout
-                style={{
-                  width: "100vw",
-                  height: "100vh",
-                  position: "relative",
-                }}
-              >
-                <Header
-                  style={{
-                    height: "50px",
-                    padding: "0px",
-                    margin: "0px",
-                    background: "transparent",
-                  }}
-                >
-                  <HeaderDashboard />
-                </Header>
+            <App>
+              <AuthGuard requireAuth={true} redirectTo="/">
                 <Layout
                   style={{
-                    width: "100%",
-                    height: "calc(100% - 50px)",
-                    overflow: "hidden",
+                    width: "100vw",
+                    height: "100vh",
+                    position: "relative",
                   }}
                 >
-                  <Sider width={320} style={{ background: "transparent" }}>
-                    <SiderDashBoard />
-                  </Sider>
-                  <Content style={{ maxHeight: "100%", overflow: "auto" }}>
-                    {children}
-                  </Content>
+                  <Header
+                    style={{
+                      height: "50px",
+                      padding: "0px",
+                      margin: "0px",
+                      background: "transparent",
+                    }}
+                  >
+                    <HeaderDashboard />
+                  </Header>
+                  <Layout
+                    style={{
+                      width: "100%",
+                      height: "calc(100% - 50px)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Sider width={320} style={{ background: "transparent" }}>
+                      <SiderDashBoard />
+                    </Sider>
+                    <Content style={{ maxHeight: "100%", overflow: "auto" }}>
+                      {children}
+                    </Content>
+                  </Layout>
                 </Layout>
-              </Layout>
-            </AuthGuard>
+              </AuthGuard>
+            </App>
           </ConfigProvider>
         </ReduxProvider>
       </body>

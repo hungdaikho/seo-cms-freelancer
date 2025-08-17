@@ -42,18 +42,185 @@
     }
   }
 
-  .venn-container {
+  .vennContainer {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 24px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    margin: 16px 0;
 
-    svg {
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    .vennDiagram {
+      position: relative;
+      
+      svg {
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+        max-width: 100%;
+        height: auto;
+        
+        circle {
+          transition: all 0.3s ease;
+          
+          &:hover {
+            filter: brightness(1.1);
+            stroke-width: 3;
+          }
+        }
+        
+        text {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          font-weight: 600;
+          text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+        
+        .domain-label {
+          font-size: 11px;
+          fill: #2c3e50;
+        }
+        
+        .overlap-number {
+          font-size: 14px;
+          font-weight: 700;
+          fill: #34495e;
+        }
+        
+        .unique-number {
+          font-size: 12px;
+          font-weight: 600;
+          fill: #7f8c8d;
+        }
+      }
+    }
+
+    .vennLegend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      @media (max-width: 768px) {
+        gap: 16px;
+        padding: 10px 16px;
+      }
+
+      .legendItem {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        .legendColor {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          border: 2px solid rgba(255, 255, 255, 0.8);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          flex-shrink: 0;
+        }
+        
+        .legendText {
+          font-size: 13px;
+          font-weight: 500;
+          color: #2c3e50;
+          max-width: 120px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+
+          @media (max-width: 768px) {
+            max-width: 80px;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .vennStats {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+      @media (max-width: 768px) {
+        padding: 12px;
+      }
+
+      .statItem {
+        text-align: center;
+        flex: 1;
+        
+        .statNumber {
+          display: block;
+          font-size: 18px;
+          font-weight: 700;
+          color: #2c3e50;
+          margin-bottom: 4px;
+
+          @media (max-width: 768px) {
+            font-size: 16px;
+          }
+        }
+        
+        .statLabel {
+          font-size: 11px;
+          color: #7f8c8d;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+
+          @media (max-width: 768px) {
+            font-size: 10px;
+          }
+        }
+      }
+    }
+
+    // Animation for when data loads
+    &.loaded {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    // Responsive adjustments
+    @media (max-width: 768px) {
+      padding: 16px;
+      
+      .vennDiagram svg {
+        width: 320px;
+        height: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
+      
+      .vennDiagram svg {
+        width: 280px;
+        height: 180px;
+      }
     }
   }
 
-  .opportunity-item {
+  .opportunityItem {
     padding: 8px 0;
     border-bottom: 1px solid #f0f0f0;
 
@@ -62,7 +229,7 @@
     }
   }
 
-  .filter-section {
+  .filterSection {
     background: white;
     padding: 16px;
     border-radius: 8px;
@@ -70,7 +237,7 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
-  .stats-badge {
+  .statsBadge {
     .ant-tag {
       padding: 4px 12px;
       border-radius: 4px;

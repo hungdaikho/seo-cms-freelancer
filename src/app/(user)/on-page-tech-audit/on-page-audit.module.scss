@@ -1,0 +1,812 @@
+.onPageAudit {
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding: 20px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    .headerLeft {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .headerCenter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+    }
+
+    .headerRight {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      justify-content: flex-end;
+    }
+  }
+
+  .reportCard {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: none;
+
+    :global(.ant-card-body) {
+      padding: 40px;
+    }
+
+    .reportInfo {
+      .domainTitle {
+        color: white !important;
+        font-size: 36px;
+        font-weight: 700;
+        margin: 16px 0 !important;
+      }
+
+      .reportDescription {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        line-height: 1.6;
+        margin: 0;
+      }
+    }
+
+    .scoreSection {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .mainScore {
+        position: relative;
+
+        .scoreCircle {
+          position: relative;
+          width: 120px;
+          height: 120px;
+
+          .scoreNumber {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+
+  .auditScores {
+    margin-bottom: 24px;
+
+    .auditCard {
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border: none;
+
+      :global(.ant-card-body) {
+        padding: 20px 12px;
+      }
+
+      .auditTitle {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 12px;
+        line-height: 1.4;
+      }
+
+      .auditScore {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .scoreText {
+          position: absolute;
+          font-size: 18px;
+          font-weight: 700;
+          color: #262626;
+        }
+      }
+    }
+  }
+
+  .sectionCard {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: none;
+    margin-bottom: 20px;
+
+    :global(.ant-card-head) {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 0 24px;
+
+      :global(.ant-card-head-title) {
+        font-size: 18px;
+        font-weight: 600;
+        color: #262626;
+        padding: 20px 0;
+      }
+    }
+
+    :global(.ant-card-body) {
+      padding: 24px;
+    }
+  }
+
+  .seoIssues {
+    .issueItem {
+      margin-bottom: 32px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .issueHeader {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 16px;
+
+        .issueIcon {
+          color: #faad14;
+          font-size: 20px;
+          margin-top: 4px;
+        }
+
+        .issueContent {
+          flex: 1;
+
+          :global(.ant-typography) {
+            margin-bottom: 8px !important;
+          }
+
+          h4 {
+            font-size: 18px;
+            color: #262626;
+          }
+        }
+      }
+
+      .previewSection {
+        margin-left: 36px;
+        padding: 20px;
+        background: #fafafa;
+        border-radius: 8px;
+
+        .devicePreview {
+          .deviceHeader {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 12px;
+          }
+
+          .previewCard {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+
+            .previewTitle {
+              display: block;
+              color: #1890ff;
+              font-size: 16px;
+              margin-bottom: 8px;
+            }
+
+            .previewDesc {
+              color: #666;
+              font-size: 14px;
+              line-height: 1.5;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .headingStructure {
+    .headingItem {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+
+      .headingTag {
+        min-width: 60px;
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #666;
+        background: #f5f5f5;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+
+      .headingBar {
+        flex: 1;
+        height: 8px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        overflow: hidden;
+
+        .headingFill {
+          height: 100%;
+          border-radius: 4px;
+          transition: width 0.3s ease;
+        }
+      }
+    }
+  }
+
+  .inPageLinks {
+    .domainLink {
+      color: #1890ff;
+      font-weight: 500;
+      margin: 8px 0 16px 0;
+      display: block;
+    }
+
+    .linkTypes {
+      margin: 16px 0;
+
+      .linkType {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+
+        .linkColor {
+          width: 16px;
+          height: 16px;
+          border-radius: 2px;
+        }
+      }
+    }
+
+    .pieChartContainer {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  .linksTable {
+    margin-bottom: 16px;
+
+    :global(.ant-table-thead > tr > th) {
+      background: #fafafa;
+      font-weight: 600;
+      font-size: 14px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    :global(.ant-table-tbody > tr > td) {
+      font-size: 13px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .linkText {
+      color: #1890ff;
+      font-size: 13px;
+    }
+  }
+
+  .showAllBtn {
+    color: #1890ff;
+    padding: 0;
+    font-size: 14px;
+  }
+
+  .ratioText {
+    font-size: 24px;
+    color: #262626;
+  }
+
+  .indexingSection {
+    .checkItem {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f5f5f5;
+
+      &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .checkIcon {
+        color: #52c41a;
+        font-size: 16px;
+        margin-top: 2px;
+      }
+
+      .checkContent {
+        flex: 1;
+
+        .checkDescription {
+          display: block;
+          color: #666;
+          font-size: 14px;
+          margin-top: 4px;
+        }
+      }
+    }
+
+    .urlResolveSection {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #f0f0f0;
+
+      .urlTable {
+        :global(.ant-table-thead > tr > th) {
+          background: #f8f9fa;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .performanceSection {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+
+    .performanceCard {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border: none;
+
+      .priorityTag {
+        margin-left: 8px;
+      }
+
+      .urlList {
+        margin-top: 12px;
+
+        .urlLink {
+          color: #1890ff;
+          font-size: 13px;
+        }
+      }
+    }
+  }
+
+  .analyticsSection {
+    .analyticsItem {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #f5f5f5;
+
+      &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .analyticsIcon {
+        color: #1890ff;
+        font-size: 20px;
+        margin-top: 2px;
+      }
+
+      .analyticsContent {
+        flex: 1;
+
+        .analyticsDescription {
+          display: block;
+          color: #666;
+          font-size: 14px;
+          margin-top: 4px;
+        }
+      }
+    }
+  }
+
+  .structuredDataSection {
+    .structuredDataItem {
+      margin-bottom: 24px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .dataTable {
+        margin-top: 16px;
+        margin-left: 28px;
+      }
+    }
+  }
+
+  .pageSpeedSection {
+    margin-bottom: 40px;
+
+    .pageSpeedHeader {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+
+      h4 {
+        margin: 0 !important;
+      }
+    }
+
+    .speedDescription {
+      .speedIssues {
+        margin-top: 20px;
+
+        h5 {
+          margin-bottom: 16px !important;
+        }
+
+        .speedIssue {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 12px;
+          padding: 8px 0;
+
+          .severityBar {
+            width: 4px;
+            height: 24px;
+            border-radius: 2px;
+          }
+
+          .issueTitle {
+            flex: 1;
+            color: #1890ff;
+            font-size: 14px;
+          }
+
+          .issueCount {
+            color: #666;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    .speedScore {
+      text-align: center;
+
+      .speedChart {
+        position: relative;
+        margin: 20px 0;
+        display: flex;
+        justify-content: center;
+
+        .chartScore {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 24px;
+          font-weight: 700;
+          color: #262626;
+        }
+      }
+    }
+
+    .siteSpeedSection {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #f0f0f0;
+
+      .metricsRow {
+        margin-top: 24px;
+      }
+
+      .metricCard {
+        text-align: center;
+        padding: 16px;
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+
+        h5 {
+          margin-bottom: 12px !important;
+        }
+
+        .metricBar {
+          display: flex;
+          height: 8px;
+          border-radius: 4px;
+          overflow: hidden;
+          margin: 12px 0 8px 0;
+
+          .barSegment {
+            flex: 1;
+            margin-right: 1px;
+
+            &:last-child {
+              margin-right: 0;
+            }
+          }
+        }
+
+        .barLabels {
+          display: flex;
+          justify-content: space-between;
+          font-size: 12px;
+          color: #666;
+          margin-bottom: 8px;
+        }
+      }
+    }
+  }
+
+  .additionalChecks {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #f0f0f0;
+
+    .checkItem {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+
+      .checkContent {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+    }
+  }
+
+  .socialMediaSection {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #f0f0f0;
+
+    .socialItem {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-top: 16px;
+
+      .socialContent {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+    }
+  }
+
+  .serverSecuritySection {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #f0f0f0;
+
+    .sectionHeader {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+
+      h4 {
+        margin: 0 !important;
+      }
+    }
+
+    .securityChecks {
+      .securityItem {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f5f5f5;
+
+        &:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+
+        .securityContent {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          .securityAlert {
+            margin-top: 8px;
+            
+            :global(.ant-alert-message) {
+              color: #ff4d4f;
+              font-size: 14px;
+            }
+          }
+
+          .certificateDetails {
+            margin-top: 8px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 13px;
+            
+            span {
+              display: block;
+              margin-bottom: 4px;
+              
+              &:first-child {
+                font-weight: 600;
+                margin-bottom: 8px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .onPageAudit {
+    padding: 12px;
+
+    .header {
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .reportCard {
+      :global(.ant-card-body) {
+        padding: 24px 20px;
+      }
+
+      .reportInfo {
+        .domainTitle {
+          font-size: 28px !important;
+        }
+      }
+
+      .scoreSection {
+        margin-top: 20px;
+      }
+    }
+
+    .seoIssues {
+      .issueItem {
+        .previewSection {
+          margin-left: 0;
+        }
+      }
+    }
+
+    .pageSpeedSection {
+      .speedDescription {
+        margin-bottom: 24px;
+      }
+
+      .siteSpeedSection {
+        .metricsRow {
+          .metricCard {
+            margin-bottom: 16px;
+          }
+        }
+      }
+    }
+  }
+
+  // Issue Icons
+  .issueIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  // Performance Metrics
+  .performanceMetrics {
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .performanceScore {
+    text-align: center;
+    
+    .scoreDisplay {
+      margin-top: 16px;
+    }
+  }
+
+  // Audit Statistics
+  .statItem {
+    text-align: center;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    
+    .statNumber {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1890ff;
+      margin-bottom: 4px;
+    }
+    
+    .statLabel {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.65);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .onPageAudit {
+    .auditScores {
+      .auditCard {
+        .auditTitle {
+          font-size: 11px;
+        }
+
+        .auditScore {
+          .scoreText {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+
+    .sectionCard {
+      :global(.ant-card-body) {
+        padding: 16px;
+      }
+    }
+
+    .linksTable {
+      :global(.ant-table-tbody > tr > td) {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+    }
+  }
+}

@@ -1,292 +1,287 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button, Select, Space, Typography, Input, Table } from "antd";
-import {
-  PlusOutlined,
-  ShareAltOutlined,
-  DownOutlined,
-  FlagOutlined,
-} from "@ant-design/icons";
+import { message, Form, Modal, App } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '@/stores/store';
+import { 
+  fetchProjectsWithStats, 
+  fetchProjects,
+  createProject,
+  deleteProject,
+  updateProject,
+  fetchProjectDetails,
+  setFilters,
+  clearErrors,
+  selectProjectsWithStats,
+  selectProjectsLoading,
+  selectProjectsError,
+  selectProjectsFilters,
+  selectProjectsPagination,
+} from '@/stores/slices/projects.slice';
+import { CreateProjectRequest, UpdateProjectRequest } from '@/services/project.service';
 
-const { Search } = Input;
-const { Title, Text } = Typography;
+// Components
+import {
+  SearchHeader,
+  HeroSection,
+  ProjectTabs,
+  StatsCards,
+  ProjectsTable,
+  ProjectModals
+} from './components';
+
+// Custom Hook
+import { useProjectSearch } from './hooks';
 
 type Props = {};
 
 const Page = (props: Props) => {
-  const [selectedCountry, setSelectedCountry] = useState("Nig");
+  const dispatch = useDispatch<AppDispatch>();
+  const projectsWithStats = useSelector(selectProjectsWithStats);
+  const loading = useSelector(selectProjectsLoading);
+  const error = useSelector(selectProjectsError);
+  const filters = useSelector(selectProjectsFilters);
+  const pagination = useSelector(selectProjectsPagination);
 
-  // Mock data for projects table
-  const projectsData = [
-    {
-      key: "1",
-      project: "Gooz.com",
-      domain: "gooz.online",
-      status: "Set Up",
-      siteAudit: "Set Up",
-      positionTracking: "Set Up",
-      onPageSEOChecker: "Set Up",
-      socialMediaTools: "Set Up",
-      brandMonitoring: "Set Up",
-      backlinkAudit: "Set Up",
-      buildingLinks: "Set Up",
-      ppcKeyword: "Set Up",
-      organicTraffic: "Set Up",
-      socialMedia: "Set Up",
-    },
-    {
-      key: "2",
-      project: "Gooz.com",
-      domain: "gooz.online",
-      status: "Set Up",
-      siteAudit: "Set Up",
-      positionTracking: "Set Up",
-      onPageSEOChecker: "Set Up",
-      socialMediaTools: "Set Up",
-      brandMonitoring: "Set Up",
-      backlinkAudit: "Set Up",
-      buildingLinks: "Set Up",
-      ppcKeyword: "Set Up",
-      organicTraffic: "Set Up",
-      socialMedia: "Set Up",
-    },
-  ];
+  // Use custom search hook
+  const {
+    searchValue,
+    setSearchValue,
+    debouncedSearchValue,
+    selectedCountry,
+    setSelectedCountry,
+    filteredProjects,
+    clearSearch,
+    isFiltered
+  } = useProjectSearch(projectsWithStats);
 
-  const columns = [
-    {
-      title: "Project",
-      dataIndex: "project",
-      key: "project",
-      width: 120,
-      render: (text: string, record: any) => (
+  // Modal states
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  
+  // Forms
+  const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
+  const [modal, contextHolder] = Modal.useModal();
+
+  // Load projects on component mount
+  useEffect(() => {
+    dispatch(fetchProjectsWithStats());
+  }, [dispatch]);
+
+  // Handle errors and success messages
+  useEffect(() => {
+    if (error.fetchProjectsWithStats) {
+      message.error(error.fetchProjectsWithStats);
+    }
+    if (error.createProject) {
+      message.error(error.createProject);
+    }
+    if (error.updateProject) {
+      message.error(error.updateProject);
+    }
+    if (error.deleteProject) {
+      message.error(error.deleteProject);
+    }
+    if (error.fetchProjectDetails) {
+      message.error(error.fetchProjectDetails);
+    }
+  }, [error]);
+
+  // Handle search
+  const handleSearch = (value: string) => {
+    setSearchValue(value);
+  };
+
+  // Handle advanced search (when clicking search button)
+  const handleAdvancedSearch = () => {
+    if (debouncedSearchValue) {
+      dispatch(setFilters({ 
+        search: debouncedSearchValue
+      }));
+      
+      dispatch(fetchProjects({ 
+        search: debouncedSearchValue, 
+        page: 1, 
+        limit: pagination.limit,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder 
+      }));
+    }
+  };
+
+  // Handle country change
+  const handleCountryChange = (value: string) => {
+    setSelectedCountry(value);
+  };
+
+  // Clear search and filters
+  const handleClearSearch = () => {
+    clearSearch();
+    dispatch(setFilters({ search: "" }));
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    dispatch(clearErrors());
+    dispatch(fetchProjectsWithStats());
+  };
+
+  // Handle create project
+  const handleCreateProject = async (values: any) => {
+    const projectData: CreateProjectRequest = {
+      name: values.name,
+      domain: values.domain,
+      settings: {
+        country: values.country || selectedCountry,
+        language: values.language || 'en',
+        trackingEnabled: true
+      }
+    };
+
+    try {
+      await dispatch(createProject(projectData)).unwrap();
+      message.success('Project created successfully!');
+      setIsCreateModalVisible(false);
+      form.resetFields();
+      dispatch(fetchProjectsWithStats());
+    } catch (error) {
+      // Error is handled in useEffect
+    }
+  };
+
+  // Handle view project
+  const handleViewProject = async (project: any) => {
+    setSelectedProject(project);
+    setIsViewModalVisible(true);
+    try {
+      await dispatch(fetchProjectDetails(project.id)).unwrap();
+    } catch (error) {
+      console.error('Failed to fetch project details:', error);
+    }
+  };
+
+  // Handle edit project
+  const handleEditProject = (project: any) => {
+    setSelectedProject(project);
+    editForm.setFieldsValue({
+      name: project.name,
+      domain: project.domain,
+      country: project.settings?.country || 'US',
+      language: project.settings?.language || 'en',
+      trackingEnabled: project.settings?.trackingEnabled || false,
+    });
+    setIsEditModalVisible(true);
+  };
+
+  // Handle update project
+  const handleUpdateProject = async (values: any) => {
+    if (!selectedProject) return;
+
+    const updateData: UpdateProjectRequest = {
+      name: values.name,
+      settings: {
+        country: values.country,
+        language: values.language,
+        trackingEnabled: values.trackingEnabled,
+      }
+    };
+
+    try {
+      await dispatch(updateProject({ 
+        id: selectedProject.id, 
+        data: updateData 
+      })).unwrap();
+      message.success('Project updated successfully!');
+      setIsEditModalVisible(false);
+      editForm.resetFields();
+      setSelectedProject(null);
+      dispatch(fetchProjectsWithStats());
+    } catch (error) {
+      // Error is handled in useEffect
+    }
+  };
+
+  // Handle delete project
+  const handleDeleteProject = (projectId: string, projectName: string) => {
+    console.log('Delete project clicked:', { projectId, projectName });
+    
+    modal.confirm({
+      title: 'Delete Project',
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
+      content: (
         <div>
-          <div style={{ fontWeight: "bold", color: "#1890ff" }}>{text}</div>
-          <div style={{ fontSize: "12px", color: "#999" }}>{record.domain}</div>
+          <p>Are you sure you want to delete "<strong>{projectName}</strong>"?</p>
+          <p style={{ color: '#ff4d4f', marginBottom: 0 }}>
+            This action cannot be undone and will permanently remove all project data including keywords, audits, and statistics.
+          </p>
         </div>
       ),
-    },
-    {
-      title: "Site Audit & Keyword Vulnerability",
-      dataIndex: "siteAudit",
-      key: "siteAudit",
-      width: 150,
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-    {
-      title: "Position Tracking",
-      dataIndex: "positionTracking",
-      key: "positionTracking",
-      width: 120,
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-    {
-      title: "On-page SEO Checker",
-      dataIndex: "onPageSEOChecker",
-      key: "onPageSEOChecker",
-      width: 130,
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-    {
-      title: "Social Media Tools",
-      dataIndex: "socialMediaTools",
-      key: "socialMediaTools",
-      width: 120,
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-    {
-      title: "Brand Monitoring",
-      dataIndex: "brandMonitoring",
-      key: "brandMonitoring",
-      width: 120,
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-    {
-      title: "Backlink Audit & Link Building Tools",
-      dataIndex: "backlinkAudit",
-      key: "backlinkAudit",
-      width: 180,
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-    {
-      title: "PPC Keyword & Advertising",
-      dataIndex: "ppcKeyword",
-      key: "ppcKeyword",
-      width: 150,
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-    {
-      title: "Organic Traffic & Organic Sessions",
-      dataIndex: "organicTraffic",
-      key: "organicTraffic",
-      width: 180,
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-    {
-      title: "Social Media Content Management",
-      dataIndex: "socialMedia",
-      key: "socialMedia",
-      width: 180,
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-  ];
+      okText: 'Yes, Delete Project',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      okButtonProps: {
+        loading: loading.deleteProject,
+      },
+      onOk: async () => {
+        try {
+          console.log('Deleting project:', projectId);
+          await dispatch(deleteProject(projectId)).unwrap();
+          message.success(`Project "${projectName}" deleted successfully!`);
+          dispatch(fetchProjectsWithStats());
+        } catch (error) {
+          console.error('Delete failed:', error);
+        }
+      },
+    });
+  };
 
-  // Render header with search and country selector
-  const renderHeader = () => (
-    <div
-      style={{
-        padding: "16px 24px",
-        background: "white",
-        borderBottom: "1px solid #f0f0f0",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <Search
-          placeholder="Enter URL, domain or keyword"
-          style={{ width: 400 }}
-          size="large"
-        />
-        <Select
-          value={selectedCountry}
-          onChange={setSelectedCountry}
-          style={{ width: 120 }}
-          size="large"
-          suffixIcon={<DownOutlined />}
-        >
-          <Select.Option value="Nig">
-            <Space>
-              <FlagOutlined style={{ color: "#52c41a" }} />
-              Nig
-            </Space>
-          </Select.Option>
-          <Select.Option value="USA">
-            <Space>
-              <FlagOutlined style={{ color: "#1890ff" }} />
-              USA
-            </Space>
-          </Select.Option>
-          <Select.Option value="UK">
-            <Space>
-              <FlagOutlined style={{ color: "#f5222d" }} />
-              UK
-            </Space>
-          </Select.Option>
-        </Select>
-      </div>
-      <Button type="primary" size="large">
-        Search
-      </Button>
-    </div>
-  );
+  // Get current projects for display
+  const currentProjects = isFiltered ? filteredProjects : projectsWithStats;
 
-  // Render hero section
-  const renderHeroSection = () => (
-    <div
-      style={{
-        height: "200px",
-        background:
-          "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {/* Diamond pattern overlay */}
-      <div
-        style={{
-          position: "absolute",
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: "50%",
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='white' fill-opacity='0.1'%3E%3Cpath d='M20 20L0 0h40L20 20zM20 20L40 40H0L20 20z'/%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundSize: "40px 40px",
-        }}
-      />
-    </div>
-  );
+  // Modal handlers
+  const handleCloseCreateModal = () => {
+    setIsCreateModalVisible(false);
+    form.resetFields();
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalVisible(false);
+    setSelectedProject(null);
+  };
+
+  const handleEditFromView = () => {
+    setIsViewModalVisible(false);
+    handleEditProject(selectedProject);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalVisible(false);
+    setSelectedProject(null);
+    editForm.resetFields();
+  };
 
   // Render projects section
   const renderProjectsSection = () => (
     <div style={{ padding: "24px" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "24px",
-        }}
-      >
-        <div>
-          <Title level={3} style={{ margin: 0, color: "#1890ff" }}>
-            My Projects
-          </Title>
-          <div style={{ display: "flex", gap: "24px", marginTop: "16px" }}>
-            <Text
-              style={{
-                color: "#f5222d",
-                fontWeight: "bold",
-                borderBottom: "2px solid #f5222d",
-                paddingBottom: "8px",
-              }}
-            >
-              All (2)
-            </Text>
-            <Text style={{ color: "#999" }}>My Own (3)</Text>
-            <Text style={{ color: "#999" }}>Shared (0)</Text>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: "12px" }}>
-          <Button icon={<ShareAltOutlined />} style={{ borderRadius: "6px" }}>
-            Share
-          </Button>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            style={{ borderRadius: "6px" }}
-          >
-            Create Project
-          </Button>
-        </div>
-      </div>
+      <ProjectTabs
+        projects={currentProjects}
+        totalProjects={projectsWithStats.length}
+        isFiltered={isFiltered}
+        loading={loading.fetchProjectsWithStats}
+        onRefresh={handleRefresh}
+        onCreateProject={() => setIsCreateModalVisible(true)}
+        createLoading={loading.createProject}
+      />
+
+      <StatsCards
+        projects={currentProjects}
+        isFiltered={isFiltered}
+      />
 
       <div
         style={{
@@ -306,41 +301,78 @@ const Page = (props: Props) => {
             alignItems: "center",
           }}
         >
-          <Text strong>Auto Project Set up Report</Text>
-          <div style={{ display: "flex", gap: "16px" }}>
-            <Button size="small">Search</Button>
-          </div>
+          <span style={{ fontWeight: "bold" }}>Projects Overview</span>
         </div>
 
-        <Table
-          dataSource={projectsData}
-          columns={columns}
-          pagination={false}
-          size="middle"
-          scroll={{ x: 1500 }}
+        <ProjectsTable
+          projects={currentProjects}
+          loading={loading.fetchProjectsWithStats}
+          onViewProject={handleViewProject}
+          onEditProject={handleEditProject}
+          onDeleteProject={handleDeleteProject}
+          deleteLoading={loading.deleteProject}
         />
       </div>
     </div>
   );
 
-  // Main dashboard content when projects tab is active
+  // Main dashboard content
   const renderMainDashboard = () => (
     <div style={{ background: "#f5f5f5", minHeight: "100vh" }}>
-      {renderHeader()}
-      {renderHeroSection()}
+      <SearchHeader
+        searchValue={searchValue}
+        selectedCountry={selectedCountry}
+        filteredCount={currentProjects.length}
+        totalCount={projectsWithStats.length}
+        loading={loading.fetchProjects}
+        onSearch={handleSearch}
+        onCountryChange={handleCountryChange}
+        onAdvancedSearch={handleAdvancedSearch}
+        onClearSearch={handleClearSearch}
+        onRefresh={handleRefresh}
+      />
+      <HeroSection />
       {renderProjectsSection()}
     </div>
   );
+
   return (
-    <div
-      style={{
-        padding: "0",
-        minHeight: "100vh",
-        background: "#f5f5f5",
-      }}
-    >
-      {renderMainDashboard()}
-    </div>
+    <App>
+      <div
+        style={{
+          padding: "0",
+          minHeight: "100vh",
+          background: "#f5f5f5",
+        }}
+      >
+        {contextHolder}
+        {renderMainDashboard()}
+        
+        <ProjectModals
+          // Create Modal
+          isCreateModalVisible={isCreateModalVisible}
+          createForm={form}
+          createLoading={loading.createProject}
+          selectedCountry={selectedCountry}
+          onCreateProject={handleCreateProject}
+          onCloseCreateModal={handleCloseCreateModal}
+          
+          // View Modal
+          isViewModalVisible={isViewModalVisible}
+          selectedProject={selectedProject}
+          viewLoading={loading.fetchProjectDetails}
+          onCloseViewModal={handleCloseViewModal}
+          onEditFromView={handleEditFromView}
+          
+          // Edit Modal
+          isEditModalVisible={isEditModalVisible}
+          editForm={editForm}
+          updateLoading={loading.updateProject}
+          onUpdateProject={handleUpdateProject}
+          onCloseEditModal={handleCloseEditModal}
+        />
+      </div>
+    </App>
   );
 };
 

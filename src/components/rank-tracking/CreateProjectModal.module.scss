@@ -101,58 +101,117 @@ $light-gray: #f8f9fa;
     color: rgba($white, 0.7) !important;
   }
 
+  // Error message styles
+  :global(.ant-form-item-explain-error) {
+    color: #ff6b6b !important;
+    background-color: rgba(255, 107, 107, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+  }
+
+  // Success state
+  :global(.ant-form-item-has-success .ant-input) {
+    border-color: rgba(34, 197, 94, 0.8) !important;
+  }
+
+  // Error state
+  :global(.ant-form-item-has-error .ant-input) {
+    border-color: rgba(239, 68, 68, 0.8) !important;
+    background-color: rgba(239, 68, 68, 0.1) !important;
+  }
+
+  :global(.ant-form-item-has-error .ant-select-selector) {
+    border-color: rgba(239, 68, 68, 0.8) !important;
+    background-color: rgba(239, 68, 68, 0.1) !important;
+  }
+
   // Input styles
   :global(.ant-input) {
-    @include glass-effect();
-    border: 1px solid rgba($white, 0.3);
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     border-radius: 8px;
-    color: $white;
+    color: #ffffff !important;
+    backdrop-filter: blur(10px);
 
     &::placeholder {
-      color: rgba($white, 0.6);
+      color: rgba(255, 255, 255, 0.6) !important;
     }
 
     &:hover {
-      @include glass-effect(0.2);
-      border-color: rgba($white, 0.5);
+      background-color: rgba(255, 255, 255, 0.2) !important;
+      border-color: rgba(255, 255, 255, 0.5) !important;
     }
 
     &:focus,
     &.ant-input-focused {
-      @include glass-effect(0.15);
-      border-color: rgba($white, 0.8) !important;
-      box-shadow: 0 0 0 2px rgba($white, 0.3) !important;
+      background-color: rgba(255, 255, 255, 0.15) !important;
+      border-color: rgba(255, 255, 255, 0.8) !important;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3) !important;
+      color: #ffffff !important;
     }
+  }
+
+  // TextArea specific styles
+  :global(.ant-input.ant-input) {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
   }
 
   // Select styles
   :global(.ant-select) {
     :global(.ant-select-selector) {
-      @include glass-effect();
-      border: 1px solid rgba($white, 0.3) !important;
+      background-color: rgba(255, 255, 255, 0.15) !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
       border-radius: 8px;
+      backdrop-filter: blur(10px);
     }
 
     :global(.ant-select-selection-placeholder) {
-      color: rgba($white, 0.6);
+      color: rgba(255, 255, 255, 0.6) !important;
     }
 
     :global(.ant-select-selection-item) {
-      color: $white;
+      color: #ffffff !important;
+    }
+
+    :global(.ant-select-selection-search-input) {
+      color: #ffffff !important;
     }
 
     &:hover {
       :global(.ant-select-selector) {
-        @include glass-effect(0.2);
-        border-color: rgba($white, 0.5) !important;
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
       }
     }
   }
 
   :global(.ant-select-focused .ant-select-selector) {
-    @include glass-effect(0.15);
-    border-color: rgba($white, 0.8) !important;
-    box-shadow: 0 0 0 2px rgba($white, 0.3) !important;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3) !important;
+  }
+
+  // Dropdown options styles
+  :global(.ant-select-dropdown) {
+    background-color: rgba(59, 130, 246, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+
+    :global(.ant-select-item) {
+      color: #ffffff !important;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+      }
+
+      &.ant-select-item-option-selected {
+        background-color: rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important;
+      }
+    }
   }
 }
 

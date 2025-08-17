@@ -1,0 +1,553 @@
+// Variables
+$primary-color: #004AAC;
+$secondary-color: #FF914D;
+$success-color: #52c41a;
+$warning-color: #faad14;
+$error-color: #ff4d4f;
+$background-color: #f8f9ff;
+$white: #ffffff;
+$text-primary: #13124D;
+$text-secondary: rgba(19, 18, 77, 0.65);
+$border-color: rgba(0, 74, 172, 0.15);
+$shadow: 0 4px 12px rgba(0, 74, 172, 0.08);
+
+// Mixins
+@mixin card-style {
+  background: $white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: $shadow;
+  border: 1px solid $border-color;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Container
+.container {
+  padding: 24px;
+  background-color: $background-color;
+  min-height: 100vh;
+}
+
+// Header section
+.header {
+  @include card-style;
+  margin-bottom: 24px;
+
+  .title {
+    font-size: 24px;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 8px 0;
+  }
+
+  .description {
+    font-size: 14px;
+    color: $text-secondary;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .searchSection {
+    @include flex-between;
+    gap: 16px;
+
+    .searchInput {
+      flex: 1;
+      max-width: 400px;
+
+      :global(.ant-input-affix-wrapper) {
+        height: 40px;
+        border-radius: 8px;
+        border: 1px solid $border-color;
+        box-shadow: none;
+        
+        &:hover {
+          border-color: $secondary-color;
+        }
+
+        &:focus,
+        &.ant-input-affix-wrapper-focused {
+          border-color: $primary-color;
+          box-shadow: 0 0 0 2px rgba(0, 74, 172, 0.1);
+        }
+      }
+
+      :global(.ant-input) {
+        border: none;
+        box-shadow: none;
+        
+        &:focus {
+          border: none;
+          box-shadow: none;
+        }
+      }
+    }
+
+    .controls {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+
+      .countrySelect {
+        :global(.ant-select) {
+          min-width: 140px;
+        }
+
+        :global(.ant-select-selector) {
+          height: 40px;
+          border-radius: 8px;
+          border: 1px solid $border-color;
+          
+          &:hover {
+            border-color: $secondary-color;
+          }
+        }
+
+        :global(.ant-select-focused .ant-select-selector) {
+          border-color: $primary-color !important;
+          box-shadow: 0 0 0 2px rgba(0, 74, 172, 0.1) !important;
+        }
+      }
+
+      .searchButton,
+      .refreshButton {
+        :global(.ant-btn) {
+          height: 40px;
+          padding: 0 24px;
+          background-color: $primary-color;
+          border-color: $primary-color;
+          border-radius: 8px;
+          font-weight: 500;
+
+          &:hover {
+            background-color: darken($primary-color, 10%);
+            border-color: darken($primary-color, 10%);
+          }
+        }
+      }
+
+      .refreshButton {
+        :global(.ant-btn) {
+          background-color: $white;
+          color: $primary-color;
+          border-color: $primary-color;
+
+          &:hover {
+            background-color: $primary-color;
+            color: $white;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Error message
+.errorMessage {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: $error-color;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+// Keyword ideas section
+.keywordIdeas {
+  @include card-style;
+
+  .sectionHeader {
+    @include flex-between;
+    margin-bottom: 20px;
+
+    .sectionTitle {
+      font-size: 20px;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0;
+    }
+
+    .exportButton {
+      :global(.ant-btn) {
+        color: $primary-color;
+        border-color: $primary-color;
+        border-radius: 6px;
+        font-weight: 500;
+        height: 36px;
+        padding: 0 16px;
+
+        &:hover {
+          background-color: $primary-color;
+          color: $white;
+        }
+      }
+    }
+  }
+
+  .tabCount {
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .tabs {
+    margin-bottom: 20px;
+
+    :global(.ant-tabs-tab) {
+      padding: 8px 16px;
+      color: $text-secondary;
+      font-weight: 500;
+      
+      &.ant-tabs-tab-active {
+        color: $primary-color;
+        font-weight: 600;
+      }
+    }
+
+    :global(.ant-tabs-ink-bar) {
+      background-color: $primary-color;
+    }
+
+    :global(.ant-tabs-tab-btn) {
+      font-size: 14px;
+    }
+  }
+
+  // Summary stats
+  .summaryStats {
+    display: flex;
+    gap: 24px;
+    padding: 16px;
+    background-color: $background-color;
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+
+      .statLabel {
+        font-size: 12px;
+        color: $text-secondary;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      .statValue {
+        font-size: 18px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+  }
+
+  .filterSection {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .filterTag {
+      padding: 4px 12px;
+      border-radius: 16px;
+      border: 1px solid $border-color;
+      background-color: $white;
+      color: $text-secondary;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: $secondary-color;
+        color: $secondary-color;
+      }
+
+      &.active {
+        background-color: $secondary-color;
+        border-color: $secondary-color;
+        color: $white;
+      }
+    }
+  }
+
+  .keywordTable {
+    :global(.ant-table) {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    :global(.ant-table-thead > tr > th) {
+      background-color: $background-color;
+      border-bottom: 2px solid $border-color;
+      font-weight: 600;
+      color: $text-primary;
+      padding: 16px 12px;
+      font-size: 14px;
+    }
+
+    :global(.ant-table-tbody > tr > td) {
+      border-bottom: 1px solid $border-color;
+      color: $text-primary;
+      padding: 16px 12px;
+      font-size: 14px;
+    }
+
+    :global(.ant-table-tbody > tr:hover > td) {
+      background-color: rgba($primary-color, 0.03);
+    }
+
+    .checkboxCell {
+      text-align: center;
+      width: 40px;
+
+      :global(.ant-checkbox-wrapper) {
+        margin: 0;
+      }
+    }
+
+    .keywordCell {
+      .keywordLink {
+        color: $primary-color;
+        font-weight: 500;
+        text-decoration: none;
+        
+        &:hover {
+          color: darken($primary-color, 10%);
+          text-decoration: underline;
+        }
+      }
+
+      .keywordType {
+        font-size: 12px;
+        color: $text-secondary;
+        margin-top: 4px;
+      }
+    }
+
+    .volumeCell {
+      text-align: right;
+
+      .volumeText {
+        font-weight: 500;
+        color: $text-primary;
+      }
+    }
+
+    .difficultyCell {
+      text-align: center;
+
+      .difficultyWrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+
+        .difficultyScore {
+          font-weight: 600;
+          font-size: 14px;
+        }
+
+        .difficultyBar {
+          width: 60px;
+          height: 4px;
+          background-color: #f0f0f0;
+          border-radius: 2px;
+          overflow: hidden;
+
+          .difficultyFill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+          }
+        }
+      }
+    }
+
+    .trendCell {
+      text-align: center;
+      
+      .trendWrapper {
+        @include flex-center;
+        
+        :global(.anticon) {
+          font-size: 16px;
+        }
+      }
+    }
+
+    .cpcCell {
+      text-align: right;
+
+      .cpcText {
+        font-weight: 500;
+        color: $text-primary;
+      }
+    }
+
+    .competitivenessCell,
+    .seasonalityCell {
+      text-align: center;
+
+      .competitivenessWrapper,
+      .seasonalityWrapper {
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Pagination
+  :global(.ant-pagination) {
+    margin-top: 24px;
+    text-align: center;
+
+    :global(.ant-pagination-item) {
+      border-radius: 6px;
+      border-color: $border-color;
+
+      &:hover {
+        border-color: $primary-color;
+      }
+
+      &.ant-pagination-item-active {
+        background-color: $primary-color;
+        border-color: $primary-color;
+      }
+    }
+
+    :global(.ant-pagination-prev),
+    :global(.ant-pagination-next) {
+      border-radius: 6px;
+      border-color: $border-color;
+
+      &:hover {
+        border-color: $primary-color;
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+
+// Responsive design
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .header {
+    .searchSection {
+      flex-direction: column;
+      align-items: stretch;
+
+      .searchInput {
+        max-width: none;
+      }
+
+      .controls {
+        justify-content: space-between;
+      }
+    }
+  }
+
+  .keywordIdeas {
+    .sectionHeader {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      .actionButtons {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+
+    .summaryStats {
+      flex-wrap: wrap;
+      gap: 16px;
+
+      .stat {
+        min-width: calc(50% - 8px);
+      }
+    }
+
+    .filterSection {
+      gap: 6px;
+    }
+
+    .keywordTable {
+      :global(.ant-table-tbody > tr > td) {
+        padding: 12px 8px;
+        font-size: 13px;
+      }
+
+      :global(.ant-table-thead > tr > th) {
+        padding: 12px 8px;
+        font-size: 13px;
+      }
+
+      .keywordCell {
+        .keywordMain {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+        }
+      }
+
+      .difficultyCell {
+        .difficultyWrapper {
+          .difficultyBar {
+            width: 40px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .keywordIdeas {
+    .tabs {
+      :global(.ant-tabs-tab) {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+    }
+
+    .summaryStats {
+      .stat {
+        min-width: 100%;
+        text-align: center;
+      }
+    }
+
+    .keywordTable {
+      // Enable horizontal scroll on small screens
+      :global(.ant-table-scroll) {
+        .ant-table-body {
+          overflow-x: auto;
+        }
+      }
+    }
+  }
+}

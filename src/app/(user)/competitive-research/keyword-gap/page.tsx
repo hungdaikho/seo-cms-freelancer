@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Card,
@@ -12,17 +12,25 @@ import {
   Badge,
   Typography,
   Input,
-  DatePicker,
-  Progress,
   Tag,
+  Spin,
+  message,
+  Form,
+  Alert,
+  Empty,
 } from "antd";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import {
-  SearchOutlined,
-  DownloadOutlined,
-  PlusOutlined,
-  FilterOutlined,
-} from "@ant-design/icons";
+  compareKeywordGaps,
+  getKeywordOverlap,
+  setFilters,
+  addCompetitor,
+  removeCompetitor,
+  clearKeywordGapAnalysis,
+} from "@/stores/slices/competitive.slice";
 import styles from "./KeywordGap.module.scss";
+import { getSortedCountries } from "@/utils/countries";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -31,201 +39,399 @@ const { Title, Text } = Typography;
 type Props = {};
 
 const KeyWordGap = (props: Props) => {
-  const [selectedDatabase, setSelectedDatabase] = useState("All DB");
-  const [selectedDevice, setSelectedDevice] = useState("Desktop");
-  const [selectedDate, setSelectedDate] = useState("12 September 2022");
-  const [selectedCurrency, setSelectedCurrency] = useState("NGN");
+  const dispatch = useAppDispatch();
+  const [form] = Form.useForm();
 
-  // Sample data for the table
-  const keywordData = [
-    {
-      key: "1",
-      keyword: "Designer",
-      intent: "N",
-      webflow: 12,
-      wix: 22,
-      volume: 2000,
-      kd: 70,
-      cpusd: 0,
-      result: "12M",
-    },
-    {
-      key: "2",
-      keyword: "Designer",
-      intent: "I",
-      webflow: 20,
-      wix: 20,
-      volume: 1220,
-      kd: 100,
-      cpusd: 0,
-      result: "12M",
-    },
-    {
-      key: "3",
-      keyword: "Designer",
-      intent: "I T",
-      webflow: 55,
-      wix: 55,
-      volume: 12550,
-      kd: 80,
-      cpusd: 0,
-      result: "20M",
-    },
-    {
-      key: "4",
-      keyword: "Designer",
-      intent: "I",
-      webflow: 70,
-      wix: 70,
-      volume: 1200,
-      kd: 70,
-      cpusd: 0,
-      result: "20M",
-    },
-    {
-      key: "5",
-      keyword: "Designer",
-      intent: "N",
-      webflow: 68,
-      wix: 68,
-      volume: 612000,
-      kd: 24,
-      cpusd: 0,
-      result: "23M",
-    },
-    {
-      key: "6",
-      keyword: "Designer",
-      intent: "C",
-      webflow: 24,
-      wix: 24,
-      volume: 2412560,
-      kd: 90,
-      cpusd: 0,
-      result: "1M",
-    },
-    {
-      key: "7",
-      keyword: "Designer",
-      intent: "T",
-      webflow: 12,
-      wix: 12,
-      volume: 122999,
-      kd: 77,
-      cpusd: 0,
-      result: "34M",
-    },
-    {
-      key: "8",
-      keyword: "Designer",
-      intent: "C",
-      webflow: 14,
-      wix: 14,
-      volume: 26440,
-      kd: 100,
-      cpusd: 0,
-      result: "21M",
-    },
-  ];
+  // Redux state
+  const { keywordGapAnalysis, keywordOverlap, loading, error, filters } =
+    useAppSelector((state) => state.competitive);
 
-  const topOpportunities = [
-    { keyword: "Etsy", volume: "16,600.00" },
-    { keyword: "a", volume: "2,600.00" },
-    { keyword: "a", volume: "600.00" },
-  ];
+  // Local state
+  const [targetDomain, setTargetDomain] = useState("");
+  const [keywordFilter, setKeywordFilter] = useState("");
+  const [selectedTab, setSelectedTab] = useState("organic");
 
-  const columns = [
-    {
-      title: "Keyword",
-      dataIndex: "keyword",
-      key: "keyword",
-      render: (text: string) => (
-        <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
-          {text}
-        </Button>
-      ),
-    },
-    {
-      title: "Intent",
-      dataIndex: "intent",
-      key: "intent",
-      render: (intent: string) => {
-        let color = "#52c41a";
-        if (intent === "I") color = "#722ed1";
-        if (intent === "N") color = "#1890ff";
-        if (intent === "C") color = "#faad14";
-        if (intent === "T") color = "#13c2c2";
-        return (
-          <Tag color={color} style={{ minWidth: "20px", textAlign: "center" }}>
+  useEffect(() => {
+    return () => {
+      // Clear data when component unmounts
+      dispatch(clearKeywordGapAnalysis());
+    };
+  }, [dispatch]);
+
+  // Handle form submission
+  const handleCompare = async (values: any) => {
+    if (!targetDomain.trim()) {
+      message.error("Please enter a target domain");
+      return;
+    }
+
+    if (filters.competitors.length === 0) {
+      message.error("Please add at least one competitor");
+      return;
+    }
+
+    try {
+      const requestData = {
+        targetDomain: targetDomain.trim(),
+        competitors: filters.competitors,
+        country: filters.country,
+        database: filters.database,
+        device: filters.device,
+        filters: {
+          minSearchVolume: 10,
+          maxDifficulty: 100,
+          keywordType: selectedTab,
+        },
+      };
+
+      // Fetch keyword gap analysis
+      await dispatch(compareKeywordGaps(requestData)).unwrap();
+
+      // Fetch keyword overlap data
+      await dispatch(
+        getKeywordOverlap({
+          domains: [targetDomain, ...filters.competitors],
+          country: filters.country,
+        })
+      ).unwrap();
+
+      message.success("Keyword gap analysis completed successfully!");
+    } catch (error: any) {
+      message.error(error.message || "Failed to analyze keyword gaps");
+    }
+  };
+
+  // Handle adding competitor
+  const handleAddCompetitor = (domain: string) => {
+    if (domain.trim() && filters.competitors.length < 3) {
+      dispatch(addCompetitor(domain.trim()));
+    }
+  };
+
+  // Handle removing competitor
+  const handleRemoveCompetitor = (domain: string) => {
+    dispatch(removeCompetitor(domain));
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (field: string, value: any) => {
+    dispatch(setFilters({ [field]: value }));
+  };
+
+  // Get intent color
+  const getIntentColor = (intent: string) => {
+    const intentMap: Record<string, string> = {
+      informational: "#1890ff",
+      navigational: "#52c41a",
+      commercial: "#faad14",
+      transactional: "#722ed1",
+      N: "#1890ff",
+      I: "#722ed1",
+      C: "#faad14",
+      T: "#13c2c2",
+    };
+    return intentMap[intent] || "#666";
+  };
+
+  // Render keyword details
+  const renderKeywordDetails = () => {
+    if (!keywordGapAnalysis?.keywordDetails) return [];
+
+    return keywordGapAnalysis.keywordDetails
+      .filter(
+        (item) =>
+          !keywordFilter ||
+          item.keyword.toLowerCase().includes(keywordFilter.toLowerCase())
+      )
+      .map((item, index) => ({
+        key: index.toString(),
+        keyword: item.keyword,
+        intent: item.intent,
+        targetDomain: item.targetDomain?.position || "-",
+        competitor1: item.competitor1?.position || "-",
+        competitor2: item.competitor2?.position || "-",
+        volume: item.targetDomain?.volume || 0,
+        kd: item.kd,
+        cpc: item.targetDomain?.cpc || 0,
+        status: item.status,
+        result: item.targetDomain?.result || "-",
+      }));
+  };
+
+  // Table columns configuration
+  const getColumns = () => {
+    const baseColumns = [
+      {
+        title: "Keyword",
+        dataIndex: "keyword",
+        key: "keyword",
+        render: (text: string) => (
+          <Button type="link" style={{ padding: 0, color: "#1890ff" }}>
+            {text}
+          </Button>
+        ),
+      },
+      {
+        title: "Intent",
+        dataIndex: "intent",
+        key: "intent",
+        render: (intent: string) => (
+          <Tag
+            color={getIntentColor(intent)}
+            style={{ minWidth: "20px", textAlign: "center" }}
+          >
             {intent}
           </Tag>
-        );
+        ),
       },
-    },
-    {
-      title: "Webflow.com",
-      dataIndex: "webflow",
-      key: "webflow",
-    },
-    {
-      title: "Wix.com",
-      dataIndex: "wix",
-      key: "wix",
-    },
-    {
-      title: "Volume",
-      dataIndex: "volume",
-      key: "volume",
-      render: (volume: number) => volume.toLocaleString(),
-    },
-    {
-      title: "KD%",
-      dataIndex: "kd",
-      key: "kd",
-      render: (kd: number) => `${kd} ▲`,
-    },
-    {
-      title: "CPC(USD)",
-      dataIndex: "cpusd",
-      key: "cpusd",
-    },
-    {
-      title: "Result",
-      dataIndex: "result",
-      key: "result",
-    },
-  ];
+      {
+        title: targetDomain || "Target Domain",
+        dataIndex: "targetDomain",
+        key: "targetDomain",
+        render: (position: number | string) =>
+          position === "-" ? "-" : position,
+      },
+    ];
 
-  const VennChart = () => (
-    <div className={styles.vennContainer}>
-      <svg width="300" height="200">
-        <circle
-          cx="120"
-          cy="100"
-          r="70"
-          fill="#95d5b2"
-          fillOpacity="0.6"
-          stroke="#52c41a"
-          strokeWidth="2"
-        />
-        <circle
-          cx="180"
-          cy="100"
-          r="70"
-          fill="#a8dadc"
-          fillOpacity="0.6"
-          stroke="#1890ff"
-          strokeWidth="2"
-        />
-        <text x="80" y="105" textAnchor="middle" fontSize="12" fill="#000">
-          Webflow.com
-        </text>
-        <text x="220" y="105" textAnchor="middle" fontSize="12" fill="#000">
-          Wix.com
-        </text>
-      </svg>
-    </div>
-  );
+    // Add competitor columns dynamically
+    filters.competitors.forEach((competitor, index) => {
+      baseColumns.push({
+        title: competitor,
+        dataIndex: `competitor${index + 1}`,
+        key: `competitor${index + 1}`,
+        render: (position: number | string) =>
+          position === "-" ? "-" : position,
+      });
+    });
+
+    // Add remaining columns
+    baseColumns.push(
+      {
+        title: "Volume",
+        dataIndex: "volume",
+        key: "volume",
+        render: (volume: any) =>
+          typeof volume === "number" ? volume.toLocaleString() : volume,
+      },
+      {
+        title: "KD%",
+        dataIndex: "kd",
+        key: "kd",
+        render: (kd: any) => `${kd}%`,
+      },
+      {
+        title: "CPC(USD)",
+        dataIndex: "cpc",
+        key: "cpc",
+        render: (cpc: any) =>
+          `$${typeof cpc === "number" ? cpc.toFixed(2) : cpc}`,
+      },
+      {
+        title: "Status",
+        dataIndex: "status",
+        key: "status",
+        render: (status: string) => {
+          const statusColors: Record<string, string> = {
+            shared: "green",
+            missing: "red",
+            weak: "orange",
+            strong: "blue",
+            untapped: "purple",
+            unique: "cyan",
+          };
+          return (
+            <Tag color={statusColors[status?.toLowerCase()] || "default"}>
+              {status}
+            </Tag>
+          );
+        },
+      }
+    );
+
+    return baseColumns;
+  };
+
+  // Venn Diagram Component
+  const VennChart = () => {
+    if (!keywordOverlap?.vennDiagram) {
+      return (
+        <div className={styles.vennContainer}>
+          <Empty description="No overlap data available" />
+        </div>
+      );
+    }
+
+    const targetData = keywordOverlap.vennDiagram[targetDomain] || {
+      total: 0,
+      unique: 0,
+      shared: 0,
+    };
+    const competitorData = keywordOverlap.vennDiagram[
+      filters.competitors[0]
+    ] || { total: 0, unique: 0, shared: 0 };
+    const overlapCount =
+      keywordOverlap.overview.overlap[filters.competitors[0]] || 0;
+
+    return (
+      <div
+        className={`${styles.vennContainer} ${keywordOverlap ? "loaded" : ""}`}
+      >
+        <div className={styles.vennDiagram}>
+          <svg width="360" height="240" viewBox="0 0 360 240">
+            {/* Background circles with gradients */}
+            <defs>
+              <linearGradient
+                id="targetGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop
+                  offset="0%"
+                  style={{ stopColor: "#52c41a", stopOpacity: 0.8 }}
+                />
+                <stop
+                  offset="100%"
+                  style={{ stopColor: "#73d13d", stopOpacity: 0.6 }}
+                />
+              </linearGradient>
+              <linearGradient
+                id="competitorGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop
+                  offset="0%"
+                  style={{ stopColor: "#1890ff", stopOpacity: 0.8 }}
+                />
+                <stop
+                  offset="100%"
+                  style={{ stopColor: "#40a9ff", stopOpacity: 0.6 }}
+                />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            {/* Target domain circle */}
+            <circle
+              cx="140"
+              cy="120"
+              r="80"
+              fill="url(#targetGradient)"
+              stroke="#52c41a"
+              strokeWidth="3"
+              filter="url(#glow)"
+            />
+
+            {/* Competitor domain circle */}
+            <circle
+              cx="220"
+              cy="120"
+              r="80"
+              fill="url(#competitorGradient)"
+              stroke="#1890ff"
+              strokeWidth="3"
+              filter="url(#glow)"
+            />
+
+            {/* Domain labels */}
+            <text x="110" y="80" textAnchor="middle" className="domain-label">
+              {targetDomain || "Target Domain"}
+            </text>
+            <text x="250" y="80" textAnchor="middle" className="domain-label">
+              {filters.competitors[0] || "Competitor"}
+            </text>
+
+            {/* Unique keyword counts */}
+            <text x="110" y="135" textAnchor="middle" className="unique-number">
+              {targetData.unique.toLocaleString()}
+            </text>
+            <text x="250" y="135" textAnchor="middle" className="unique-number">
+              {competitorData.unique.toLocaleString()}
+            </text>
+
+            {/* Overlap count in the middle */}
+            <text
+              x="180"
+              y="125"
+              textAnchor="middle"
+              className="overlap-number"
+            >
+              {overlapCount.toLocaleString()}
+            </text>
+            <text x="180" y="140" textAnchor="middle" className="domain-label">
+              Shared
+            </text>
+
+            {/* Total labels */}
+            <text x="110" y="155" textAnchor="middle" className="domain-label">
+              Total: {targetData.total.toLocaleString()}
+            </text>
+            <text x="250" y="155" textAnchor="middle" className="domain-label">
+              Total: {competitorData.total.toLocaleString()}
+            </text>
+          </svg>
+        </div>
+
+        {/* Legend */}
+        <div className={styles.vennLegend}>
+          <div className={styles.legendItem}>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: "#52c41a" }}
+            />
+            <span className={styles.legendText} title={targetDomain}>
+              {targetDomain || "Target Domain"}
+            </span>
+          </div>
+          <div className={styles.legendItem}>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: "#1890ff" }}
+            />
+            <span className={styles.legendText} title={filters.competitors[0]}>
+              {filters.competitors[0] || "Competitor"}
+            </span>
+          </div>
+        </div>
+
+        {/* Statistics */}
+        <div className={styles.vennStats}>
+          <div className={styles.statItem}>
+            <span className={styles.statNumber}>
+              {keywordOverlap.overview.totalUnique.toLocaleString()}
+            </span>
+            <span className={styles.statLabel}>Total Unique</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statNumber}>
+              {overlapCount.toLocaleString()}
+            </span>
+            <span className={styles.statLabel}>Shared</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statNumber}>
+              {(
+                (overlapCount / keywordOverlap.overview.totalUnique) *
+                100
+              ).toFixed(1)}
+              %
+            </span>
+            <span className={styles.statLabel}>Overlap Rate</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.keywordGap}>
@@ -238,30 +444,46 @@ const KeyWordGap = (props: Props) => {
         >
           <Col>
             <Title level={2} style={{ margin: 0 }}>
-              Keyword Gap
+              Keyword Gap Analysis
             </Title>
           </Col>
-          <Col>
-            <Button type="primary" icon={<DownloadOutlined />}>
-              Export to PDF
-            </Button>
-          </Col>
         </Row>
+
+        {/* Error Display */}
+        {(error.keywordGap || error.keywordOverlap) && (
+          <Alert
+            message="Error"
+            description={error.keywordGap || error.keywordOverlap}
+            type="error"
+            showIcon
+            closable
+            style={{ marginBottom: "24px" }}
+          />
+        )}
 
         {/* Filters */}
         <div className={styles.filterSection}>
           <Row gutter={[16, 16]}>
             <Col span={6}>
               <Space direction="vertical" style={{ width: "100%" }}>
-                <Text>Database:</Text>
+                <Text>Country/Database:</Text>
                 <Select
-                  value={selectedDatabase}
-                  onChange={setSelectedDatabase}
+                  value={filters.country}
+                  onChange={(value) => handleFilterChange("country", value)}
                   style={{ width: "100%" }}
+                  showSearch
+                  placeholder="Select country"
+                  filterOption={(input, option) =>
+                    (option?.children as unknown as string)
+                      ?.toLowerCase()
+                      ?.includes(input.toLowerCase())
+                  }
                 >
-                  <Option value="All DB">🌍 All DB</Option>
-                  <Option value="US">🇺🇸 US</Option>
-                  <Option value="UK">🇬🇧 UK</Option>
+                  {getSortedCountries().map((country) => (
+                    <Option key={country.code} value={country.code}>
+                      {country.name}
+                    </Option>
+                  ))}
                 </Select>
               </Space>
             </Col>
@@ -269,37 +491,40 @@ const KeyWordGap = (props: Props) => {
               <Space direction="vertical" style={{ width: "100%" }}>
                 <Text>Device:</Text>
                 <Select
-                  value={selectedDevice}
-                  onChange={setSelectedDevice}
+                  value={filters.device}
+                  onChange={(value) => handleFilterChange("device", value)}
                   style={{ width: "100%" }}
                 >
-                  <Option value="Desktop">🖥️ Desktop</Option>
-                  <Option value="Mobile">📱 Mobile</Option>
+                  <Option value="desktop">🖥️ Desktop</Option>
+                  <Option value="mobile">📱 Mobile</Option>
                 </Select>
               </Space>
             </Col>
             <Col span={6}>
               <Space direction="vertical" style={{ width: "100%" }}>
-                <Text>Date:</Text>
+                <Text>Database:</Text>
                 <Select
-                  value={selectedDate}
-                  onChange={setSelectedDate}
+                  value={filters.database}
+                  onChange={(value) => handleFilterChange("database", value)}
                   style={{ width: "100%" }}
                 >
-                  <Option value="12 September 2022">12 September 2022</Option>
+                  <Option value="all">All Databases</Option>
+                  <Option value="google">Google</Option>
+                  <Option value="bing">Bing</Option>
                 </Select>
               </Space>
             </Col>
             <Col span={6}>
               <Space direction="vertical" style={{ width: "100%" }}>
-                <Text>Currency:</Text>
+                <Text>Timeframe:</Text>
                 <Select
-                  value={selectedCurrency}
-                  onChange={setSelectedCurrency}
+                  value={filters.timeframe}
+                  onChange={(value) => handleFilterChange("timeframe", value)}
                   style={{ width: "100%" }}
                 >
-                  <Option value="NGN">NGN</Option>
-                  <Option value="USD">USD</Option>
+                  <Option value="7d">Last 7 days</Option>
+                  <Option value="30d">Last 30 days</Option>
+                  <Option value="90d">Last 90 days</Option>
                 </Select>
               </Space>
             </Col>
@@ -308,156 +533,249 @@ const KeyWordGap = (props: Props) => {
 
         {/* Domain Selection */}
         <Card style={{ marginBottom: "24px" }}>
-          <Tabs defaultActiveKey="1">
-            <TabPane tab="Organic Keywords" key="1">
-              <Row gutter={[16, 16]}>
-                <Col span={8}>
-                  <Space direction="vertical" style={{ width: "100%" }}>
-                    <Text>Root Domain ∨</Text>
-                    <Input placeholder="Enter domain" />
-                  </Space>
-                </Col>
-                <Col span={8}>
-                  <Space direction="vertical" style={{ width: "100%" }}>
-                    <Text>Root Domain ∨</Text>
-                    <Input placeholder="Enter domain" />
-                  </Space>
-                </Col>
-                <Col span={8}>
-                  <Text style={{ color: "#1890ff", cursor: "pointer" }}>
-                    ← Add up to 3 competitors
-                  </Text>
-                </Col>
-              </Row>
-              <Row style={{ marginTop: "16px" }}>
-                <Col>
-                  <Space>
-                    <Button type="primary">Compare</Button>
-                    <Button>Cancel</Button>
-                  </Space>
-                </Col>
-              </Row>
-            </TabPane>
-            <TabPane tab="Paid Keywords" key="2">
-              <div>Paid Keywords content</div>
-            </TabPane>
-            <TabPane tab="PLA Keywords" key="3">
-              <div>PLA Keywords content</div>
-            </TabPane>
-          </Tabs>
-          <Text style={{ color: "#666" }}>
-            Select keyword type for each domain
-          </Text>
+          <Form form={form} onFinish={handleCompare}>
+            <Tabs
+              activeKey={selectedTab}
+              onChange={setSelectedTab}
+              defaultActiveKey="organic"
+            >
+              <TabPane tab="Organic Keywords" key="organic">
+                <Row gutter={[16, 16]}>
+                  <Col span={8}>
+                    <Space direction="vertical" style={{ width: "100%" }}>
+                      <Text>Target Domain:</Text>
+                      <Input
+                        placeholder="Enter your domain (e.g., example.com)"
+                        value={targetDomain}
+                        onChange={(e) => setTargetDomain(e.target.value)}
+                      />
+                    </Space>
+                  </Col>
+                  <Col span={16}>
+                    <Space direction="vertical" style={{ width: "100%" }}>
+                      <Text>Competitors (max 3):</Text>
+                      <Row gutter={[8, 8]}>
+                        {filters.competitors.map((competitor, index) => (
+                          <Col key={index} span={8}>
+                            <Input
+                              value={competitor}
+                              readOnly
+                              suffix={
+                                <Button
+                                  type="text"
+                                  size="small"
+                                  icon={<DeleteOutlined />}
+                                  onClick={() =>
+                                    handleRemoveCompetitor(competitor)
+                                  }
+                                />
+                              }
+                            />
+                          </Col>
+                        ))}
+                        {filters.competitors.length < 3 && (
+                          <Col span={8}>
+                            <Input
+                              placeholder="Enter competitor domain"
+                              onPressEnter={(e) => {
+                                const target = e.target as HTMLInputElement;
+                                handleAddCompetitor(target.value);
+                                target.value = "";
+                              }}
+                            />
+                          </Col>
+                        )}
+                      </Row>
+                    </Space>
+                  </Col>
+                </Row>
+                <Row style={{ marginTop: "16px" }}>
+                  <Col>
+                    <Space>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading.keywordGap || loading.keywordOverlap}
+                      >
+                        Compare
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setTargetDomain("");
+                          dispatch(setFilters({ competitors: [] }));
+                          dispatch(clearKeywordGapAnalysis());
+                        }}
+                      >
+                        Clear
+                      </Button>
+                    </Space>
+                  </Col>
+                </Row>
+              </TabPane>
+              <TabPane tab="Paid Keywords" key="paid">
+                <div>Paid Keywords analysis will be available soon</div>
+              </TabPane>
+              <TabPane tab="PLA Keywords" key="pla">
+                <div>PLA Keywords analysis will be available soon</div>
+              </TabPane>
+            </Tabs>
+          </Form>
         </Card>
 
-        {/* Main Content */}
-        <Row gutter={[24, 24]}>
-          {/* Left Column - Venn Diagram */}
-          <Col span={12}>
-            <Card>
-              <Title level={4}>Keyword Overlap</Title>
-              <VennChart />
-              <div style={{ marginTop: "16px" }}>
-                <Space>
-                  <Badge color="#52c41a" text="Webflow.com" />
-                  <Badge color="#1890ff" text="Wix.com" />
-                </Space>
-              </div>
-            </Card>
-          </Col>
+        {/* Loading State */}
+        {(loading.keywordGap || loading.keywordOverlap) && (
+          <Card style={{ textAlign: "center", marginBottom: "24px" }}>
+            <Spin size="large" />
+            <div style={{ marginTop: "16px" }}>
+              <Text>Analyzing keyword gaps...</Text>
+            </div>
+          </Card>
+        )}
 
-          {/* Right Column - Top Opportunities */}
-          <Col span={12}>
-            <Card>
-              <Row justify="space-between" align="middle">
-                <Title level={4}>Top Opportunities</Title>
-                <Space>
-                  <Text style={{ fontSize: "12px", color: "#666" }}>
-                    Missing | Weak
-                  </Text>
-                </Space>
-              </Row>
-              <div style={{ marginBottom: "16px" }}>
-                {topOpportunities.map((item, index) => (
-                  <div key={index} className={styles.opportunityItem}>
-                    <Row justify="space-between">
-                      <Text style={{ color: "#1890ff" }}>
-                        {item.keyword} &gt;&gt;
-                      </Text>
-                      <Text>{item.volume}</Text>
-                    </Row>
-                  </div>
-                ))}
-              </div>
-              <Button type="primary">View details</Button>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Keyword Details Table */}
-        <Card style={{ marginTop: "24px" }}>
-          <Row
-            justify="space-between"
-            align="middle"
-            style={{ marginBottom: "16px" }}
-          >
-            <Col>
-              <Title level={4}>All keyword details for: webflow.com ∨</Title>
-            </Col>
-            <Col>
-              <Space>
-                <Input
-                  placeholder="Filter by keyword"
-                  prefix={<SearchOutlined />}
-                  style={{ width: "200px" }}
-                />
-                <Button icon={<DownloadOutlined />}>EXPORT</Button>
-              </Space>
-            </Col>
-          </Row>
-
-          {/* Filter Tags */}
-          <div className={styles.statsBadge}>
-            <Row
-              style={{
-                marginBottom: "16px",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Col>
-                <Space wrap>
-                  <Tag color="orange">Shared 36,805</Tag>
-                  <Tag>Missing 6,606</Tag>
-                  <Tag>Weak 16,805</Tag>
-                  <Tag>Strong 12,805</Tag>
-                  <Tag>Untapped 3,605</Tag>
-                  <Tag>Unique 134,805</Tag>
-                  <Tag>All 636,805</Tag>
-                </Space>
+        {/* Results */}
+        {keywordGapAnalysis && (
+          <>
+            {/* Main Content */}
+            <Row gutter={[24, 24]}>
+              {/* Left Column - Venn Diagram */}
+              <Col span={12}>
+                <Card>
+                  <Title level={4}>Keyword Overlap Analysis</Title>
+                  <VennChart />
+                </Card>
               </Col>
-              <Col>
-                <Col>
-                  <Button type="primary" icon={<PlusOutlined />}>
-                    Add to keyword list
-                  </Button>
-                </Col>
+
+              {/* Right Column - Top Opportunities */}
+              <Col span={12}>
+                <Card>
+                  <Row justify="space-between" align="middle">
+                    <Title level={4}>Top Opportunities</Title>
+                    <Space>
+                      <Text style={{ fontSize: "12px", color: "#666" }}>
+                        Missing | Weak Keywords
+                      </Text>
+                    </Space>
+                  </Row>
+                  <div style={{ marginBottom: "16px" }}>
+                    {keywordOverlap?.topOpportunities
+                      ?.slice(0, 5)
+                      .map((item, index) => (
+                        <div key={index} className={styles.opportunityItem}>
+                          <Row justify="space-between">
+                            <Text style={{ color: "#1890ff" }}>
+                              {item.keyword} &gt;&gt;
+                            </Text>
+                            <Text>{item.volume.toLocaleString()}</Text>
+                          </Row>
+                        </div>
+                      )) || <Empty description="No opportunities found" />}
+                  </div>
+                  {(keywordOverlap?.topOpportunities?.length ?? 0) > 0 && (
+                    <Button type="primary">View all opportunities</Button>
+                  )}
+                </Card>
               </Col>
             </Row>
-          </div>
-          {/* Table */}
-          <Table
-            columns={columns}
-            dataSource={keywordData}
-            pagination={{
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} of ${total} items`,
-            }}
-            scroll={{ x: 800 }}
-          />
-        </Card>
+
+            {/* Keyword Details Table */}
+            <Card style={{ marginTop: "24px" }}>
+              <Row
+                justify="space-between"
+                align="middle"
+                style={{ marginBottom: "16px" }}
+              >
+                <Col>
+                  <Title level={4}>Keyword Details: {targetDomain}</Title>
+                </Col>
+                <Col></Col>
+              </Row>
+
+              {/* Filter Tags */}
+              {keywordGapAnalysis.overview.comparison && (
+                <div className={styles.statsBadge}>
+                  <Row
+                    style={{
+                      marginBottom: "16px",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Col>
+                      <Space wrap>
+                        <Tag color="orange">
+                          Shared{" "}
+                          {keywordGapAnalysis.overview.comparison.shared.toLocaleString()}
+                        </Tag>
+                        <Tag>
+                          Missing{" "}
+                          {keywordGapAnalysis.overview.comparison.missing.toLocaleString()}
+                        </Tag>
+                        <Tag>
+                          Weak{" "}
+                          {keywordGapAnalysis.overview.comparison.weak.toLocaleString()}
+                        </Tag>
+                        <Tag>
+                          Strong{" "}
+                          {keywordGapAnalysis.overview.comparison.strong.toLocaleString()}
+                        </Tag>
+                        <Tag>
+                          Untapped{" "}
+                          {keywordGapAnalysis.overview.comparison.untapped.toLocaleString()}
+                        </Tag>
+                        <Tag>
+                          Unique{" "}
+                          {keywordGapAnalysis.overview.comparison.unique.toLocaleString()}
+                        </Tag>
+                        <Tag>
+                          Total{" "}
+                          {keywordGapAnalysis.totalKeywords.toLocaleString()}
+                        </Tag>
+                      </Space>
+                    </Col>
+                    <Col>
+                      <Button type="primary" icon={<PlusOutlined />}>
+                        Add to keyword list
+                      </Button>
+                    </Col>
+                  </Row>
+                </div>
+              )}
+
+              {/* Table */}
+              <Table
+                columns={getColumns()}
+                dataSource={renderKeywordDetails()}
+                loading={loading.keywordGap}
+                pagination={{
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  showTotal: (total, range) =>
+                    `${range[0]}-${range[1]} of ${total} items`,
+                  pageSize: 50,
+                }}
+                scroll={{ x: 800 }}
+              />
+            </Card>
+          </>
+        )}
+
+        {/* Empty State */}
+        {!keywordGapAnalysis &&
+          !loading.keywordGap &&
+          !loading.keywordOverlap && (
+            <Card style={{ textAlign: "center", padding: "48px" }}>
+              <Empty
+                description={
+                  <div>
+                    <Text>
+                      Enter your domain and competitors above to start analyzing
+                      keyword gaps
+                    </Text>
+                  </div>
+                }
+              />
+            </Card>
+          )}
       </div>
     </div>
   );

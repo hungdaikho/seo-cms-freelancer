@@ -1,7 +1,16 @@
 "use client";
-import React, { useState } from "react";
-import { Modal, Form, Input, Button, Steps, message, Select } from "antd";
-import { CreateProjectData } from "@/types/rank-tracking.type";
+import React, { useState, useEffect } from "react";
+import { Modal, Form, Input, Button, Steps, message, Select, Spin } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/stores/store";
+import { createProject, clearErrors } from "@/stores/slices/projects.slice";
+import { CreateProjectRequest } from "@/services/project.service";
+import { getSortedCountries } from "@/utils/countries";
+import { getSortedLanguages } from "@/utils/languages";
+import {
+  validateDomain,
+  getDomainPlaceholder,
+} from "@/utils/domain-validation";
 import styles from "./CreateProjectModal.module.scss";
 
 const { Step } = Steps;
@@ -10,19 +19,69 @@ const { TextArea } = Input;
 interface CreateProjectModalProps {
   visible: boolean;
   onCancel: () => void;
-  onSubmit: (data: CreateProjectData) => void;
+  onSuccess?: () => void;
+}
+
+interface ProjectFormData {
+  name: string;
+  domain: string;
+  country: string;
+  language: string;
+  keywords: string;
 }
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   visible,
   onCancel,
-  onSubmit,
+  onSuccess,
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, error } = useSelector((state: RootState) => state.projects);
+
   const [current, setCurrent] = useState(0);
   const [form] = Form.useForm();
-  const [projectData, setProjectData] = useState<Partial<CreateProjectData>>(
-    {}
-  );
+  const [projectData, setProjectData] = useState<Partial<ProjectFormData>>({});
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+
+  // Get sorted countries and languages
+  const countries = getSortedCountries();
+  const languages = getSortedLanguages();
+
+  // Clear errors when modal opens
+  useEffect(() => {
+    if (visible) {
+      dispatch(clearErrors());
+    }
+  }, [visible, dispatch]);
+
+  // Handle success message and callback
+  useEffect(() => {
+    if (
+      !loading.createProject &&
+      !error.createProject &&
+      visible &&
+      current === 0 &&
+      Object.keys(projectData).length > 0
+    ) {
+      message.success("Project created successfully!");
+      onSuccess?.();
+      handleCancel();
+    }
+  }, [
+    loading.createProject,
+    error.createProject,
+    visible,
+    onSuccess,
+    projectData,
+    current,
+  ]);
+
+  // Handle error message
+  useEffect(() => {
+    if (error.createProject) {
+      message.error(error.createProject);
+    }
+  }, [error.createProject]);
 
   const steps = [
     {
@@ -30,23 +89,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       content: "project-info",
     },
     {
-      title: "Specify Locations",
-      content: "locations",
+      title: "Settings",
+      content: "settings",
     },
     {
       title: "Enter Keywords",
       content: "keywords",
     },
-  ];
-
-  const countries = [
-    { value: "US", label: "United States" },
-    { value: "UK", label: "United Kingdom" },
-    { value: "CA", label: "Canada" },
-    { value: "AU", label: "Australia" },
-    { value: "DE", label: "Germany" },
-    { value: "FR", label: "France" },
-    { value: "VN", label: "Vietnam" },
   ];
 
   const next = async () => {
@@ -69,17 +118,34 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       const finalData = { ...projectData, ...values };
 
       // Convert keywords string to array
-      if (typeof finalData.keywords === "string") {
-        finalData.keywords = finalData.keywords
-          .split("\n")
-          .map((k: string) => k.trim())
-          .filter((k: string) => k.length > 0);
-      }
+      const keywordsArray =
+        typeof finalData.keywords === "string"
+          ? finalData.keywords
+              .split("\n")
+              .map((k: string) => k.trim())
+              .filter((k: string) => k.length > 0)
+          : [];
 
-      onSubmit(finalData as CreateProjectData);
-      handleCancel();
+      // Prepare data for API
+      const createProjectData: CreateProjectRequest = {
+        name: finalData.name,
+        domain: finalData.domain,
+        settings: {
+          country: finalData.country,
+          language: finalData.language,
+          trackingEnabled: true,
+        },
+      };
+
+      // Dispatch create project action
+      await dispatch(createProject(createProjectData)).unwrap();
+
+      // Success handling is done in useEffect
     } catch (errorInfo) {
       console.log("Failed:", errorInfo);
+      if (typeof errorInfo === "string") {
+        message.error(errorInfo);
+      }
     }
   };
 
@@ -96,54 +162,130 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
         return (
           <>
             <Form.Item
-              name="websiteUrl"
-              label="Website URL"
-              rules={[
-                { required: true, message: "Please input your website URL!" },
-                { type: "url", message: "Please enter a valid URL!" },
-              ]}
-            >
-              <Input placeholder="https://example.com" />
-            </Form.Item>
-            <Form.Item
               name="name"
               label="Project Name"
               rules={[
                 { required: true, message: "Please input project name!" },
+                {
+                  min: 2,
+                  message: "Project name must be at least 2 characters!",
+                },
               ]}
             >
               <Input placeholder="My SEO Project" />
+            </Form.Item>
+            <Form.Item
+              name="domain"
+              label="Website Domain"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your website domain!",
+                },
+                {
+                  validator: (_, value) => {
+                    if (!value) return Promise.resolve();
+
+                    const validation = validateDomain(value);
+
+                    if (!validation.isValid) {
+                      return Promise.reject(new Error(validation.error));
+                    }
+
+                    // Update form value with cleaned domain if it was modified
+                    if (validation.cleanDomain !== value) {
+                      form.setFieldValue("domain", validation.cleanDomain);
+                    }
+
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <Input
+                placeholder={getDomainPlaceholder(selectedCountry)}
+                onChange={(e) => {
+                  // Auto-clean domain as user types
+                  const value = e.target.value;
+                  if (value) {
+                    const cleaned = value
+                      .toLowerCase()
+                      .replace(/^https?:\/\//, "")
+                      .replace(/^www\./, "");
+                    if (cleaned !== value) {
+                      form.setFieldValue("domain", cleaned);
+                    }
+                  }
+                }}
+              />
             </Form.Item>
           </>
         );
       case 1:
         return (
-          <Form.Item
-            name="location"
-            label="Enter country or city"
-            rules={[{ required: true, message: "Please select a location!" }]}
-          >
-            <Select
-              placeholder="Select a country"
-              options={countries}
-              showSearch
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-            />
-          </Form.Item>
+          <>
+            <Form.Item
+              name="country"
+              label="Target Country"
+              rules={[{ required: true, message: "Please select a country!" }]}
+            >
+              <Select
+                placeholder="Select a country"
+                showSearch
+                optionFilterProp="label"
+                onChange={(value) => {
+                  setSelectedCountry(value);
+                  // Update domain placeholder when country changes
+                  const domainField = form.getFieldValue("domain");
+                  if (!domainField) {
+                    // Trigger re-render to update placeholder
+                    form.setFieldsValue({ domain: undefined });
+                  }
+                }}
+                filterOption={(input, option) =>
+                  ((option?.label as string) ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                options={countries.map((country) => ({
+                  value: country.code,
+                  label: `${country.flag} ${country.name}`,
+                }))}
+              />
+            </Form.Item>
+            <Form.Item
+              name="language"
+              label="Target Language"
+              rules={[{ required: true, message: "Please select a language!" }]}
+            >
+              <Select
+                placeholder="Select a language"
+                showSearch
+                optionFilterProp="label"
+                filterOption={(input, option) =>
+                  ((option?.label as string) ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                options={languages.map((language) => ({
+                  value: language.code,
+                  label: `${language.name} (${language.nativeName})`,
+                }))}
+              />
+            </Form.Item>
+          </>
         );
       case 2:
         return (
           <Form.Item
             name="keywords"
-            label="Keywords"
-            rules={[{ required: true, message: "Please enter keywords!" }]}
-            extra="Explore better plans to add multiple locations"
+            label="Keywords (Optional)"
+            extra="You can add keywords later from the project dashboard"
           >
-            <TextArea rows={6} placeholder="Enter keywords (one per line)" />
+            <TextArea
+              rows={6}
+              placeholder="Enter keywords (one per line)&#10;Example:&#10;seo services&#10;digital marketing&#10;website optimization"
+            />
           </Form.Item>
         );
       default:
@@ -159,58 +301,73 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       footer={null}
       width={800}
       className={styles.modal}
+      maskClosable={!loading.createProject}
+      closable={!loading.createProject}
     >
-      <div className={styles.stepsContainer}>
-        <Steps current={current} size="small">
-          {steps.map((item) => (
-            <Step key={item.title} title={item.title} />
-          ))}
-        </Steps>
-      </div>
-
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={projectData}
-        className={styles.formContainer}
-      >
-        <div className={styles.contentArea}>{renderStepContent()}</div>
-
-        <div className={styles.footerArea}>
-          <div>
-            {current > 0 && (
-              <Button onClick={prev} className={styles.secondaryButton}>
-                Back
-              </Button>
-            )}
-            {current === 0 && (
-              <Button onClick={handleCancel} className={styles.secondaryButton}>
-                Close
-              </Button>
-            )}
-          </div>
-          <div>
-            {current < steps.length - 1 && (
-              <Button
-                type="primary"
-                onClick={next}
-                className={styles.primaryButton}
-              >
-                Next
-              </Button>
-            )}
-            {current === steps.length - 1 && (
-              <Button
-                type="primary"
-                onClick={handleSubmit}
-                className={styles.primaryButton}
-              >
-                Create Project
-              </Button>
-            )}
-          </div>
+      <Spin spinning={loading.createProject} tip="Creating project...">
+        <div className={styles.stepsContainer}>
+          <Steps current={current} size="small">
+            {steps.map((item) => (
+              <Step key={item.title} title={item.title} />
+            ))}
+          </Steps>
         </div>
-      </Form>
+
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={projectData}
+          className={styles.formContainer}
+        >
+          <div className={styles.contentArea}>{renderStepContent()}</div>
+
+          <div className={styles.footerArea}>
+            <div>
+              {current > 0 && (
+                <Button
+                  onClick={prev}
+                  className={styles.secondaryButton}
+                  disabled={loading.createProject}
+                >
+                  Back
+                </Button>
+              )}
+              {current === 0 && (
+                <Button
+                  onClick={handleCancel}
+                  className={styles.secondaryButton}
+                  disabled={loading.createProject}
+                >
+                  Close
+                </Button>
+              )}
+            </div>
+            <div>
+              {current < steps.length - 1 && (
+                <Button
+                  type="primary"
+                  onClick={next}
+                  className={styles.primaryButton}
+                  disabled={loading.createProject}
+                >
+                  Next
+                </Button>
+              )}
+              {current === steps.length - 1 && (
+                <Button
+                  type="primary"
+                  onClick={handleSubmit}
+                  className={styles.primaryButton}
+                  loading={loading.createProject}
+                  disabled={loading.createProject}
+                >
+                  Create Project
+                </Button>
+              )}
+            </div>
+          </div>
+        </Form>
+      </Spin>
     </Modal>
   );
 };
