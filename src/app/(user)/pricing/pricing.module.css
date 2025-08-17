@@ -1,0 +1,392 @@
+.pricingContainer {
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #fff;
+}
+
+.pricingHeader {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.pricingTitle {
+  font-size: 48px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+
+.toggleContainer {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
+}
+
+.planToggle {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  border: none;
+}
+
+.toggleButton {
+  padding: 8px 24px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggleButton.active {
+  background: #1a1a1a;
+  color: white;
+}
+
+.toggleButton.inactive {
+  background: transparent;
+  color: #666;
+}
+
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+.pricingCard {
+  background: white;
+  border-radius: 16px;
+  padding: 40px 30px;
+  border: 2px solid #f0f0f0;
+  position: relative;
+  transition: all 0.3s ease;
+  height: fit-content;
+}
+
+.pricingCard:hover {
+  border-color: #e6e6e6;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+}
+
+.cardHeader {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.planIcon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.planIcon.individual {
+  background: linear-gradient(135deg, #ff6b35, #ff8a50);
+}
+
+.planIcon.business {
+  background: linear-gradient(135deg, #ff6b35, #ff8a50);
+}
+
+.planIcon.enterprise {
+  background: linear-gradient(135deg, #ff6b35, #ff8a50);
+}
+
+.planName {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.planPrice {
+  font-size: 48px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.planPriceSmall {
+  font-size: 16px;
+  color: #666;
+  font-weight: 400;
+}
+
+.planDescription {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.upgradeButton {
+  width: 100%;
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 30px;
+  transition: all 0.3s ease;
+}
+
+.upgradeButton.primary {
+  background: #1677ff;
+  color: white;
+}
+
+.upgradeButton.primary:hover {
+  background: #4096ff;
+}
+
+.upgradeButton.secondary {
+  background: #f0f8ff;
+  color: #1677ff;
+  border: 1px solid #d9d9d9;
+}
+
+.upgradeButton.secondary:hover {
+  background: #e6f4ff;
+  border-color: #1677ff;
+}
+
+.featuresList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+.featureIcon {
+  width: 16px;
+  height: 16px;
+  margin-right: 12px;
+  border-radius: 2px;
+  border: 2px solid #ff6b35;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.currentPlanTag {
+  background: #e6f4ff;
+  color: #1677ff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+/* Comparison Table Styles */
+.comparisonContainer {
+  margin-top: 80px;
+}
+
+.comparisonHeader {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.comparisonTitle {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.comparisonSubtitle {
+  color: #666;
+  font-size: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.comparisonTable {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tableHeaderCell {
+  padding: 24px;
+  text-align: center;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.tableHeaderCell:first-child {
+  text-align: left;
+}
+
+.planHeaderInfo {
+  text-align: center;
+}
+
+.planHeaderName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.planHeaderPrice {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.planHeaderPeriod {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.planHeaderDescription {
+  color: #666;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableCell {
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.tableCell:first-child {
+  justify-content: flex-start;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.checkIcon {
+  width: 20px;
+  height: 20px;
+  background: #52c41a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+.tableActionRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  background: #fafafa;
+  padding: 24px;
+}
+
+.tableActionCell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tableActionCell:first-child {
+  justify-content: flex-start;
+}
+
+.tableActionButton {
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.tableActionButton.current {
+  background: #e6f4ff;
+  color: #1677ff;
+  border: 1px solid #1677ff;
+}
+
+.tableActionButton.upgrade {
+  background: #1677ff;
+  color: white;
+}
+
+.tableActionButton.upgrade:hover {
+  background: #4096ff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pricingContainer {
+    padding: 40px 16px;
+  }
+  
+  .pricingTitle {
+    font-size: 36px;
+  }
+  
+  .cardsContainer {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .pricingCard {
+    padding: 30px 20px;
+  }
+  
+  .planPrice {
+    font-size: 36px;
+  }
+  
+  .comparisonTable {
+    overflow-x: auto;
+  }
+  
+  .tableHeader,
+  .tableRow,
+  .tableActionRow {
+    min-width: 600px;
+  }
+}
