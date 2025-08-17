@@ -9,6 +9,7 @@ import keywordResearchSlice from "./slices/keyword-research.slice";
 import contentIdeasSlice from "./slices/content-ideas.slice";
 import backlinkResearchSlice from "./slices/backlik-research.slice";
 import auditSlice from "./slices/audit.slice";
+import adminDashboardSlice from "./slices/admin-dashboard.slice";
 
 const store = configureStore({
   reducer: {
@@ -21,6 +22,7 @@ const store = configureStore({
     contentIdeas: contentIdeasSlice,
     backlinkResearch: backlinkResearchSlice,
     audit: auditSlice,
+    adminDashboard: adminDashboardSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(apiEventMiddleware),

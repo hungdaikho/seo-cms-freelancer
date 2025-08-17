@@ -9,7 +9,7 @@ export interface AuditState {
   // Current audits
   audits: AuditAPIResponse[];
   currentAudit: AuditAPIResponse | null;
-  auditResults: AuditResultsResponse | null;
+  auditResults: AuditAPIResponse | null;
 
   // Summary and history
   auditSummary: AuditSummaryResponse | null;

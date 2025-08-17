@@ -161,7 +161,7 @@ export const fetchAudit = createAsyncThunk<AuditAPIResponse, FetchAuditPayload>(
 /**
  * Lấy kết quả audit
  */
-export const fetchAuditResults = createAsyncThunk<AuditResultsResponse, string>(
+export const fetchAuditResults = createAsyncThunk<AuditAPIResponse, string>(
   "audit/fetchAuditResults",
   async (auditId, { rejectWithValue }) => {
     try {
@@ -327,6 +327,37 @@ const auditSlice = createSlice({
     ) => {
       state.pagination = { ...state.pagination, ...action.payload };
     },
+
+    updateAuditData: (
+      state,
+      action: PayloadAction<{
+        auditId: string;
+        auditData: Partial<AuditAPIResponse>;
+      }>
+    ) => {
+      const { auditId, auditData } = action.payload;
+
+      // Update current audit if it matches
+      if (state.currentAudit?.id === auditId) {
+        state.currentAudit = { ...state.currentAudit, ...auditData };
+      }
+
+      // Update in audits list
+      const auditIndex = state.audits.findIndex(
+        (audit) => audit.id === auditId
+      );
+      if (auditIndex !== -1) {
+        state.audits[auditIndex] = {
+          ...state.audits[auditIndex],
+          ...auditData,
+        };
+      }
+
+      // Update audit results if it matches
+      if (state.auditResults?.id === auditId) {
+        state.auditResults = { ...state.auditResults, ...auditData };
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -422,6 +453,30 @@ const auditSlice = createSlice({
       .addCase(fetchAuditResults.fulfilled, (state, action) => {
         state.isLoading = false;
         state.auditResults = action.payload;
+
+        // Update current audit if it matches
+        if (state.currentAudit?.id === action.payload.id) {
+          state.currentAudit = {
+            ...state.currentAudit,
+            status: action.payload.status,
+            results: action.payload.results || state.currentAudit.results,
+            completedAt: action.payload.completedAt,
+          };
+        }
+
+        // Update in audits list
+        const auditIndex = state.audits.findIndex(
+          (audit) => audit.id === action.payload.id
+        );
+        if (auditIndex !== -1) {
+          state.audits[auditIndex] = {
+            ...state.audits[auditIndex],
+            status: action.payload.status,
+            results: action.payload.results || state.audits[auditIndex].results,
+            completedAt: action.payload.completedAt,
+          };
+        }
+
         state.error = null;
       })
       .addCase(fetchAuditResults.rejected, (state, action) => {
@@ -436,6 +491,9 @@ const auditSlice = createSlice({
         // Update current audit
         if (state.currentAudit?.id === auditId) {
           state.currentAudit.status = status.status;
+          if (status.completedAt) {
+            state.currentAudit.completedAt = status.completedAt;
+          }
           if (state.currentAudit && state.currentAudit.results) {
             state.currentAudit.results.progress = status.progress;
           }
@@ -447,6 +505,9 @@ const auditSlice = createSlice({
         );
         if (auditIndex !== -1) {
           state.audits[auditIndex].status = status.status;
+          if (status.completedAt) {
+            state.audits[auditIndex].completedAt = status.completedAt;
+          }
           if (state.audits[auditIndex].results) {
             state.audits[auditIndex].results.progress = status.progress;
           }
@@ -522,6 +583,7 @@ export const {
   stopPolling,
   clearPolling,
   updatePagination,
+  updateAuditData,
 } = auditSlice.actions;
 
 export default auditSlice.reducer;

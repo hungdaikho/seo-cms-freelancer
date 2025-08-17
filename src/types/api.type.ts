@@ -1577,7 +1577,7 @@ export interface CreateComprehensiveAuditRequest {
 
 export interface AuditAPIResponse {
   id: string;
-  projectId: string;
+  projectId?: string; // Made optional since API response might not include it
   status: "pending" | "running" | "completed" | "failed";
   results: {
     config?: Record<string, any>;

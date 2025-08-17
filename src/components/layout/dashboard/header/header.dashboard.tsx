@@ -4,10 +4,12 @@ import { Button, Dropdown, MenuProps, Input } from "antd";
 import { SearchOutlined, BellOutlined } from "@ant-design/icons";
 import { FaUser } from "react-icons/fa";
 import { useAuth } from "@/stores/hooks/useAuth";
+import { useRouter } from "next/navigation";
 type Props = {};
 
 const HeaderDashBorad = ({}: Props) => {
   const { user } = useAuth();
+  const router = useRouter();
   const userAction: MenuProps["items"] = [
     {
       key: "1",
@@ -25,6 +27,9 @@ const HeaderDashBorad = ({}: Props) => {
     {
       key: "3",
       label: "Manage users",
+      onClick: () => {
+        router.push("/manage-user");
+      },
     },
     {
       key: "4",

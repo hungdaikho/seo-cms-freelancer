@@ -5,6 +5,7 @@ import modalSlice from "./slices/modal.slice";
 import projectsSlice from "./slices/projects.slice";
 import rankTrackingSlice from "./slices/rank-tracking.slice";
 import competitiveSlice from "./slices/competitive.slice";
+import adminDashboardSlice from "./slices/admin-dashboard.slice";
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     projects: projectsSlice,
     rankTracking: rankTrackingSlice,
     competitive: competitiveSlice,
+    adminDashboard: adminDashboardSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(apiEventMiddleware),

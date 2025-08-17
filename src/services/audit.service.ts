@@ -132,8 +132,8 @@ export class AuditService extends BaseService {
   /**
    * Lấy kết quả audit (chỉ khi hoàn thành)
    */
-  async getAuditResults(auditId: string): Promise<AuditResultsResponse> {
-    return this.get<AuditResultsResponse>(`/audits/${auditId}/results`);
+  async getAuditResults(auditId: string): Promise<AuditAPIResponse> {
+    return this.get<AuditAPIResponse>(`/audits/${auditId}/results`);
   }
 
   /**
@@ -153,7 +153,7 @@ export class AuditService extends BaseService {
   async pollAuditUntilComplete(
     auditId: string,
     onProgress?: (progress: number) => void
-  ): Promise<AuditResultsResponse> {
+  ): Promise<AuditAPIResponse> {
     return new Promise((resolve, reject) => {
       const pollInterval = setInterval(async () => {
         try {
