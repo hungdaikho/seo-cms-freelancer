@@ -97,11 +97,13 @@ export class AuthService extends BaseService {
    */
   resetPassword(
     token: string,
-    newPassword: string
+    newPassword: string,
+    confirmPassword?: string
   ): Promise<{ message: string }> {
     return this.post<{ message: string }>("/auth/reset-password", {
       token,
       newPassword,
+      confirmPassword: confirmPassword || newPassword,
     });
   }
 

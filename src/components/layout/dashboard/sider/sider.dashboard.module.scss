@@ -1,6 +1,6 @@
 .sider {
   width: 100%;
-  background: #ffffff;
+  background: rgb(245, 245, 245);
   border-right: 1px solid #e8e8e8;
   height: 100vh;
   overflow-y: auto;
@@ -22,6 +22,7 @@
   .menuItem {
     padding: 16px 8px;
     width: 300px;
+    background: #fff;
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 18px;
@@ -29,47 +30,31 @@
     font-weight: 700;
     line-height: 100%;
     text-align: center;
+    margin-bottom: 8px;
 
     &:hover {
-      background-color: #f5f5f5;
+      background-color: #0d4acf1f;
     }
 
     &.active {
-      background-color: #e6f7ff;
+      background-color: #0d4acf1f;
       color: #0d4ccf;
     }
 
-    &.submenuItem {
-      font-size: 14px;
-      border-left: none;
-      color: #595959;
-
-      &:hover {
-        background-color: #fafafa;
-        color: #262626;
-      }
-
-      &.active {
-        background-color: #e6f7ff;
-        color: #1890ff;
-      }
-    }
-
     &.subSubmenuItem {
-      font-size: 13px;
+      font-size: 14px;
       padding-left: 24px;
       color: #8c8c8c;
-      font-weight: 400;
-
+      font-weight: 500;
+      background: transparent;
       &:hover {
         background-color: #fafafa;
         color: #262626;
       }
 
       &.active {
-        background-color: #e6f7ff;
-        color: #1890ff;
-        font-weight: 500;
+        background-color: transparent;
+        color: #0d4ccf;
       }
     }
 
@@ -87,7 +72,7 @@
     align-items: center;
     justify-content: center;
     font-size: 14px;
-    color: #595959;
+    color: #000;
     transition: all 0.2s ease;
     background-color: #ffffff;
 
@@ -102,7 +87,7 @@
     }
 
     span {
-      font-weight: 400;
+      font-weight: 500;
     }
   }
 }

@@ -135,6 +135,7 @@ const OnPageAuditPage = () => {
           country: values.country || "US",
           language: values.language || "en",
           trackingEnabled: true,
+          keyWordsArray: [],
         },
       };
 

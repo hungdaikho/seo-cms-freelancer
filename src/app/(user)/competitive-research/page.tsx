@@ -395,7 +395,7 @@ const CompetitiveResearchPage = (props: Props) => {
 
       {/* Domain Search Section */}
       <Card className={styles.searchSection}>
-        <h2 className={styles.sectionTitle}>Competitive Research</h2>
+        <h2 className={styles.sectionTitle}>Domain Overview</h2>
         <p className={styles.sectionDescription}>
           Analyze your domain against competitors to discover opportunities and
           gaps

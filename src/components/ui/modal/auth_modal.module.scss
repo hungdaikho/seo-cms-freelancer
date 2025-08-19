@@ -143,16 +143,6 @@
       margin: 24px 0;
       position: relative;
 
-      &::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: #e0e0e0;
-      }
-
       span {
         background: white;
         padding: 0 16px;

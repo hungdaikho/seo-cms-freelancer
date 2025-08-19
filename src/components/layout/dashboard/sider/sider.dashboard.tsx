@@ -21,11 +21,11 @@ const SiderDashBoard = () => {
   const isKeywordResearchExpanded = () => {
     return pathname.startsWith("/keyword-research");
   };
-
-  const isBacklinkResearchExpanded = () => {
-    return pathname.startsWith("/backlink-research");
+  const isDashBoardExpanded = () => {
+    return (
+      pathname.startsWith("/dashboard") || pathname.startsWith("/rank-tracking")
+    );
   };
-
   return (
     <div className={styles.sider}>
       {/* Dashboard Section */}
@@ -41,14 +41,16 @@ const SiderDashBoard = () => {
       </div>
 
       {/* SEO Submenu Items */}
-      <div
-        className={`${styles.menuItem} ${styles.submenuItem} ${
-          isActive("/rank-tracking") ? styles.active : ""
-        }`}
-        onClick={() => router.push("/rank-tracking")}
-      >
-        <span>Rank Tracking</span>
-      </div>
+      {isDashBoardExpanded() && (
+        <div
+          className={`${styles.menuItem} ${styles.subSubmenuItem} ${
+            isActive("/rank-tracking") ? styles.active : ""
+          }`}
+          onClick={() => router.push("/rank-tracking")}
+        >
+          <span>Rank Tracking</span>
+        </div>
+      )}
 
       <div
         className={`${styles.menuItem} ${styles.submenuItem} ${

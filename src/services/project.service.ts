@@ -24,6 +24,7 @@ export interface CreateProjectRequest {
         country: string;
         language: string;
         trackingEnabled: boolean;
+        keyWordsArray: string[]
     };
 }
 
@@ -32,6 +33,9 @@ export interface Project {
     name: string;
     domain: string;
     ownerId: string;
+    description?: string;
+    isShared?: boolean;
+    shareCode?: string;
     settings: {
         country: string;
         language: string;
@@ -44,6 +48,7 @@ export interface Project {
         competitors: number;
         audits: number;
         backlinks?: number;
+        members?: number;
     };
 }
 
@@ -99,6 +104,113 @@ export interface UpdateProjectRequest {
     };
 }
 
+// Project Sharing Types
+export interface SharedProject {
+    id: string;
+    name: string;
+    domain: string;
+    description?: string;
+    shareCode: string;
+    owner: {
+        id: string;
+        name: string;
+        email: string;
+    };
+    _count: {
+        keywords: number;
+        competitors: number;
+        audits: number;
+        members: number;
+    };
+}
+
+export interface SharedProjectsSearchResponse {
+    data: SharedProject[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
+export interface ProjectMember {
+    id: string;
+    projectId: string;
+    userId: string;
+    role: 'member' | 'moderator';
+    status: 'active' | 'inactive';
+    appliedAt: string;
+    approvedAt?: string;
+    user: {
+        id: string;
+        name: string;
+        email: string;
+        avatarUrl?: string;
+    };
+}
+
+export interface ProjectMembership {
+    id: string;
+    projectId: string;
+    userId: string;
+    role: 'member' | 'moderator';
+    status: 'active' | 'inactive';
+    appliedAt: string;
+    project: {
+        id: string;
+        name: string;
+        domain: string;
+        description?: string;
+        owner: {
+            id: string;
+            name: string;
+            email: string;
+        };
+        _count: {
+            keywords: number;
+            competitors: number;
+            audits: number;
+            members: number;
+        };
+    };
+}
+
+export interface AppliedProjectsResponse {
+    data: ProjectMembership[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
+export interface ProjectMembersResponse {
+    data: ProjectMember[];
+    total: number;
+}
+
+export interface SharedProjectsSearchParams {
+    search?: string;
+    shareCode?: string;
+    page?: number;
+    limit?: number;
+}
+
+export interface ApplyToProjectRequest {
+    shareCode: string;
+}
+
+export interface ToggleSharingRequest {
+    isShared: boolean;
+}
+
+export interface ToggleSharingResponse {
+    id: string;
+    name: string;
+    domain: string;
+    isShared: boolean;
+    shareCode?: string;
+    message: string;
+}
+
 export class ProjectService extends BaseService {
     constructor() {
         super(getBaseUrl() + "/api/v1");
@@ -112,7 +224,7 @@ export class ProjectService extends BaseService {
     // 2. Get User Projects
     async getProjects(params?: ProjectsListParams): Promise<ProjectsListResponse> {
         const queryParams = new URLSearchParams();
-        
+
         if (params) {
             if (params.page) queryParams.append('page', params.page.toString());
             if (params.limit) queryParams.append('limit', params.limit.toString());
@@ -147,11 +259,11 @@ export class ProjectService extends BaseService {
 
     // Additional helper methods for dashboard
     async getUserProjectsOverview(): Promise<ProjectsListResponse> {
-        return this.getProjects({ 
-            page: 1, 
-            limit: 10, 
-            sortBy: 'createdAt', 
-            sortOrder: 'desc' 
+        return this.getProjects({
+            page: 1,
+            limit: 10,
+            sortBy: 'createdAt',
+            sortOrder: 'desc'
         });
     }
 
@@ -169,6 +281,81 @@ export class ProjectService extends BaseService {
             })
         );
         return projectsWithStats;
+    }
+
+    // Project Sharing Methods
+
+    // 1. Search Shared Projects
+    async searchSharedProjects(params?: SharedProjectsSearchParams): Promise<SharedProjectsSearchResponse> {
+        const queryParams = new URLSearchParams();
+
+        if (params) {
+            if (params.page) queryParams.append('page', params.page.toString());
+            if (params.limit) queryParams.append('limit', params.limit.toString());
+            if (params.search) queryParams.append('search', params.search);
+            if (params.shareCode) queryParams.append('shareCode', params.shareCode);
+        }
+
+        const url = `/projects/shared/search${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+        return this.get<SharedProjectsSearchResponse>(url);
+    }
+
+    // 2. Apply to Project
+    async applyToProject(data: ApplyToProjectRequest): Promise<{ message: string; membership: ProjectMembership }> {
+        return this.post<{ message: string; membership: ProjectMembership }>('/projects/shared/apply', data);
+    }
+
+    // 3. Get Applied Projects
+    async getAppliedProjects(params?: ProjectsListParams): Promise<AppliedProjectsResponse> {
+        const queryParams = new URLSearchParams();
+
+        if (params) {
+            if (params.page) queryParams.append('page', params.page.toString());
+            if (params.limit) queryParams.append('limit', params.limit.toString());
+            if (params.search) queryParams.append('search', params.search);
+            if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+            if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+        }
+
+        const url = `/projects/applied${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+        return this.get<AppliedProjectsResponse>(url);
+    }
+
+    // 4. Leave Applied Project
+    async leaveAppliedProject(projectId: string): Promise<{ message: string }> {
+        return this.delete<{ message: string }>(`/projects/applied/${projectId}`);
+    }
+
+    // 5. Toggle Project Sharing
+    async toggleProjectSharing(id: string, data: ToggleSharingRequest): Promise<ToggleSharingResponse> {
+        return this.patch<ToggleSharingResponse>(`/projects/${id}/sharing`, data);
+    }
+
+    // 6. Get Project Members
+    async getProjectMembers(id: string): Promise<ProjectMembersResponse> {
+        return this.get<ProjectMembersResponse>(`/projects/${id}/members`);
+    }
+
+    // 7. Remove Project Member
+    async removeProjectMember(projectId: string, memberId: string): Promise<{ message: string }> {
+        return this.delete<{ message: string }>(`/projects/${projectId}/members/${memberId}`);
+    }
+
+    // Additional helper methods for shared projects
+    async getSharedProjectsOverview(): Promise<SharedProjectsSearchResponse> {
+        return this.searchSharedProjects({
+            page: 1,
+            limit: 10
+        });
+    }
+
+    async getAppliedProjectsOverview(): Promise<AppliedProjectsResponse> {
+        return this.getAppliedProjects({
+            page: 1,
+            limit: 10,
+            sortBy: 'appliedAt',
+            sortOrder: 'desc'
+        });
     }
 }
 

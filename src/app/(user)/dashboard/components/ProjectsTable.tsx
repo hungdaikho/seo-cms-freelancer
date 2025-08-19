@@ -6,6 +6,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
+  ShareAltOutlined,
   RiseOutlined,
   FallOutlined,
   MinusOutlined,
@@ -19,6 +20,7 @@ interface ProjectsTableProps {
   onViewProject: (project: any) => void;
   onEditProject: (project: any) => void;
   onDeleteProject: (projectId: string, projectName: string) => void;
+  onManageSharing?: (project: any) => void;
   deleteLoading: boolean;
 }
 
@@ -29,6 +31,7 @@ const ProjectsTable = memo(
     onViewProject,
     onEditProject,
     onDeleteProject,
+    onManageSharing,
     deleteLoading,
   }: ProjectsTableProps) => {
     // Get status tag based on setup progress
@@ -67,9 +70,18 @@ const ProjectsTable = memo(
                   fontWeight: "bold",
                   color: "#1890ff",
                   marginBottom: 4,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                {text}
+                <span>{text}</span>
+                {record.relationshipType === "member" && (
+                  <Tag color="orange" style={{ fontSize: 10, lineHeight: 1 }}>
+                    <ShareAltOutlined style={{ fontSize: 10 }} />
+                    Shared
+                  </Tag>
+                )}
               </div>
               <div style={{ fontSize: "12px", color: "#999", marginBottom: 4 }}>
                 <a
@@ -87,6 +99,13 @@ const ProjectsTable = memo(
                   {record.domain}
                 </a>
               </div>
+              {record.relationshipType === "member" && record.owner && (
+                <div
+                  style={{ fontSize: "11px", color: "#999", marginBottom: 4 }}
+                >
+                  Owner: {record.owner.name}
+                </div>
+              )}
               <div style={{ marginBottom: 4 }}>{getStatusTag(record)}</div>
               <div style={{ fontSize: "11px", color: "#666" }}>
                 {countryInfo && (
@@ -257,6 +276,51 @@ const ProjectsTable = memo(
         ),
       },
       {
+        title: "Sharing",
+        key: "sharing",
+        width: 120,
+        render: (record: any) => {
+          const isSharedByOwner = record.isShared; // Project is shared by owner
+          const isMemberOfShared = record.relationshipType === "member"; // User is member of shared project
+
+          return (
+            <div style={{ textAlign: "center" }}>
+              {isSharedByOwner || isMemberOfShared ? (
+                <div>
+                  <Tag color="green" style={{ marginBottom: 4 }}>
+                    <ShareAltOutlined style={{ marginRight: 4 }} />
+                    {isMemberOfShared ? "Applied" : "Shared"}
+                  </Tag>
+                  {record.shareCode && (
+                    <div
+                      style={{
+                        fontSize: "10px",
+                        color: "#666",
+                        fontFamily: "monospace",
+                      }}
+                    >
+                      {record.shareCode}
+                    </div>
+                  )}
+                  {record._count?.members > 0 && (
+                    <div style={{ fontSize: "11px", color: "#999" }}>
+                      {record._count.members} members
+                    </div>
+                  )}
+                  {isMemberOfShared && record.owner && (
+                    <div style={{ fontSize: "10px", color: "#999" }}>
+                      Owner: {record.owner.name}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Tag color="default">Private</Tag>
+              )}
+            </div>
+          );
+        },
+      },
+      {
         title: "Actions",
         key: "actions",
         width: 120,
@@ -270,24 +334,43 @@ const ProjectsTable = memo(
                 onClick={() => onViewProject(record)}
               />
             </Tooltip>
-            <Tooltip title="Edit Project">
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                size="small"
-                onClick={() => onEditProject(record)}
-              />
-            </Tooltip>
-            <Tooltip title="Delete Project">
-              <Button
-                type="text"
-                danger
-                icon={<DeleteOutlined />}
-                size="small"
-                onClick={() => onDeleteProject(record.id, record.name)}
-                loading={deleteLoading}
-              />
-            </Tooltip>
+            {record.relationshipType !== "member" && (
+              <Tooltip title="Edit Project">
+                <Button
+                  type="text"
+                  icon={<EditOutlined />}
+                  size="small"
+                  onClick={() => onEditProject(record)}
+                />
+              </Tooltip>
+            )}
+            {onManageSharing && record.relationshipType !== "member" && (
+              <Tooltip
+                title={record.isShared ? "Manage Sharing" : "Enable Sharing"}
+              >
+                <Button
+                  type="text"
+                  icon={<ShareAltOutlined />}
+                  size="small"
+                  style={{
+                    color: record.isShared ? "#52c41a" : "#1890ff",
+                  }}
+                  onClick={() => onManageSharing(record)}
+                />
+              </Tooltip>
+            )}
+            {record.relationshipType !== "member" && (
+              <Tooltip title="Delete Project">
+                <Button
+                  type="text"
+                  danger
+                  icon={<DeleteOutlined />}
+                  size="small"
+                  onClick={() => onDeleteProject(record.id, record.name)}
+                  loading={deleteLoading}
+                />
+              </Tooltip>
+            )}
           </Space>
         ),
       },

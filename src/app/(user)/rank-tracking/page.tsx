@@ -53,14 +53,10 @@ const RankTrackingPage = () => {
       message.error(error.fetchProjectsWithStats);
     }
   }, [error.fetchProjectsWithStats]);
-
-  const handleEditProject = () => {
-    setIsCreateModalVisible(true);
-  };
-
-  const handleProjectCreated = () => {
+  const handleProjectCreated = async () => {
     // Refresh projects list after creating new project
-    dispatch(fetchProjectsWithStats());
+    await dispatch(fetchProjectsWithStats());
+    setIsCreateModalVisible(false);
   };
 
   const handleProjectChange = (project: Project) => {

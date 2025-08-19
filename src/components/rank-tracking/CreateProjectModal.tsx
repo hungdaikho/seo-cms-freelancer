@@ -134,12 +134,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
           country: finalData.country,
           language: finalData.language,
           trackingEnabled: true,
+          keyWordsArray: keywordsArray,
         },
       };
 
       // Dispatch create project action
       await dispatch(createProject(createProjectData)).unwrap();
-
+      onSuccess?.();
       // Success handling is done in useEffect
     } catch (errorInfo) {
       console.log("Failed:", errorInfo);

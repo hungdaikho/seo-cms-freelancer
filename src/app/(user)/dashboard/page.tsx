@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { message, Form, Modal, App } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '@/stores/store';
-import { 
-  fetchProjectsWithStats, 
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/stores/store";
+import {
+  fetchProjectsWithStats,
   fetchProjects,
   createProject,
   deleteProject,
@@ -19,8 +19,11 @@ import {
   selectProjectsError,
   selectProjectsFilters,
   selectProjectsPagination,
-} from '@/stores/slices/projects.slice';
-import { CreateProjectRequest, UpdateProjectRequest } from '@/services/project.service';
+} from "@/stores/slices/projects.slice";
+import {
+  CreateProjectRequest,
+  UpdateProjectRequest,
+} from "@/services/project.service";
 
 // Components
 import {
@@ -29,11 +32,14 @@ import {
   ProjectTabs,
   StatsCards,
   ProjectsTable,
-  ProjectModals
-} from './components';
+  ProjectModals,
+  SharedProjectsModal,
+  AppliedProjectsModal,
+  ProjectSharingModal,
+} from "./components";
 
 // Custom Hook
-import { useProjectSearch } from './hooks';
+import { useProjectSearch } from "./hooks";
 
 type Props = {};
 
@@ -54,7 +60,7 @@ const Page = (props: Props) => {
     setSelectedCountry,
     filteredProjects,
     clearSearch,
-    isFiltered
+    isFiltered,
   } = useProjectSearch(projectsWithStats);
 
   // Modal states
@@ -62,7 +68,20 @@ const Page = (props: Props) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
-  
+
+  // Sharing modal states
+  const [isSharedProjectsModalVisible, setIsSharedProjectsModalVisible] =
+    useState(false);
+  const [isAppliedProjectsModalVisible, setIsAppliedProjectsModalVisible] =
+    useState(false);
+  const [isProjectSharingModalVisible, setIsProjectSharingModalVisible] =
+    useState(false);
+
+  // Project filter state
+  const [projectFilter, setProjectFilter] = useState<
+    "all" | "owner" | "shared"
+  >("all");
+
   // Forms
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
@@ -100,17 +119,21 @@ const Page = (props: Props) => {
   // Handle advanced search (when clicking search button)
   const handleAdvancedSearch = () => {
     if (debouncedSearchValue) {
-      dispatch(setFilters({ 
-        search: debouncedSearchValue
-      }));
-      
-      dispatch(fetchProjects({ 
-        search: debouncedSearchValue, 
-        page: 1, 
-        limit: pagination.limit,
-        sortBy: filters.sortBy,
-        sortOrder: filters.sortOrder 
-      }));
+      dispatch(
+        setFilters({
+          search: debouncedSearchValue,
+        })
+      );
+
+      dispatch(
+        fetchProjects({
+          search: debouncedSearchValue,
+          page: 1,
+          limit: pagination.limit,
+          sortBy: filters.sortBy,
+          sortOrder: filters.sortOrder,
+        })
+      );
     }
   };
 
@@ -138,14 +161,15 @@ const Page = (props: Props) => {
       domain: values.domain,
       settings: {
         country: values.country || selectedCountry,
-        language: values.language || 'en',
-        trackingEnabled: true
-      }
+        language: values.language || "en",
+        trackingEnabled: true,
+        keyWordsArray: [],
+      },
     };
 
     try {
       await dispatch(createProject(projectData)).unwrap();
-      message.success('Project created successfully!');
+      message.success("Project created successfully!");
       setIsCreateModalVisible(false);
       form.resetFields();
       dispatch(fetchProjectsWithStats());
@@ -161,7 +185,7 @@ const Page = (props: Props) => {
     try {
       await dispatch(fetchProjectDetails(project.id)).unwrap();
     } catch (error) {
-      console.error('Failed to fetch project details:', error);
+      console.error("Failed to fetch project details:", error);
     }
   };
 
@@ -171,8 +195,8 @@ const Page = (props: Props) => {
     editForm.setFieldsValue({
       name: project.name,
       domain: project.domain,
-      country: project.settings?.country || 'US',
-      language: project.settings?.language || 'en',
+      country: project.settings?.country || "US",
+      language: project.settings?.language || "en",
       trackingEnabled: project.settings?.trackingEnabled || false,
     });
     setIsEditModalVisible(true);
@@ -188,15 +212,17 @@ const Page = (props: Props) => {
         country: values.country,
         language: values.language,
         trackingEnabled: values.trackingEnabled,
-      }
+      },
     };
 
     try {
-      await dispatch(updateProject({ 
-        id: selectedProject.id, 
-        data: updateData 
-      })).unwrap();
-      message.success('Project updated successfully!');
+      await dispatch(
+        updateProject({
+          id: selectedProject.id,
+          data: updateData,
+        })
+      ).unwrap();
+      message.success("Project updated successfully!");
       setIsEditModalVisible(false);
       editForm.resetFields();
       setSelectedProject(null);
@@ -208,40 +234,65 @@ const Page = (props: Props) => {
 
   // Handle delete project
   const handleDeleteProject = (projectId: string, projectName: string) => {
-    console.log('Delete project clicked:', { projectId, projectName });
-    
+    console.log("Delete project clicked:", { projectId, projectName });
+
     modal.confirm({
-      title: 'Delete Project',
-      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
+      title: "Delete Project",
+      icon: <ExclamationCircleOutlined style={{ color: "#ff4d4f" }} />,
       content: (
         <div>
-          <p>Are you sure you want to delete "<strong>{projectName}</strong>"?</p>
-          <p style={{ color: '#ff4d4f', marginBottom: 0 }}>
-            This action cannot be undone and will permanently remove all project data including keywords, audits, and statistics.
+          <p>
+            Are you sure you want to delete "<strong>{projectName}</strong>"?
+          </p>
+          <p style={{ color: "#ff4d4f", marginBottom: 0 }}>
+            This action cannot be undone and will permanently remove all project
+            data including keywords, audits, and statistics.
           </p>
         </div>
       ),
-      okText: 'Yes, Delete Project',
-      okType: 'danger',
-      cancelText: 'Cancel',
+      okText: "Yes, Delete Project",
+      okType: "danger",
+      cancelText: "Cancel",
       okButtonProps: {
         loading: loading.deleteProject,
       },
       onOk: async () => {
         try {
-          console.log('Deleting project:', projectId);
+          console.log("Deleting project:", projectId);
           await dispatch(deleteProject(projectId)).unwrap();
           message.success(`Project "${projectName}" deleted successfully!`);
           dispatch(fetchProjectsWithStats());
         } catch (error) {
-          console.error('Delete failed:', error);
+          console.error("Delete failed:", error);
         }
       },
     });
   };
 
+  // Handle filter change
+  const handleFilterChange = (filter: "all" | "owner" | "shared") => {
+    setProjectFilter(filter);
+  };
+
+  // Apply project filter
+  const getFilteredProjects = (projects: any[]) => {
+    const baseProjects = isFiltered ? filteredProjects : projects;
+
+    switch (projectFilter) {
+      case "owner":
+        return baseProjects.filter((p) => p.relationshipType !== "member");
+      case "shared":
+        return baseProjects.filter(
+          (p) => p.isShared || p.relationshipType === "member"
+        );
+      case "all":
+      default:
+        return baseProjects;
+    }
+  };
+
   // Get current projects for display
-  const currentProjects = isFiltered ? filteredProjects : projectsWithStats;
+  const currentProjects = getFilteredProjects(projectsWithStats);
 
   // Modal handlers
   const handleCloseCreateModal = () => {
@@ -265,23 +316,53 @@ const Page = (props: Props) => {
     editForm.resetFields();
   };
 
+  // Sharing handlers
+  const handleDiscoverSharedProjects = () => {
+    setIsSharedProjectsModalVisible(true);
+  };
+
+  const handleViewAppliedProjects = () => {
+    setIsAppliedProjectsModalVisible(true);
+  };
+
+  const handleManageSharing = (project: any) => {
+    setSelectedProject(project);
+    setIsProjectSharingModalVisible(true);
+  };
+
+  const handleApplySuccess = () => {
+    // Refresh projects when user applies to a new project
+    dispatch(fetchProjectsWithStats());
+  };
+
+  const handleLeaveSuccess = () => {
+    // Refresh projects when user leaves a project
+    dispatch(fetchProjectsWithStats());
+  };
+
+  const handleSharingToggled = (updatedProject: any) => {
+    // Refresh projects to show updated sharing status
+    dispatch(fetchProjectsWithStats());
+  };
+
   // Render projects section
   const renderProjectsSection = () => (
     <div style={{ padding: "24px" }}>
       <ProjectTabs
         projects={currentProjects}
         totalProjects={projectsWithStats.length}
-        isFiltered={isFiltered}
+        isFiltered={isFiltered || projectFilter !== "all"}
         loading={loading.fetchProjectsWithStats}
         onRefresh={handleRefresh}
         onCreateProject={() => setIsCreateModalVisible(true)}
         createLoading={loading.createProject}
+        onDiscoverSharedProjects={handleDiscoverSharedProjects}
+        onViewAppliedProjects={handleViewAppliedProjects}
+        activeFilter={projectFilter}
+        onFilterChange={handleFilterChange}
       />
 
-      <StatsCards
-        projects={currentProjects}
-        isFiltered={isFiltered}
-      />
+      <StatsCards projects={currentProjects} isFiltered={isFiltered} />
 
       <div
         style={{
@@ -310,6 +391,7 @@ const Page = (props: Props) => {
           onViewProject={handleViewProject}
           onEditProject={handleEditProject}
           onDeleteProject={handleDeleteProject}
+          onManageSharing={handleManageSharing}
           deleteLoading={loading.deleteProject}
         />
       </div>
@@ -347,7 +429,7 @@ const Page = (props: Props) => {
       >
         {contextHolder}
         {renderMainDashboard()}
-        
+
         <ProjectModals
           // Create Modal
           isCreateModalVisible={isCreateModalVisible}
@@ -356,20 +438,41 @@ const Page = (props: Props) => {
           selectedCountry={selectedCountry}
           onCreateProject={handleCreateProject}
           onCloseCreateModal={handleCloseCreateModal}
-          
           // View Modal
           isViewModalVisible={isViewModalVisible}
           selectedProject={selectedProject}
           viewLoading={loading.fetchProjectDetails}
           onCloseViewModal={handleCloseViewModal}
           onEditFromView={handleEditFromView}
-          
           // Edit Modal
           isEditModalVisible={isEditModalVisible}
           editForm={editForm}
           updateLoading={loading.updateProject}
           onUpdateProject={handleUpdateProject}
           onCloseEditModal={handleCloseEditModal}
+        />
+
+        {/* Sharing Modals */}
+        <SharedProjectsModal
+          visible={isSharedProjectsModalVisible}
+          onClose={() => setIsSharedProjectsModalVisible(false)}
+          onApplySuccess={handleApplySuccess}
+        />
+
+        <AppliedProjectsModal
+          visible={isAppliedProjectsModalVisible}
+          onClose={() => setIsAppliedProjectsModalVisible(false)}
+          onLeaveSuccess={handleLeaveSuccess}
+        />
+
+        <ProjectSharingModal
+          visible={isProjectSharingModalVisible}
+          onClose={() => {
+            setIsProjectSharingModalVisible(false);
+            setSelectedProject(null);
+          }}
+          project={selectedProject}
+          onSharingToggled={handleSharingToggled}
         />
       </div>
     </App>
