@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./sider.dashboard.module.scss";
-import { FaQuestionCircle } from "react-icons/fa";
+import { FaQuestion } from "react-icons/fa";
 import { useRouter, usePathname } from "next/navigation";
 
 const SiderDashBoard = () => {
@@ -162,9 +162,8 @@ const SiderDashBoard = () => {
       {/* Support Section */}
       <div className={styles.sectionTitle}>Support</div>
 
-      <div className={styles.helpButton}>
-        <FaQuestionCircle />
-        <span>Help ?</span>
+      <div className={styles.helpButton} style={{ fontSize: "16px" }}>
+        <span>Help </span> <FaQuestion style={{ fontSize: "14px" }} />
       </div>
     </div>
   );

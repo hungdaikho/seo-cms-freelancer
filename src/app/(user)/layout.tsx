@@ -4,11 +4,12 @@ import ReduxProvider from "@/provider/redux_provider";
 import AuthGuard from "@/components/layout/auth_guard";
 import "../globals.css";
 import { useTranslation } from "react-i18next";
-import { Content, Header } from "antd/es/layout/layout";
+import { Content, Header, Footer } from "antd/es/layout/layout";
 import { Layout, ConfigProvider, App } from "antd";
 import Sider from "antd/es/layout/Sider";
 import HeaderDashboard from "@/components/layout/dashboard/header/header.dashboard";
 import SiderDashBoard from "@/components/layout/dashboard/sider/sider.dashboard";
+import FooterComponent from "@/components/layout/footer/footer";
 import { useEffect } from "react";
 import suppressAntdReact19Warning from "@/utils/suppress-warnings";
 import { antdConfig } from "@/config/antd.config";
@@ -71,8 +72,15 @@ export default function RootLayout({
                     <Sider width={320} style={{ background: "transparent" }}>
                       <SiderDashBoard />
                     </Sider>
-                    <Content style={{ maxHeight: "100%", overflow: "auto" }}>
-                      {children}
+                    <Content style={{ overflow: "auto" }}>
+                      <div style={{ minHeight: "100%" }}>
+                        {children}
+                        <Footer
+                          style={{ padding: 0, background: "transparent" }}
+                        >
+                          <FooterComponent />
+                        </Footer>
+                      </div>
                     </Content>
                   </Layout>
                 </Layout>

@@ -87,10 +87,7 @@ const SearchHeader = memo(
             }}
           >
             <Select.Option key="ALL" value="ALL" label="🌍 All Countries">
-              <Space>
-                <span>🌍</span>
-                All Countries
-              </Space>
+              <Space>All Countries</Space>
             </Select.Option>
             <Select.OptGroup label="Popular Countries">
               {popularCountries.map((country) => (
@@ -151,6 +148,7 @@ const SearchHeader = memo(
             icon={<ReloadOutlined />}
             onClick={onRefresh}
             loading={loading}
+            style={{ fontWeight: "600" }}
           >
             Refresh
           </Button>

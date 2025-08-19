@@ -1,0 +1,244 @@
+.footer {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 20px 0;
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .topSection {
+    margin-bottom: 20px;
+
+    @media (max-width: 768px) {
+      margin-bottom: 15px;
+    }
+  }
+
+  .contactSection {
+    width: 100%;
+
+    .contactTitle {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: white;
+    }
+
+    .topRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 30px;
+      margin-bottom: 20px;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+
+    .searchContainer {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      max-width: 300px;
+
+      .emailInput {
+        flex: 1;
+        height: 32px;
+        border: 1px solid #333;
+        background: #2a2a2a;
+        color: white;
+        padding: 0 12px;
+        border-radius: 4px;
+        font-size: 13px;
+
+        &::placeholder {
+          color: #888;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #1890ff;
+        }
+      }
+
+      .searchButton {
+        background: #1890ff;
+        color: white;
+        border: none;
+        padding: 0 16px;
+        height: 32px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 13px;
+
+        &:hover {
+          background: #40a9ff;
+        }
+      }
+    }
+
+    .workingHours {
+      color: #ccc;
+      font-size: 12px;
+      line-height: 1.4;
+      flex: 1;
+      text-align: center;
+    }
+
+    .getStartedSection {
+      display: flex;
+      align-items: flex-start;
+
+      .getStartedButton {
+        background: #1890ff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+
+        &:hover {
+          background: #40a9ff;
+        }
+      }
+    }
+
+    .bottomInfo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+
+    .address {
+      color: #ccc;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .email {
+      color: #ccc;
+      font-size: 12px;
+    }
+
+    .phoneSection {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .countrySelect {
+        background: #2a2a2a;
+        border: 1px solid #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+
+      .phoneNumber {
+        color: #ccc;
+        font-size: 12px;
+      }
+    }
+
+    .languageSelect {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .languageLabel {
+        color: #ccc;
+        font-size: 12px;
+      }
+
+      .languageDropdown {
+        background: #2a2a2a;
+        border: 1px solid #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        min-width: 80px;
+      }
+    }
+  }
+
+  .getStartedSection {
+    display: flex;
+    align-items: center;
+
+    .getStartedButton {
+      background: #1890ff;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+
+      &:hover {
+        background: #40a9ff;
+      }
+    }
+  }
+
+  .linksSection {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 30px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .linkColumn {
+      flex: 1;
+      min-width: 120px;
+
+      .columnTitle {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: white;
+      }
+
+      .linkList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          margin-bottom: 6px;
+
+          a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.3s ease;
+
+            &:hover {
+              color: #1890ff;
+            }
+          }
+        }
+      }
+    }
+  }
+}

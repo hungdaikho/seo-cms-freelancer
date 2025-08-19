@@ -251,6 +251,7 @@ const OnPageAuditPage = () => {
               icon={<PlayCircleOutlined />}
               onClick={handleCreateAudit}
               loading={isCreating}
+              style={{ fontWeight: "bold" }}
             >
               Start New Audit
             </Button>

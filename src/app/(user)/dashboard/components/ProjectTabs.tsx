@@ -95,22 +95,22 @@ const ProjectTabs = memo(
         </div>
         <Space size={12}>
           <Button
-            icon={<ShareAltOutlined />}
-            style={{ borderRadius: "6px" }}
+            icon={<ShareAltOutlined style={{ fontWeight: "bold" }} />}
+            style={{ borderRadius: "6px", fontWeight: "bold" }}
             onClick={onDiscoverSharedProjects}
           >
             Discover Projects
           </Button>
           <Button
             icon={<TeamOutlined />}
-            style={{ borderRadius: "6px" }}
+            style={{ borderRadius: "6px", fontWeight: "bold" }}
             onClick={onViewAppliedProjects}
           >
             My Applied
           </Button>
           <Button
             icon={<ReloadOutlined />}
-            style={{ borderRadius: "6px" }}
+            style={{ borderRadius: "6px", fontWeight: "bold" }}
             onClick={onRefresh}
             loading={loading}
           >
@@ -119,7 +119,7 @@ const ProjectTabs = memo(
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            style={{ borderRadius: "6px" }}
+            style={{ borderRadius: "6px", fontWeight: "bold" }}
             onClick={onCreateProject}
             loading={createLoading}
           >

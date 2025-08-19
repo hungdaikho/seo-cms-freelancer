@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import styles from "./header.dashboard.module.scss";
 import { Button, Dropdown, MenuProps, Input, AutoComplete } from "antd";
 import { SearchOutlined, BellOutlined } from "@ant-design/icons";
-import { FaUser } from "react-icons/fa";
 import { useAuth } from "@/stores/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import useSearch from "@/hooks/useSearch";
+import { IoIosNotifications } from "react-icons/io";
 type Props = {};
 
 const HeaderDashBorad = ({}: Props) => {
@@ -40,6 +40,17 @@ const HeaderDashBorad = ({}: Props) => {
             label: "Manage users",
             onClick: () => {
               router.push("/manage-user");
+            },
+          },
+        ]
+      : []),
+    ...(user?.role === "super_admin"
+      ? [
+          {
+            key: "5",
+            label: "CMS Infomation",
+            onClick: () => {
+              router.push("/cms-admin");
             },
           },
         ]
@@ -143,13 +154,24 @@ const HeaderDashBorad = ({}: Props) => {
         {/* Notification Bell */}
         <Button
           type="text"
-          icon={<BellOutlined />}
+          style={{ fontSize: "24px" }}
+          icon={<IoIosNotifications />}
           className={styles.iconButton}
         />
 
         {/* User Profile */}
         <Dropdown menu={{ items: userAction }} trigger={["click"]}>
-          <Button type="text" icon={<FaUser />} className={styles.userButton} />
+          <Button
+            type="text"
+            icon={
+              <img
+                style={{ objectFit: "contain", width: "16px" }}
+                src="/user.png"
+                alt=""
+              />
+            }
+            className={styles.userButton}
+          ></Button>
         </Dropdown>
       </div>
     </div>
