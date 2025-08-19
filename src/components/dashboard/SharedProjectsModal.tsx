@@ -15,6 +15,7 @@ import {
   Row,
   Col,
   Divider,
+  App,
 } from "antd";
 import {
   SearchOutlined,
@@ -59,7 +60,7 @@ const SharedProjectsModal: React.FC<SharedProjectsModalProps> = ({
   const loading = useSelector(selectProjectsLoading);
   const error = useSelector(selectProjectsError);
   const filters = useSelector(selectSharedFilters);
-
+  const { notification } = App.useApp();
   const [shareCode, setShareCode] = useState("");
 
   useEffect(() => {
@@ -70,10 +71,10 @@ const SharedProjectsModal: React.FC<SharedProjectsModalProps> = ({
 
   useEffect(() => {
     if (error.applyToProject) {
-      message.error(error.applyToProject);
+      notification.error({ message: error.applyToProject });
     }
     if (error.searchSharedProjects) {
-      message.error(error.searchSharedProjects);
+      notification.error({ message: error.searchSharedProjects });
     }
   }, [error]);
 
@@ -108,7 +109,9 @@ const SharedProjectsModal: React.FC<SharedProjectsModalProps> = ({
   const handleApplyToProject = async (project: SharedProject) => {
     try {
       await dispatch(applyToProject({ shareCode: project.shareCode })).unwrap();
-      message.success(`Successfully applied to project "${project.name}"!`);
+      notification.success({
+        message: `Successfully applied to project "${project.name}"!`,
+      });
       onApplySuccess?.();
     } catch (error) {
       // Error handled in useEffect

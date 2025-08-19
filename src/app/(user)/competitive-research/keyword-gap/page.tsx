@@ -9,7 +9,7 @@ import {
   Tabs,
   Table,
   Space,
-  Badge,
+  App,
   Typography,
   Input,
   Tag,
@@ -40,6 +40,7 @@ type Props = {};
 
 const KeyWordGap = (props: Props) => {
   const dispatch = useAppDispatch();
+  const { notification } = App.useApp();
   const [form] = Form.useForm();
 
   // Redux state
@@ -61,12 +62,12 @@ const KeyWordGap = (props: Props) => {
   // Handle form submission
   const handleCompare = async (values: any) => {
     if (!targetDomain.trim()) {
-      message.error("Please enter a target domain");
+      notification.error({ message: "Please enter a target domain" });
       return;
     }
 
     if (filters.competitors.length === 0) {
-      message.error("Please add at least one competitor");
+      notification.error({ message: "Please add at least one competitor" });
       return;
     }
 
@@ -95,9 +96,13 @@ const KeyWordGap = (props: Props) => {
         })
       ).unwrap();
 
-      message.success("Keyword gap analysis completed successfully!");
+      notification.success({
+        message: "Keyword gap analysis completed successfully!",
+      });
     } catch (error: any) {
-      message.error(error.message || "Failed to analyze keyword gaps");
+      notification.error({
+        message: error.message || "Failed to analyze keyword gaps",
+      });
     }
   };
 

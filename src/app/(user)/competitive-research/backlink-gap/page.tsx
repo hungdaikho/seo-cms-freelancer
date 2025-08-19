@@ -20,8 +20,6 @@ import {
   Form,
   Checkbox,
   Dropdown,
-  Menu,
-  notification,
 } from "antd";
 import {
   DownloadOutlined,
@@ -65,6 +63,7 @@ type Props = {};
 const BacklinkGapPage = (props: Props) => {
   const { message } = App.useApp();
   const dispatch = useAppDispatch();
+  const { notification } = App.useApp();
   const {
     backlinkGapAnalysis,
     linkBuildingProspects,
@@ -109,7 +108,9 @@ const BacklinkGapPage = (props: Props) => {
 
   const handleAnalyze = async () => {
     if (!targetDomain || filters.competitors.length === 0) {
-      message.error("Please enter target domain and at least one competitor");
+      notification.error({
+        message: "Please enter target domain and at least one competitor",
+      });
       return;
     }
 
@@ -134,9 +135,13 @@ const BacklinkGapPage = (props: Props) => {
         })
       ).unwrap();
 
-      message.success("Backlink gap analysis completed successfully!");
+      notification.success({
+        message: "Backlink gap analysis completed successfully!",
+      });
     } catch (error: any) {
-      message.error(error.message || "Failed to analyze backlink gap");
+      notification.error({
+        message: error.message || "Failed to analyze backlink gap",
+      });
     }
   };
 
@@ -162,7 +167,7 @@ const BacklinkGapPage = (props: Props) => {
         : filteredProspects || [];
 
     if (!dataToExport.length) {
-      message.warning("No data to export");
+      notification.warning({ message: "No data to export" });
       return;
     }
 
@@ -223,7 +228,9 @@ const BacklinkGapPage = (props: Props) => {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
 
-    message.success(`Exported ${dataToExport.length} prospects successfully!`);
+    notification.success({
+      message: `Exported ${dataToExport.length} prospects successfully!`,
+    });
     setExportModalVisible(false);
   };
 
@@ -233,7 +240,9 @@ const BacklinkGapPage = (props: Props) => {
 
   const handleStartOutreach = () => {
     if (selectedProspects.length === 0) {
-      message.warning("Please select at least one prospect for outreach");
+      notification.warning({
+        message: "Please select at least one prospect for outreach",
+      });
       return;
     }
     setOutreachModalVisible(true);
@@ -276,7 +285,7 @@ const BacklinkGapPage = (props: Props) => {
       // Optionally clear selections
       setSelectedProspects([]);
     } catch (error) {
-      message.error("Failed to create outreach campaign");
+      notification.error({ message: "Failed to create outreach campaign" });
       console.error("Outreach error:", error);
     }
   };
@@ -977,10 +986,9 @@ const BacklinkGapPage = (props: Props) => {
                 onChange: (selectedRowKeys) => {
                   setSelectedProspects(selectedRowKeys as string[]);
                   if (selectedRowKeys.length > 0) {
-                    message.success(
-                      `${selectedRowKeys.length} prospects selected for outreach`,
-                      2
-                    );
+                    notification.success({
+                      message: `${selectedRowKeys.length} prospects selected for outreach`,
+                    });
                   }
                 },
                 getCheckboxProps: (record) => ({
@@ -997,9 +1005,9 @@ const BacklinkGapPage = (props: Props) => {
                       setSelectedProspects((prev) => [
                         ...new Set([...prev, ...highPriorityDomains]),
                       ]);
-                      message.success(
-                        `Selected ${highPriorityDomains.length} high priority prospects`
-                      );
+                      notification.success({
+                        message: `Selected ${highPriorityDomains.length} high priority prospects`,
+                      });
                     },
                   },
                   {
@@ -1012,9 +1020,9 @@ const BacklinkGapPage = (props: Props) => {
                       setSelectedProspects((prev) => [
                         ...new Set([...prev, ...uniqueDomains]),
                       ]);
-                      message.success(
-                        `Selected ${uniqueDomains.length} unique opportunities`
-                      );
+                      notification.success({
+                        message: `Selected ${uniqueDomains.length} unique opportunities`,
+                      });
                     },
                   },
                 ],

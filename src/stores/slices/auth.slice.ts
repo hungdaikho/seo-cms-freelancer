@@ -16,10 +16,6 @@ export const registerAccount = createAsyncThunk<AuthResponse, RegisterRequest>(
     async (data: RegisterRequest, { rejectWithValue }) => {
         try {
             const response = await authService.register(data)
-            // Lưu token vào localStorage
-            if (response.accessToken) {
-                localStorage.setItem('accessToken', response.accessToken)
-            }
             return response
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Registration failed')
@@ -120,9 +116,6 @@ const authSlice = createSlice({
             })
             .addCase(registerAccount.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
                 state.isLoading = false
-                state.user = action.payload.user
-                state.accessToken = action.payload.accessToken
-                state.isAuthenticated = true
                 state.error = null
             })
             .addCase(registerAccount.rejected, (state, action) => {

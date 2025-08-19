@@ -3,7 +3,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/stores/store";
 import { googleAuthSuccess } from "@/stores/slices/auth.slice";
-import { message, Spin, Result, Button } from "antd";
+import { message, Spin, Result, Button, App } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
 const GoogleAuthCallback: React.FC = () => {
@@ -12,7 +12,7 @@ const GoogleAuthCallback: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [isProcessing, setIsProcessing] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const { notification } = App.useApp();
   useEffect(() => {
     const handleGoogleAuth = async () => {
       try {
@@ -28,7 +28,9 @@ const GoogleAuthCallback: React.FC = () => {
         if (token) {
           try {
             await dispatch(googleAuthSuccess(token)).unwrap();
-            message.success("Successfully logged in with Google!");
+            notification.success({
+              message: "Successfully logged in with Google!",
+            });
 
             // Redirect with a small delay to ensure state is updated
             setTimeout(() => {

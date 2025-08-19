@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthModal from "@/components/ui/modal/auth_modal_new";
-import { message } from "antd";
+import { App } from "antd";
 import { useTranslation } from "react-i18next";
 
 const ResetPasswordHandler: React.FC = () => {
@@ -11,7 +11,7 @@ const ResetPasswordHandler: React.FC = () => {
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resetToken, setResetToken] = useState<string>("");
-
+  const { notification } = App.useApp();
   useEffect(() => {
     const token = searchParams.get("token");
 
@@ -20,10 +20,11 @@ const ResetPasswordHandler: React.FC = () => {
       setIsModalOpen(true);
     } else {
       // If no token, redirect to login page or show error
-      message.error(
-        t("invalid_reset_link") ||
-          "Invalid or missing reset token. Please request a new password reset."
-      );
+      notification.error({
+        message:
+          t("invalid_reset_link") ||
+          "Invalid or missing reset token. Please request a new password reset.",
+      });
       router.push("/"); // Redirect to home page
     }
   }, [searchParams, router, t]);

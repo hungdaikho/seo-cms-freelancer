@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { message, Spin, Button, Result } from "antd";
+import { message, Spin, Button, Result, App } from "antd";
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -18,7 +18,7 @@ const VerifyEmailHandler: React.FC = () => {
   const [verified, setVerified] = useState<boolean | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [resendLoading, setResendLoading] = useState(false);
-
+  const { notification } = App.useApp();
   useEffect(() => {
     const token = searchParams.get("token");
 
@@ -38,21 +38,29 @@ const VerifyEmailHandler: React.FC = () => {
     try {
       setLoading(true);
       const response = await authService.verifyEmail(token);
-
       setVerified(true);
-      message.success(
-        response.message ||
-          t("email_verified_success") ||
-          "Email has been verified successfully! You can now sign in to your account."
-      );
+
+      // Handle both string and object response
+      const successMessage =
+        typeof response === "string"
+          ? response
+          : response?.message ||
+            t("email_verified_success") ||
+            "Email has been verified successfully! You can now sign in to your account.";
+
+      notification.success({
+        message: successMessage,
+      });
     } catch (error: any) {
+      console.error("Email verification error:", error);
       setVerified(false);
       const errorMsg =
         error.response?.data?.message ||
+        error.message ||
         t("email_verification_error") ||
         "Failed to verify email. The link may be expired or invalid.";
       setErrorMessage(errorMsg);
-      message.error(errorMsg);
+      notification.error({ message: errorMsg });
     } finally {
       setLoading(false);
     }
@@ -62,17 +70,27 @@ const VerifyEmailHandler: React.FC = () => {
     try {
       setResendLoading(true);
       const response = await authService.resendEmailVerification();
-      message.success(
-        response.message ||
-          t("verification_email_resent") ||
-          "Verification email has been sent. Please check your inbox."
-      );
+
+      // Handle both string and object response
+      const successMessage =
+        typeof response === "string"
+          ? response
+          : response?.message ||
+            t("verification_email_resent") ||
+            "Verification email has been sent. Please check your inbox.";
+
+      notification.success({
+        message: successMessage,
+      });
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message ||
+      console.error("Resend verification error:", error);
+      notification.error({
+        message:
+          error.response?.data?.message ||
+          error.message ||
           t("resend_verification_error") ||
-          "Failed to resend verification email. Please try again later."
-      );
+          "Failed to resend verification email. Please try again later.",
+      });
     } finally {
       setResendLoading(false);
     }

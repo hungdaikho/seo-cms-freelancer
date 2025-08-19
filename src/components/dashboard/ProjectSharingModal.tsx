@@ -16,6 +16,7 @@ import {
   Table,
   Popconfirm,
   Tag,
+  App,
 } from "antd";
 import {
   ShareAltOutlined,
@@ -58,7 +59,7 @@ const ProjectSharingModal: React.FC<ProjectSharingModalProps> = ({
 
   const [isShared, setIsShared] = useState(false);
   const [shareCode, setShareCode] = useState("");
-
+  const { notification } = App.useApp();
   useEffect(() => {
     if (project) {
       setIsShared(project.isShared || false);
@@ -72,13 +73,13 @@ const ProjectSharingModal: React.FC<ProjectSharingModalProps> = ({
 
   useEffect(() => {
     if (error.toggleProjectSharing) {
-      message.error(error.toggleProjectSharing);
+      notification.error({ message: error.toggleProjectSharing });
     }
     if (error.fetchProjectMembers) {
-      message.error(error.fetchProjectMembers);
+      notification.error({ message: error.fetchProjectMembers });
     }
     if (error.removeProjectMember) {
-      message.error(error.removeProjectMember);
+      notification.error({ message: error.removeProjectMember });
     }
   }, [error]);
 
@@ -96,7 +97,7 @@ const ProjectSharingModal: React.FC<ProjectSharingModalProps> = ({
       setIsShared(result.isShared);
       setShareCode(result.shareCode || "");
 
-      message.success(result.message);
+      notification.success({ message: result.message });
 
       // Update the project object with new sharing info
       const updatedProject = {
@@ -117,7 +118,7 @@ const ProjectSharingModal: React.FC<ProjectSharingModalProps> = ({
   const handleCopyShareCode = () => {
     if (shareCode) {
       navigator.clipboard.writeText(shareCode);
-      message.success("Share code copied to clipboard!");
+      notification.success({ message: "Share code copied to clipboard!" });
     }
   };
 
@@ -132,7 +133,9 @@ const ProjectSharingModal: React.FC<ProjectSharingModalProps> = ({
         })
       ).unwrap();
 
-      message.success(`Removed ${member.user.name} from project`);
+      notification.success({
+        message: `Removed ${member.user.name} from project`,
+      });
       // Refresh members list
       dispatch(fetchProjectMembers(project.id));
     } catch (error) {

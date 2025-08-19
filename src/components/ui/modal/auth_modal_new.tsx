@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Input, Form, message } from "antd";
+import { Modal, Button, Input, Form, message, App } from "antd";
 import {
   UserOutlined,
   LockOutlined,
@@ -27,7 +27,7 @@ interface AuthModalProps {
   initialTab?: "login" | "signup" | "forgot-password" | "reset-password";
   resetToken?: string;
 }
-
+let er: any = null;
 const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
@@ -51,7 +51,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
   const [resetToken, setResetToken] = useState<string>(initialResetToken);
-
+  const [signupSuccess, setSignupSuccess] = useState(false);
+  const { notification } = App.useApp();
   // Clear error when modal opens/closes
   useEffect(() => {
     if (isOpen) {
@@ -67,22 +68,37 @@ const AuthModal: React.FC<AuthModalProps> = ({
     }
   }, [initialResetToken, isOpen]);
 
-  // Close modal when authentication is successful
+  // Close modal when login is successful, but not signup
   useEffect(() => {
-    if (isAuthenticated && isOpen) {
-      message.success(t("login_success") || "Login successful!");
+    if (isAuthenticated && isOpen && !signupSuccess) {
+      notification.success({
+        message: t("login_success") || "Login successful!",
+      });
       onClose();
       loginForm.resetFields();
       signupForm.resetFields();
     }
-  }, [isAuthenticated, isOpen, onClose, loginForm, signupForm, t]);
+  }, [
+    isAuthenticated,
+    isOpen,
+    onClose,
+    loginForm,
+    signupForm,
+    t,
+    signupSuccess,
+  ]);
 
-  // Show error message
+  // Handle error display - only show once then clear to prevent duplicates
   useEffect(() => {
-    if (error) {
-      message.error(error);
+    if (error && error !== er) {
+      er = error; // Store error to prevent duplicate notifications
+      notification.error({ message: error });
+      // Clear error immediately after showing to prevent duplicate notifications
+      dispatch(clearError());
+    } else {
+      er = null;
     }
-  }, [error]);
+  }, [error, notification, dispatch]);
 
   const handleLogin = async (values: LoginRequest) => {
     try {
@@ -98,8 +114,24 @@ const AuthModal: React.FC<AuthModalProps> = ({
     try {
       // Remove confirmPassword before sending to API
       const { confirmPassword, ...signupData } = values;
+      setSignupSuccess(true); // Set flag to prevent auto-close
       await dispatch(registerAccount(signupData)).unwrap();
+
+      // Show email verification notification after successful signup
+      notification.info({
+        message: t("signup_success") || "Account Created Successfully!",
+        description:
+          t("verify_email_message") ||
+          "Please check your email and click the verification link to activate your account.",
+        duration: 6, // Show for 6 seconds
+      });
+
+      // Reset form and switch to login tab
+      signupForm.resetFields();
+      setActiveTab("login");
+      setSignupSuccess(false); // Reset flag
     } catch (error) {
+      setSignupSuccess(false); // Reset flag on error
       // Error is handled by Redux slice and useEffect above
     }
   };
@@ -108,19 +140,21 @@ const AuthModal: React.FC<AuthModalProps> = ({
     try {
       setForgotPasswordLoading(true);
       const response = await authService.forgotPassword(values.email);
-      message.success(
-        response.message ||
+      notification.success({
+        message:
+          response.message ||
           t("forgot_password_email_sent") ||
-          "Password reset instructions have been sent to your email."
-      );
+          "Password reset instructions have been sent to your email.",
+      });
       forgotPasswordForm.resetFields();
       setActiveTab("login"); // Redirect back to login
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message ||
+      notification.error({
+        message:
+          error.response?.data?.message ||
           t("forgot_password_error") ||
-          "Failed to send reset email. Please try again."
-      );
+          "Failed to send reset email. Please try again.",
+      });
     } finally {
       setForgotPasswordLoading(false);
     }
@@ -137,20 +171,22 @@ const AuthModal: React.FC<AuthModalProps> = ({
         values.newPassword,
         values.confirmPassword
       );
-      message.success(
-        response.message ||
+      notification.success({
+        message:
+          response.message ||
           t("password_reset_success") ||
-          "Password has been reset successfully. Please login with your new password."
-      );
+          "Password has been reset successfully. Please login with your new password.",
+      });
       resetPasswordForm.resetFields();
       setActiveTab("login"); // Redirect to login
       setResetToken(""); // Clear token
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message ||
+      notification.error({
+        message:
+          error.response?.data?.message ||
           t("password_reset_error") ||
-          "Failed to reset password. Please try again or request a new reset link."
-      );
+          "Failed to reset password. Please try again or request a new reset link.",
+      });
     } finally {
       setResetPasswordLoading(false);
     }
@@ -163,12 +199,16 @@ const AuthModal: React.FC<AuthModalProps> = ({
         authService.initiateGoogleAuth();
       } catch (error) {
         setGoogleLoading(false);
-        message.error("Failed to initialize Google authentication");
+        notification.error({
+          message: "Google authentication failed. Please try again.",
+        });
       }
     } else {
-      message.info(
-        `${t("login_with") || "Login with"} ${provider} - Coming soon!`
-      );
+      notification.info({
+        message: `${
+          t("login_with") || "Login with"
+        } ${provider} - Coming soon!`,
+      });
     }
   };
 
@@ -180,6 +220,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setGoogleLoading(false);
     setForgotPasswordLoading(false);
     setResetPasswordLoading(false);
+    setSignupSuccess(false); // Reset signup success flag
     dispatch(clearError());
     onClose();
   };
@@ -195,6 +236,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setGoogleLoading(false);
     setForgotPasswordLoading(false);
     setResetPasswordLoading(false);
+    setSignupSuccess(false); // Reset signup success flag
     dispatch(clearError());
   };
 

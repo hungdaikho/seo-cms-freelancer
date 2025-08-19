@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
 import {
   Card,
   Button,
   Progress,
-  Table,
+  App,
   Tag,
   Space,
   Typography,
@@ -24,30 +23,13 @@ import {
   Input,
 } from "antd";
 import {
-  CheckCircleOutlined,
   ExclamationCircleOutlined,
   CloseCircleOutlined,
   MailOutlined,
   DownloadOutlined,
-  BulbOutlined,
-  SearchOutlined,
-  BarChartOutlined,
-  LinkOutlined,
-  GlobalOutlined,
-  SafetyCertificateOutlined,
-  MobileOutlined,
-  DesktopOutlined,
   ReloadOutlined,
   PlayCircleOutlined,
   PlusOutlined,
-  TrophyOutlined,
-  RocketOutlined,
-  EyeOutlined,
-  FileTextOutlined,
-  DashboardOutlined,
-  ThunderboltOutlined,
-  UserOutlined,
-  EditOutlined,
 } from "@ant-design/icons";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import useAudit from "@/hooks/useAudit";
@@ -64,7 +46,7 @@ const OnPageAuditPage = () => {
   >(undefined);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [createProjectForm] = Form.useForm();
-  const router = useRouter();
+  const { notification } = App.useApp();
 
   // Get project ID from URL or use current project
   const {
@@ -142,7 +124,7 @@ const OnPageAuditPage = () => {
       const result = await createProject(projectData);
 
       if (result.meta.requestStatus === "fulfilled") {
-        message.success("Project created successfully!");
+        notification.success({ message: "Project created successfully!" });
         setIsCreateModalVisible(false);
         createProjectForm.resetFields();
 
@@ -154,7 +136,7 @@ const OnPageAuditPage = () => {
         fetchProjects();
       }
     } catch (error) {
-      message.error("Failed to create project");
+      notification.error({ message: "Failed to create project" });
     }
   };
 
@@ -166,7 +148,7 @@ const OnPageAuditPage = () => {
   // Handle creating new audit
   const handleCreateAudit = async () => {
     if (!projectId || !currentProject?.domain) {
-      message.error("Please select a project first");
+      notification.error({ message: "Please select a project first" });
       return;
     }
 
@@ -179,13 +161,13 @@ const OnPageAuditPage = () => {
       if (result.meta.requestStatus === "fulfilled") {
         const payload = result.payload as any;
         const auditId = payload.id;
-        message.success("Audit started successfully!");
+        notification.success({ message: "Audit started successfully!" });
 
         // Start polling for audit progress
         startAuditPolling(auditId);
       }
     } catch (error) {
-      message.error("Failed to start audit");
+      notification.error({ message: "Failed to start audit" });
     }
   };
 

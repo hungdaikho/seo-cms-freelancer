@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Steps, message, Select, Spin } from "antd";
+import { Modal, Form, Input, Button, Steps, Select, Spin, App } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/stores/store";
 import { createProject, clearErrors } from "@/stores/slices/projects.slice";
@@ -11,6 +11,7 @@ import {
   validateDomain,
   getDomainPlaceholder,
 } from "@/utils/domain-validation";
+import { useAntdMessage } from "@/hooks/useAntdUtils";
 import styles from "./CreateProjectModal.module.scss";
 
 const { Step } = Steps;
@@ -37,12 +38,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.projects);
+  const message = useAntdMessage();
 
   const [current, setCurrent] = useState(0);
   const [form] = Form.useForm();
   const [projectData, setProjectData] = useState<Partial<ProjectFormData>>({});
   const [selectedCountry, setSelectedCountry] = useState<string>("");
-
+  const { notification } = App.useApp();
   // Get sorted countries and languages
   const countries = getSortedCountries();
   const languages = getSortedLanguages();
@@ -63,7 +65,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       current === 0 &&
       Object.keys(projectData).length > 0
     ) {
-      message.success("Project created successfully!");
+      notification.success({ message: "Project created successfully!" });
       onSuccess?.();
       handleCancel();
     }
@@ -79,7 +81,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   // Handle error message
   useEffect(() => {
     if (error.createProject) {
-      message.error(error.createProject);
+      notification.error({ message: error.createProject });
     }
   }, [error.createProject]);
 
@@ -145,7 +147,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
     } catch (errorInfo) {
       console.log("Failed:", errorInfo);
       if (typeof errorInfo === "string") {
-        message.error(errorInfo);
+        notification.error({ message: errorInfo });
       }
     }
   };

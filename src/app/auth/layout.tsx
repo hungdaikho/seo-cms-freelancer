@@ -4,7 +4,7 @@ import ReduxProvider from "@/provider/redux_provider";
 import "../globals.css";
 import { useEffect } from "react";
 import suppressAntdReact19Warning from "@/utils/suppress-warnings";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, App } from "antd";
 import { antdConfig } from "@/config/antd.config";
 
 export default function AuthLayout({
@@ -27,7 +27,9 @@ export default function AuthLayout({
         }}
       >
         <ReduxProvider>
-          <ConfigProvider {...antdConfig}>{children}</ConfigProvider>
+          <ConfigProvider {...antdConfig}>
+            <App>{children}</App>
+          </ConfigProvider>
         </ReduxProvider>
       </body>
     </html>

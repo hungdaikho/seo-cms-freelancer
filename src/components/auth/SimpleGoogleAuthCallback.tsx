@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { message, Spin, Result, Button } from "antd";
+import { Spin, Result, Button, App } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
 const SimpleGoogleAuthCallback: React.FC = () => {
@@ -10,7 +10,7 @@ const SimpleGoogleAuthCallback: React.FC = () => {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const { notification } = App.useApp();
   useEffect(() => {
     const handleGoogleAuth = async () => {
       try {
@@ -27,7 +27,9 @@ const SimpleGoogleAuthCallback: React.FC = () => {
           try {
             // Đơn giản chỉ lưu token vào localStorage
             localStorage.setItem("accessToken", token);
-            message.success("Successfully logged in with Google!");
+            notification.success({
+              message: "Successfully logged in with Google!",
+            });
 
             // Redirect với delay nhỏ
             setTimeout(() => {

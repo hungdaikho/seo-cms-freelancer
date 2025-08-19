@@ -9,7 +9,7 @@ import HeaderSite from "@/components/layout/header/header.site";
 import FooterSite from "@/components/layout/footer/footer.site";
 import { useEffect } from "react";
 import suppressAntdReact19Warning from "@/utils/suppress-warnings";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, App } from "antd";
 import { antdConfig } from "@/config/antd.config";
 
 export default function RootLayout({
@@ -31,13 +31,15 @@ export default function RootLayout({
       >
         <ReduxProvider>
           <ConfigProvider {...antdConfig}>
-            <AuthGuard requireAuth={false} redirectTo="/dashboard">
-              <AdminRedirect>
-                <HeaderSite />
-                {children}
-                <FooterSite />
-              </AdminRedirect>
-            </AuthGuard>
+            <App>
+              <AuthGuard requireAuth={false} redirectTo="/dashboard">
+                <AdminRedirect>
+                  <HeaderSite />
+                  {children}
+                  <FooterSite />
+                </AdminRedirect>
+              </AuthGuard>
+            </App>
           </ConfigProvider>
         </ReduxProvider>
       </body>

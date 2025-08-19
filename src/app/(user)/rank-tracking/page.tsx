@@ -9,8 +9,8 @@
  * - Empty state when no projects
  */
 "use client";
-import React, { useState, useEffect } from "react";
-import { message, Spin, Select, Space, Typography } from "antd";
+import React, { useState, useEffect, useMemo } from "react";
+import { message, Spin, Select, Space, Typography, App } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/stores/store";
 import {
@@ -34,23 +34,30 @@ const RankTrackingPage = () => {
 
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
-
+  const { notification } = App.useApp();
   // Load projects on component mount
   useEffect(() => {
     dispatch(fetchProjectsWithStats());
   }, [dispatch]);
 
+  // Filter projects to exclude member projects
+  const ownedProjects = useMemo(() => {
+    return projects.filter(
+      (project: any) => project.relationshipType !== "member"
+    );
+  }, [projects]);
+
   // Set current project when projects are loaded
   useEffect(() => {
-    if (projects.length > 0 && !currentProject) {
-      setCurrentProject(projects[0]);
+    if (ownedProjects.length > 0 && !currentProject) {
+      setCurrentProject(ownedProjects[0]);
     }
-  }, [projects, currentProject]);
+  }, [ownedProjects, currentProject]);
 
   // Handle errors
   useEffect(() => {
     if (error.fetchProjectsWithStats) {
-      message.error(error.fetchProjectsWithStats);
+      notification.error({ message: error.fetchProjectsWithStats });
     }
   }, [error.fetchProjectsWithStats]);
   const handleProjectCreated = async () => {
@@ -81,8 +88,8 @@ const RankTrackingPage = () => {
     );
   }
 
-  // Show empty state if no projects
-  if (projects.length === 0) {
+  // Show empty state if no owned projects
+  if (ownedProjects.length === 0) {
     return (
       <>
         <EmptyProjectState
@@ -102,7 +109,7 @@ const RankTrackingPage = () => {
     return (
       <div>
         {/* Project Selector */}
-        {projects.length > 1 && (
+        {ownedProjects.length > 1 && (
           <div
             style={{
               padding: "20px 24px",
@@ -117,7 +124,7 @@ const RankTrackingPage = () => {
               <Select
                 value={currentProject.id}
                 onChange={(projectId) => {
-                  const selectedProject = projects.find(
+                  const selectedProject = ownedProjects.find(
                     (p) => p.id === projectId
                   );
                   if (selectedProject) {
@@ -127,15 +134,15 @@ const RankTrackingPage = () => {
                 style={{ minWidth: 200 }}
                 placeholder="Select a project"
               >
-                {projects.map((project) => (
+                {ownedProjects.map((project) => (
                   <Select.Option key={project.id} value={project.id}>
                     {project.name}
                   </Select.Option>
                 ))}
               </Select>
               <span style={{ color: "#666", fontSize: "14px" }}>
-                ({projects.length} project{projects.length > 1 ? "s" : ""}{" "}
-                total)
+                ({ownedProjects.length} project
+                {ownedProjects.length > 1 ? "s" : ""} total)
               </span>
             </Space>
           </div>

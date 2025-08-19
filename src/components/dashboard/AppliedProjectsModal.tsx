@@ -12,6 +12,7 @@ import {
   Tooltip,
   Card,
   Popconfirm,
+  App,
 } from "antd";
 import {
   ShareAltOutlined,
@@ -51,7 +52,7 @@ const AppliedProjectsModal: React.FC<AppliedProjectsModalProps> = ({
   const pagination = useSelector(selectAppliedProjectsPagination);
   const loading = useSelector(selectProjectsLoading);
   const error = useSelector(selectProjectsError);
-
+  const { notification } = App.useApp();
   useEffect(() => {
     if (visible) {
       dispatch(fetchAppliedProjects({ page: 1, limit: 10 }));
@@ -60,17 +61,19 @@ const AppliedProjectsModal: React.FC<AppliedProjectsModalProps> = ({
 
   useEffect(() => {
     if (error.fetchAppliedProjects) {
-      message.error(error.fetchAppliedProjects);
+      notification.error({ message: error.fetchAppliedProjects });
     }
     if (error.leaveAppliedProject) {
-      message.error(error.leaveAppliedProject);
+      notification.error({ message: error.leaveAppliedProject });
     }
   }, [error]);
 
   const handleLeaveProject = async (membership: ProjectMembership) => {
     try {
       await dispatch(leaveAppliedProject(membership.projectId)).unwrap();
-      message.success(`Successfully left project "${membership.project.name}"`);
+      notification.success({
+        message: `Successfully left project "${membership.project.name}"`,
+      });
       onLeaveSuccess?.();
       // Refresh the list
       dispatch(

@@ -15,6 +15,7 @@ import {
   Spin,
   message,
   DatePicker,
+  App,
 } from "antd";
 import {
   LineChart,
@@ -56,7 +57,7 @@ const BacklinksPage = () => {
   const [isSubdomain, setIsSubdomain] = useState(false);
   const [competitors, setCompetitors] = useState<string[]>([]);
   const [newCompetitor, setNewCompetitor] = useState("");
-
+  const { notification } = App.useApp();
   const {
     // State
     domainOverview,
@@ -92,7 +93,7 @@ const BacklinksPage = () => {
         // Initialize project analysis
         await initializeProjectAnalysis(MOCK_PROJECT_ID);
       } catch (error) {
-        message.error("Failed to load backlink data");
+        notification.error({ message: "Failed to load backlink data" });
       }
     };
 
@@ -107,7 +108,7 @@ const BacklinksPage = () => {
     try {
       await initializeDomainAnalysis(domain, isSubdomain);
     } catch (error) {
-      message.error("Failed to analyze domain");
+      notification.error({ message: "Failed to analyze domain" });
     }
   };
 
@@ -119,7 +120,7 @@ const BacklinksPage = () => {
     try {
       await initializeDomainAnalysis(selectedDomain, checked);
     } catch (error) {
-      message.error("Failed to update analysis");
+      notification.error({ message: "Failed to update analysis" });
     }
   };
 

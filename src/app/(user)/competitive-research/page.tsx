@@ -32,8 +32,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -55,11 +53,12 @@ import { getSortedCountries } from "@/utils/countries";
 import styles from "./DomainOverview.module.scss";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
-
+import { App } from "antd";
 type Props = {};
 
 const CompetitiveResearchPage = (props: Props) => {
   const dispatch = useDispatch<AppDispatch>();
+  const { notification } = App.useApp();
   const {
     domainOverview,
     domainTopKeywords,
@@ -80,7 +79,7 @@ const CompetitiveResearchPage = (props: Props) => {
   // Handle domain search
   const handleDomainSearch = async () => {
     if (!filters.domain) {
-      message.error("Please enter a domain to search");
+      notification.error({ message: "Please enter a domain to search" });
       return;
     }
 
@@ -103,16 +102,18 @@ const CompetitiveResearchPage = (props: Props) => {
         ),
         dispatch(fetchDomainAuthority(filters.domain)),
       ]);
-      message.success("Domain analysis completed successfully!");
+      notification.success({
+        message: "Domain analysis completed successfully!",
+      });
     } catch (error) {
-      message.error("Failed to analyze domain");
+      notification.error({ message: "Failed to analyze domain" });
     }
   };
 
   // Remove competitor
   const handleRemoveCompetitor = (competitor: string) => {
     dispatch(removeCompetitor(competitor));
-    message.success("Competitor removed successfully!");
+    notification.success({ message: "Competitor removed successfully!" });
   };
 
   // Handle create project

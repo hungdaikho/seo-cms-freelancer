@@ -86,7 +86,7 @@ const Page = (props: Props) => {
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
   const [modal, contextHolder] = Modal.useModal();
-
+  const { notification } = App.useApp();
   // Load projects on component mount
   useEffect(() => {
     dispatch(fetchProjectsWithStats());
@@ -95,19 +95,19 @@ const Page = (props: Props) => {
   // Handle errors and success messages
   useEffect(() => {
     if (error.fetchProjectsWithStats) {
-      message.error(error.fetchProjectsWithStats);
+      notification.error({ message: error.fetchProjectsWithStats });
     }
     if (error.createProject) {
-      message.error(error.createProject);
+      notification.error({ message: error.createProject });
     }
     if (error.updateProject) {
-      message.error(error.updateProject);
+      notification.error({ message: error.updateProject });
     }
     if (error.deleteProject) {
-      message.error(error.deleteProject);
+      notification.error({ message: error.deleteProject });
     }
     if (error.fetchProjectDetails) {
-      message.error(error.fetchProjectDetails);
+      notification.error({ message: error.fetchProjectDetails });
     }
   }, [error]);
 
@@ -169,7 +169,7 @@ const Page = (props: Props) => {
 
     try {
       await dispatch(createProject(projectData)).unwrap();
-      message.success("Project created successfully!");
+      notification.success({ message: "Project created successfully!" });
       setIsCreateModalVisible(false);
       form.resetFields();
       dispatch(fetchProjectsWithStats());
@@ -222,7 +222,7 @@ const Page = (props: Props) => {
           data: updateData,
         })
       ).unwrap();
-      message.success("Project updated successfully!");
+      notification.success({ message: "Project updated successfully!" });
       setIsEditModalVisible(false);
       editForm.resetFields();
       setSelectedProject(null);
@@ -260,7 +260,9 @@ const Page = (props: Props) => {
         try {
           console.log("Deleting project:", projectId);
           await dispatch(deleteProject(projectId)).unwrap();
-          message.success(`Project "${projectName}" deleted successfully!`);
+          notification.success({
+            message: `Project "${projectName}" deleted successfully!`,
+          });
           dispatch(fetchProjectsWithStats());
         } catch (error) {
           console.error("Delete failed:", error);

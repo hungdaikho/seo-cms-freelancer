@@ -8,7 +8,7 @@ import {
   Input,
   Tag,
   Dropdown,
-  Space,
+  App,
   Card,
   Row,
   Col,
@@ -65,7 +65,7 @@ const ManageUserPage: React.FC = () => {
   const adminDashboardState = useSelector(
     (state: RootState) => state.adminDashboard
   );
-
+  const { notification } = App.useApp();
   const {
     dashboardStats,
     dashboardStatsLoading,
@@ -183,7 +183,7 @@ const ManageUserPage: React.FC = () => {
 
   const handleUpdateUser = (userId: string, data: AdminUpdateUserData) => {
     dispatch(updateUser({ userId, data })).then(() => {
-      message.success("User updated successfully");
+      notification.success({ message: "User updated successfully" });
       dispatch(setEditUserModalVisible(false));
       dispatch(fetchUsers(usersFilters || { page: 1, limit: 10 }));
     });
@@ -199,7 +199,7 @@ const ManageUserPage: React.FC = () => {
       cancelText: "Cancel",
       onOk() {
         dispatch(deleteUser(userId)).then(() => {
-          message.success("User deleted successfully");
+          notification.success({ message: "User deleted successfully" });
           dispatch(fetchUsers(usersFilters || { page: 1, limit: 10 }));
         });
       },
@@ -208,14 +208,14 @@ const ManageUserPage: React.FC = () => {
 
   const handleActivateUser = (userId: string) => {
     dispatch(activateUser(userId)).then(() => {
-      message.success("User activated successfully");
+      notification.success({ message: "User activated successfully" });
       dispatch(fetchUsers(usersFilters || { page: 1, limit: 10 }));
     });
   };
 
   const handleDeactivateUser = (userId: string) => {
     dispatch(deactivateUser(userId)).then(() => {
-      message.success("User deactivated successfully");
+      notification.success({ message: "User deactivated successfully" });
       dispatch(fetchUsers(usersFilters || { page: 1, limit: 10 }));
     });
   };

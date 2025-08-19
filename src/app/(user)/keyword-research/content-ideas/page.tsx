@@ -11,6 +11,7 @@ import {
   Alert,
   Spin,
   Tooltip,
+  App,
 } from "antd";
 import {
   SearchOutlined,
@@ -38,7 +39,7 @@ const ContentIdeasPage = (props: Props) => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("English/Nigeria");
   const [isExporting, setIsExporting] = useState(false);
-
+  const { notification } = App.useApp();
   // Redux hooks
   const {
     contentIdeas,
@@ -100,7 +101,7 @@ const ContentIdeasPage = (props: Props) => {
     async (keyword?: string) => {
       const searchTerm = keyword || searchKeyword;
       if (!searchTerm.trim()) {
-        message.warning("Please enter a keyword to search");
+        notification.warning({ message: "Please enter a keyword to search" });
         return;
       }
 
@@ -109,12 +110,16 @@ const ContentIdeasPage = (props: Props) => {
         const result = await search(searchTerm, { country, limit: 50 });
 
         if (result.success) {
-          message.success(`Found content ideas for "${searchTerm}"`);
+          notification.success({
+            message: `Found content ideas for "${searchTerm}"`,
+          });
         } else {
-          message.error(result.error || "Failed to search content ideas");
+          notification.error({
+            message: result.error || "Failed to search content ideas",
+          });
         }
       } catch (error: any) {
-        message.error("An error occurred while searching");
+        notification.error({ message: "An error occurred while searching" });
       }
     },
     [searchKeyword, selectedLanguage, search]
@@ -144,7 +149,7 @@ const ContentIdeasPage = (props: Props) => {
             : contentIdeas;
 
           if (!dataToExport || dataToExport.length === 0) {
-            message.warning("No data to export");
+            notification.warning({ message: "No data to export" });
             return;
           }
 
@@ -191,13 +196,13 @@ const ContentIdeasPage = (props: Props) => {
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
 
-          message.success(
-            `Exported ${dataToExport.length} content ideas to CSV`
-          );
+          notification.success({
+            message: `Exported ${dataToExport.length} content ideas to CSV`,
+          });
         } catch (error: any) {
-          message.error(
-            `Failed to export: ${error.message || "Unknown error"}`
-          );
+          notification.error({
+            message: `Failed to export: ${error.message || "Unknown error"}`,
+          });
         } finally {
           setIsExporting(false);
         }

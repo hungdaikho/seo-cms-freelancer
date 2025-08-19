@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Modal, Form, Input, Select, Switch, Button, message } from "antd";
+import { Modal, Form, Input, Select, Switch, Button, message, App } from "antd";
 import { AdminUser, AdminUpdateUserData } from "@/types/admin.type";
 
 const { Option } = Select;
@@ -20,7 +20,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   onSubmit,
 }) => {
   const [form] = Form.useForm();
-
+  const { notification } = App.useApp();
   useEffect(() => {
     if (user && visible) {
       form.setFieldsValue({
@@ -39,7 +39,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       const values = await form.validateFields();
       if (user) {
         onSubmit(user.id, values);
-        message.success("User updated successfully");
+        notification.success({ message: "User updated successfully" });
         onClose();
       }
     } catch (error) {

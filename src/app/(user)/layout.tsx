@@ -12,7 +12,6 @@ import SiderDashBoard from "@/components/layout/dashboard/sider/sider.dashboard"
 import { useEffect } from "react";
 import suppressAntdReact19Warning from "@/utils/suppress-warnings";
 import { antdConfig } from "@/config/antd.config";
-import { useAuth } from "@/hooks/useAuth";
 
 export default function RootLayout({
   children,
