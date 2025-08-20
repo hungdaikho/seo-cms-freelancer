@@ -3,7 +3,14 @@ import "../../config/i18n";
 import ReduxProvider from "@/provider/redux_provider";
 import AuthGuard from "@/components/layout/auth_guard";
 import "../globals.css";
+import { IBM_Plex_Mono } from "next/font/google";
 import { useTranslation } from "react-i18next";
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  variable: "--font-ibm-plex-mono",
+});
 import { Content, Header, Footer } from "antd/es/layout/layout";
 import { Layout, ConfigProvider, App } from "antd";
 import Sider from "antd/es/layout/Sider";
@@ -33,9 +40,9 @@ export default function RootLayout({
   return (
     <html lang={i18n.language}>
       <body
+        className={`${ibmPlexMono.variable} font-mono`}
         style={{
           fontSize: "16px",
-          fontFamily: "inherit",
           background:
             "linear-gradient(135deg, #f8f9ff 0%, rgba(255, 145, 77, 0.05) 100%)",
           color: "#000",

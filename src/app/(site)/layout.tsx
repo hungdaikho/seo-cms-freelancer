@@ -4,7 +4,14 @@ import ReduxProvider from "@/provider/redux_provider";
 import AuthGuard from "@/components/layout/auth_guard";
 import AdminRedirect from "@/components/auth/AdminRedirect";
 import "../globals.css";
+import { IBM_Plex_Mono } from "next/font/google";
 import { useTranslation } from "react-i18next";
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  variable: "--font-ibm-plex-mono",
+});
 import HeaderSite from "@/components/layout/header/header.site";
 import FooterSite from "@/components/layout/footer/footer.site";
 import { useEffect } from "react";
@@ -27,7 +34,8 @@ export default function RootLayout({
   return (
     <html lang={i18n.language}>
       <body
-        style={{ fontSize: "16px", fontFamily: "inherit", background: "#000" }}
+        className={`${ibmPlexMono.variable} font-mono`}
+        style={{ fontSize: "16px", background: "#000" }}
       >
         <ReduxProvider>
           <ConfigProvider {...antdConfig}>

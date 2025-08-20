@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/* Font Variables */
+:root {
+  --font-ibm-plex-mono: 'IBM Plex Mono', monospace;
+}
+
+/* Global Font Application */
+* {
+  font-family: var(--font-ibm-plex-mono) !important;
+}
+
+html, body {
+  font-family: var(--font-ibm-plex-mono) !important;
+}
+
 :root {
   /* Brand Colors */
   --primary-blue: #004AAC;
